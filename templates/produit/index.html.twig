@@ -1,0 +1,362 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produits{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4">
+
+```
+{# En-tête #}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="fw-bold mb-1">
+            <i class="bi bi-box-seam me-2"></i>Produits
+        </h1>
+        <p class="text-muted mb-0">
+            Gestion de votre catalogue et de votre stock
+        </p>
+    </div>
+
+    <a href="{{ path('app_produit_new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>
+        Nouveau produit
+    </a>
+</div>
+
+{# Messages flash #}
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+{% endfor %}
+
+{# Statistiques #}
+{% set totalProduits = produits|length %}
+{% set produitsActifs = 0 %}
+{% set produitsAlerte = 0 %}
+{% set stockTotal = 0 %}
+
+{% for produit in produits %}
+    {% if produit.actif %}
+        {% set produitsActifs = produitsActifs + 1 %}
+    {% endif %}
+
+    {% if produit.quantiteStock <= produit.seuilAlerte %}
+        {% set produitsAlerte = produitsAlerte + 1 %}
+    {% endif %}
+
+    {% set stockTotal = stockTotal + produit.quantiteStock %}
+{% endfor %}
+
+<div class="row g-3 mb-4">
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-3 bg-primary bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-box-seam text-primary fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Total produits</div>
+                    <div class="fs-3 fw-bold">{{ totalProduits }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-3 bg-success bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-check-circle text-success fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Produits actifs</div>
+                    <div class="fs-3 fw-bold">{{ produitsActifs }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-3 bg-warning bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-exclamation-triangle text-warning fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Stock en alerte</div>
+                    <div class="fs-3 fw-bold">{{ produitsAlerte }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-3 bg-info bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-stack text-info fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Articles en stock</div>
+                    <div class="fs-3 fw-bold">{{ stockTotal }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# Tableau #}
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-white border-0 py-3">
+        <div class="row g-2 align-items-center">
+
+            <div class="col-12 col-lg-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input
+                        type="text"
+                        id="productSearch"
+                        class="form-control"
+                        placeholder="Rechercher un produit, une référence..."
+                    >
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <select id="statusFilter" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    <option value="actif">Actifs</option>
+                    <option value="inactif">Inactifs</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-lg-3 text-lg-end">
+                <span class="text-muted small">
+                    {{ totalProduits }} produit(s)
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="productsTable">
+
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Produit</th>
+                    <th>Référence</th>
+                    <th>Catégorie</th>
+                    <th>Prix achat</th>
+                    <th>Prix vente</th>
+                    <th>Stock</th>
+                    <th>Statut</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for produit in produits %}
+
+                <tr
+                    data-status="{{ produit.actif ? 'actif' : 'inactif' }}"
+                    data-search="{{ (produit.nom ~ ' ' ~ produit.reference)|lower }}"
+                >
+
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center">
+
+                            <div class="rounded-3 bg-primary bg-opacity-10 p-2 me-3">
+                                <i class="bi bi-box text-primary"></i>
+                            </div>
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ produit.nom }}
+                                </div>
+
+                                {% if produit.description %}
+                                    <div class="text-muted small text-truncate" style="max-width: 220px;">
+                                        {{ produit.description }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="badge text-bg-light border">
+                            {{ produit.reference }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if produit.categorie %}
+                            {{ produit.categorie.nom }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ produit.prixAchat|number_format(2, ',', ' ') }}
+                    </td>
+
+                    <td class="fw-semibold">
+                        {{ produit.prixVente|number_format(2, ',', ' ') }}
+                    </td>
+
+                    <td>
+                        {% if produit.quantiteStock <= produit.seuilAlerte %}
+                            <span class="badge text-bg-danger">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ produit.quantiteStock }} {{ produit.unite }}
+                            </span>
+                        {% elseif produit.quantiteStock <= produit.seuilAlerte * 2 %}
+                            <span class="badge text-bg-warning">
+                                {{ produit.quantiteStock }} {{ produit.unite }}
+                            </span>
+                        {% else %}
+                            <span class="badge text-bg-success">
+                                {{ produit.quantiteStock }} {{ produit.unite }}
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if produit.actif %}
+                            <span class="badge text-bg-success">
+                                Actif
+                            </span>
+                        {% else %}
+                            <span class="badge text-bg-secondary">
+                                Inactif
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td class="text-end pe-4">
+                        <div class="btn-group">
+
+                            <a
+                                href="{{ path('app_produit_show', {'id': produit.id}) }}"
+                                class="btn btn-sm btn-outline-secondary"
+                                title="Voir"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            <a
+                                href="{{ path('app_produit_edit', {'id': produit.id}) }}"
+                                class="btn btn-sm btn-outline-primary"
+                                title="Modifier"
+                            >
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            <form
+                                method="post"
+                                action="{{ path('app_produit_delete', {'id': produit.id}) }}"
+                                onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');"
+                                class="d-inline"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value="{{ csrf_token('delete' ~ produit.id) }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Supprimer"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+
+                        <div class="mb-3">
+                            <i class="bi bi-box-seam text-muted" style="font-size: 3rem;"></i>
+                        </div>
+
+                        <h5>Aucun produit</h5>
+
+                        <p class="text-muted">
+                            Votre catalogue ne contient encore aucun produit.
+                        </p>
+
+                        <a href="{{ path('app_produit_new') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Ajouter le premier produit
+                        </a>
+
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+```
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const searchInput = document.getElementById('productSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const rows = document.querySelectorAll('#productsTable tbody tr[data-status]');
+
+    function filterProducts() {
+
+        const search = searchInput.value.toLowerCase().trim();
+        const status = statusFilter.value;
+
+        rows.forEach(function (row) {
+
+            const rowSearch = row.dataset.search || '';
+            const rowStatus = row.dataset.status || '';
+
+            const matchesSearch = rowSearch.includes(search);
+            const matchesStatus = !status || rowStatus === status;
+
+            row.style.display =
+                matchesSearch && matchesStatus
+                    ? ''
+                    : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterProducts);
+    statusFilter.addEventListener('change', filterProducts);
+
+});
+</script>
+
+{% endblock %}

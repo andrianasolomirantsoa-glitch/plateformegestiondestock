@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <h1 class="h3 fw-bold">Tableau de bord</h1>
+        <p class="text-muted mb-0">
+            Bienvenue dans votre système de gestion de stock.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Produits</h6>
+                    <h2 class="fw-bold">—</h2>
+                    <a href="{{ path('app_produit_index') }}"
+                       class="btn btn-primary btn-sm">
+                        Voir les produits
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Catégories</h6>
+                    <h2 class="fw-bold">—</h2>
+                    <span class="text-muted small">
+                        Module en préparation
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Entrées de stock</h6>
+                    <h2 class="fw-bold">—</h2>
+                    <span class="text-muted small">
+                        Module en préparation
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Sorties de stock</h6>
+                    <h2 class="fw-bold">—</h2>
+                    <span class="text-muted small">
+                        Module en préparation
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
