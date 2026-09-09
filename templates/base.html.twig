@@ -12,66 +12,147 @@
     <title>
         {% block title %}Gestion de Stock{% endblock %}
     </title>
-<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    {# CSS personnel #}
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    {# Bootstrap #}
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
+    {# Bootstrap Icons #}
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
         rel="stylesheet"
     >
 
     <style>
+
+        /* =========================================================
+           GLOBAL
+           ========================================================= */
+
         body {
+            margin: 0;
             background: #f5f7fb;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #172033;
         }
 
-        .sidebar {
-            min-height: 100vh;
+        /* =========================================================
+           NAVBAR PRINCIPALE
+           ========================================================= */
+
+        .main-navbar {
             background: #172033;
+            min-height: 70px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
         }
 
-        .sidebar .brand {
+        .navbar-container {
+            width: 100%;
+            padding: 0 25px;
+        }
+
+        /* Logo */
+
+        .brand {
+            color: white;
             font-size: 21px;
-            font-weight: bold;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .brand:hover {
             color: white;
         }
 
-        .sidebar .nav-link {
+        .brand-icon {
+            font-size: 25px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* =========================================================
+           MENU
+           ========================================================= */
+
+        .main-menu {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 30px;
+        }
+
+        .main-menu .nav-link {
             color: #b9c1d0;
-            padding: 12px 15px;
+            padding: 10px 13px;
             border-radius: 8px;
-            margin-bottom: 5px;
-            transition: .2s;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
-        .sidebar .nav-link:hover {
-            background: #263653;
+        .main-menu .nav-link i {
+            margin-right: 5px;
+        }
+
+        .main-menu .nav-link:hover {
             color: white;
-        }
-
-        .sidebar .nav-link.active {
             background: #263653;
-            color: white;
         }
 
-        .sidebar .nav-link.disabled {
+        .main-menu .nav-link.active {
+            color: white;
+            background: #34466b;
+        }
+
+        .main-menu .nav-link.disabled {
             color: #697386;
             cursor: not-allowed;
-            opacity: .7;
+            opacity: 0.6;
         }
 
-        .topbar {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 15px 25px;
+        /* =========================================================
+           UTILISATEUR
+           ========================================================= */
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            gap: 12px;
         }
+
+        .user-info {
+            color: #dce2ec;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .user-info i {
+            font-size: 18px;
+            margin-right: 5px;
+        }
+
+        .logout-btn {
+            border-radius: 8px;
+            font-size: 13px;
+            padding: 7px 12px;
+        }
+
+        /* =========================================================
+           CONTENU
+           ========================================================= */
 
         .content {
-            padding: 25px;
+            padding: 30px;
+            max-width: 1600px;
+            margin: auto;
         }
 
         .page-title {
@@ -79,15 +160,27 @@
             color: #172033;
         }
 
+        /* =========================================================
+           CARDS
+           ========================================================= */
+
         .card {
             border: 0;
             border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
         }
+
+        /* =========================================================
+           TABLEAUX
+           ========================================================= */
 
         .table th {
             white-space: nowrap;
         }
+
+        /* =========================================================
+           BADGES STOCK
+           ========================================================= */
 
         .badge-stock-normal {
             background: #d1fae5;
@@ -104,49 +197,147 @@
             color: #991b1b;
         }
 
-        @media (max-width: 767px) {
-            .sidebar {
-                min-height: auto;
+        /* =========================================================
+           BOUTON MENU MOBILE
+           ========================================================= */
+
+        .mobile-menu-btn {
+            color: white;
+            border: 1px solid #4a5872;
+        }
+
+        .mobile-menu-btn:hover {
+            background: #263653;
+            color: white;
+        }
+
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+        @media (max-width: 1199px) {
+
+            .main-menu {
+                margin-left: 10px;
             }
+
+            .main-menu .nav-link {
+                padding: 9px 9px;
+                font-size: 13px;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 991px) {
+
+            .navbar-container {
+                padding: 0 15px;
+            }
+
+            .main-menu {
+                margin-left: 0;
+                padding: 15px 0;
+            }
+
+            .main-menu .nav-link {
+                margin-bottom: 4px;
+            }
+
+            .user-section {
+                margin-left: 0;
+                padding-bottom: 15px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 575px) {
 
             .content {
                 padding: 15px;
             }
 
-            .topbar {
-                padding: 15px;
+            .brand {
+                font-size: 18px;
+            }
+
+            .brand-icon {
+                font-size: 21px;
             }
         }
+
     </style>
 
     {% block stylesheets %}{% endblock %}
 </head>
 
+
 <body>
 
-<div class="container-fluid">
-    <div class="row">
+{# ==============================================================
+   MENU HORIZONTAL
+   ============================================================== #}
+
+<nav class="navbar navbar-expand-lg main-navbar">
+
+    <div class="navbar-container">
+
+        <div class="d-flex align-items-center">
+
+            {# LOGO #}
+
+            <a
+                href="{{ path('app_dashboard') }}"
+                class="brand"
+            >
+                <i class="bi bi-box-seam brand-icon"></i>
+                Gestion Stock
+            </a>
+
+
+            {# BOUTON MOBILE #}
+
+            <button
+                class="navbar-toggler mobile-menu-btn ms-auto"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainMenu"
+                aria-controls="mainMenu"
+                aria-expanded="false"
+                aria-label="Ouvrir le menu"
+            >
+                <i class="bi bi-list fs-4"></i>
+            </button>
+
+        </div>
+
 
         {# ==========================================================
-           SIDEBAR
+           MENU
            ========================================================== #}
 
-        <aside class="col-md-3 col-lg-2 p-3 sidebar">
+        <div
+            class="collapse navbar-collapse"
+            id="mainMenu"
+        >
 
-            <div class="brand mb-4">
-                <i class="bi bi-box-seam"></i>
-                Gestion Stock
-            </div>
+            <div class="main-menu">
 
-            <nav class="nav flex-column">
-
-                {# DASHBOARD #}
+                {# TABLEAU DE BORD #}
 
                 <a
                     href="{{ path('app_dashboard') }}"
-                    class="nav-link {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}"
+                    class="nav-link
+                    {% if app.request.attributes.get('_route') == 'app_dashboard' %}
+                        active
+                    {% endif %}"
                 >
-                    <i class="bi bi-speedometer2 me-2"></i>
+                    <i class="bi bi-speedometer2"></i>
                     Tableau de bord
                 </a>
 
@@ -155,16 +346,17 @@
 
                 <a
                     href="{{ path('app_produit_index') }}"
-                    class="nav-link {% if app.request.attributes.get('_route') starts with 'app_produit_' %}active{% endif %}"
+                    class="nav-link
+                    {% if app.request.attributes.get('_route') starts with 'app_produit_' %}
+                        active
+                    {% endif %}"
                 >
-                    <i class="bi bi-box me-2"></i>
+                    <i class="bi bi-box"></i>
                     Produits
                 </a>
 
 
-                {# CATEGORIES
-                   Route pas encore créée
-                #}
+                {# CATEGORIES #}
 
                 <a
                     href="#"
@@ -172,7 +364,7 @@
                     onclick="return false;"
                     title="Module en préparation"
                 >
-                    <i class="bi bi-tags me-2"></i>
+                    <i class="bi bi-tags"></i>
                     Catégories
                 </a>
 
@@ -185,8 +377,8 @@
                     onclick="return false;"
                     title="Module en préparation"
                 >
-                    <i class="bi bi-arrow-down-circle me-2"></i>
-                    Entrées de stock
+                    <i class="bi bi-arrow-down-circle"></i>
+                    Entrées
                 </a>
 
 
@@ -198,8 +390,8 @@
                     onclick="return false;"
                     title="Module en préparation"
                 >
-                    <i class="bi bi-arrow-up-circle me-2"></i>
-                    Sorties de stock
+                    <i class="bi bi-arrow-up-circle"></i>
+                    Sorties
                 </a>
 
 
@@ -211,7 +403,7 @@
                     onclick="return false;"
                     title="Module en préparation"
                 >
-                    <i class="bi bi-people me-2"></i>
+                    <i class="bi bi-people"></i>
                     Clients
                 </a>
 
@@ -224,12 +416,9 @@
                     onclick="return false;"
                     title="Module en préparation"
                 >
-                    <i class="bi bi-truck me-2"></i>
+                    <i class="bi bi-truck"></i>
                     Fournisseurs
                 </a>
-
-
-                <hr class="text-secondary">
 
 
                 {# UTILISATEURS #}
@@ -240,101 +429,112 @@
                     onclick="return false;"
                     title="Module en préparation"
                 >
-                    <i class="bi bi-person me-2"></i>
+                    <i class="bi bi-person"></i>
                     Utilisateurs
                 </a>
 
-            </nav>
-
-        </aside>
+            </div>
 
 
-        {# ==========================================================
-           CONTENU PRINCIPAL
-           ========================================================== #}
+            {# ======================================================
+               UTILISATEUR / DECONNEXION
+               ====================================================== #}
 
-        <main class="col-md-9 col-lg-10 p-0">
+            <div class="user-section">
 
-            {# TOPBAR #}
+                {% if app.user %}
 
-            <header class="topbar d-flex justify-content-between align-items-center">
+                    <span class="user-info">
 
-                <div>
-                    <strong>
-                        {% block header_title %}
-                            Gestion de Stock
-                        {% endblock %}
-                    </strong>
-                </div>
+                        <i class="bi bi-person-circle"></i>
 
-                <div>
+                        {{ app.user.prenom }}
+                        {{ app.user.nom }}
 
-                    {% if app.user %}
-
-                        <span class="me-3">
-                            <i class="bi bi-person-circle"></i>
-                            {{ app.user.email }}
-                        </span>
-
-                        <a
-                            href="{{ path('app_logout') }}"
-                            class="btn btn-outline-danger btn-sm"
-                        >
-                            <i class="bi bi-box-arrow-right"></i>
-                            Déconnexion
-                        </a>
-
-                    {% endif %}
-
-                </div>
-
-            </header>
+                    </span>
 
 
-            {# CONTENU #}
+                    <a
+                        href="{{ path('app_logout') }}"
+                        class="btn btn-outline-danger logout-btn"
+                    >
+                        <i class="bi bi-box-arrow-right"></i>
+                        Déconnexion
+                    </a>
 
-            <div class="content">
-
-                {# MESSAGES FLASH #}
-
-                {% for label, messages in app.flashes %}
-
-                    {% for message in messages %}
-
-                        <div
-                            class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show"
-                            role="alert"
-                        >
-
-                            {{ message }}
-
-                            <button
-                                type="button"
-                                class="btn-close"
-                                data-bs-dismiss="alert"
-                                aria-label="Fermer"
-                            ></button>
-
-                        </div>
-
-                    {% endfor %}
-
-                {% endfor %}
-
-
-                {# PAGE #}
-
-                {% block body %}{% endblock %}
+                {% endif %}
 
             </div>
 
-        </main>
+        </div>
 
     </div>
-</div>
+
+</nav>
 
 
-{# BOOTSTRAP JS #}
+{# ==============================================================
+   CONTENU PRINCIPAL
+   ============================================================== #}
+
+<main>
+
+    <div class="content">
+
+        {# ==========================================================
+           MESSAGES FLASH
+           ========================================================== #}
+
+        {% for label, messages in app.flashes %}
+
+            {% for message in messages %}
+
+                <div
+                    class="alert
+                    alert-{{ label == 'error' ? 'danger' : label }}
+                    alert-dismissible
+                    fade
+                    show"
+                    role="alert"
+                >
+
+                    {{ message }}
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Fermer"
+                    ></button>
+
+                </div>
+
+            {% endfor %}
+
+        {% endfor %}
+
+
+        {# ==========================================================
+           TITRE DE LA PAGE
+           ========================================================== #}
+
+        {% block header_title %}{% endblock %}
+
+
+        {# ==========================================================
+           CONTENU DE LA PAGE
+           ========================================================== #}
+
+        {% block body %}{% endblock %}
+
+    </div>
+
+</main>
+
+
+{# ==============================================================
+   BOOTSTRAP JS
+   ============================================================== #}
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -344,5 +544,5 @@
 {% block javascripts %}{% endblock %}
 
 </body>
-</html>
 
+</html>

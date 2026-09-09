@@ -1,0 +1,1179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Tableau de bord - Gestion de Stock
+{% endblock %}
+
+{% block header_title %}
+    <div class="mb-4">
+        <h1 class="page-title mb-1">
+            Tableau de bord
+        </h1>
+
+        <p class="text-muted mb-0">
+            Vue d'ensemble de votre gestion de stock
+        </p>
+    </div>
+{% endblock %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+
+        /* =========================================================
+           VARIABLES
+           ========================================================= */
+
+        :root {
+            --brown-900: #4a2c1a;
+            --brown-800: #5c3d2a;
+            --brown-700: #7a5238;
+            --brown-600: #8b6b4f;
+            --brown-500: #a8876b;
+            --brown-400: #c4a68a;
+            --brown-300: #dec9b8;
+            --brown-200: #ede0d6;
+            --brown-100: #f5ede7;
+            --brown-50: #faf6f2;
+
+            --text-dark: #2d1a0e;
+            --text-gray: #7a6b5f;
+
+            --white: #ffffff;
+
+            --shadow-sm:
+                0 2px 8px rgba(74, 44, 26, 0.06);
+
+            --shadow-md:
+                0 6px 20px rgba(74, 44, 26, 0.10);
+
+            --shadow-lg:
+                0 12px 35px rgba(74, 44, 26, 0.13);
+
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+
+            --transition:
+                all 0.25s ease;
+        }
+
+
+        /* =========================================================
+           PAGE
+           ========================================================= */
+
+        .dashboard-page {
+            width: 100%;
+        }
+
+
+        /* =========================================================
+           WELCOME
+           ========================================================= */
+
+        .welcome-banner {
+            position: relative;
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--brown-900),
+                    var(--brown-700)
+                );
+
+            color: white;
+
+            border-radius: var(--radius-xl);
+
+            padding: 38px 42px;
+
+            margin-bottom: 28px;
+
+            box-shadow: var(--shadow-lg);
+        }
+
+
+        .welcome-banner::before {
+            content: "";
+
+            position: absolute;
+
+            width: 250px;
+            height: 250px;
+
+            right: -80px;
+            top: -100px;
+
+            border-radius: 50%;
+
+            background: rgba(255,255,255,0.06);
+        }
+
+
+        .welcome-banner::after {
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            left: 35%;
+            bottom: -130px;
+
+            border-radius: 50%;
+
+            background: rgba(255,255,255,0.04);
+        }
+
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+        }
+
+
+        .welcome-label {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            color: var(--brown-300);
+
+            font-size: 14px;
+            font-weight: 500;
+
+            margin-bottom: 8px;
+        }
+
+
+        .welcome-banner h2 {
+            font-size: 32px;
+            font-weight: 700;
+
+            margin: 0 0 10px;
+
+            letter-spacing: -0.5px;
+        }
+
+
+        .welcome-banner p {
+            max-width: 650px;
+
+            margin: 0;
+
+            color: var(--brown-200);
+
+            font-size: 15px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================================================
+           STATISTIQUES
+           ========================================================= */
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 18px;
+
+            margin-bottom: 32px;
+        }
+
+
+        .stat-card {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+
+            gap: 16px;
+
+            background: var(--white);
+
+            border: 1px solid var(--brown-200);
+
+            border-radius: var(--radius-lg);
+
+            padding: 22px;
+
+            transition: var(--transition);
+        }
+
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+
+            box-shadow: var(--shadow-lg);
+
+            border-color: var(--brown-300);
+        }
+
+
+        .stat-card::before {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            top: 15px;
+            bottom: 15px;
+
+            width: 3px;
+
+            border-radius: 0 5px 5px 0;
+
+            background: var(--brown-700);
+
+            opacity: 0;
+
+            transition: var(--transition);
+        }
+
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+
+        /* =========================================================
+           ICONES STATISTIQUES
+           ========================================================= */
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: var(--radius-md);
+
+            font-size: 23px;
+        }
+
+
+        .stat-icon.products {
+            background: var(--brown-100);
+            color: var(--brown-800);
+        }
+
+
+        .stat-icon.stock {
+            background: #f3eee9;
+            color: var(--brown-700);
+        }
+
+
+        .stat-icon.alert {
+            background: #fff4df;
+            color: #9a6717;
+        }
+
+
+        .stat-icon.users {
+            background: #eee8e3;
+            color: var(--brown-900);
+        }
+
+
+        /* =========================================================
+           INFORMATIONS STAT
+           ========================================================= */
+
+        .stat-info {
+            min-width: 0;
+        }
+
+
+        .stat-label {
+            color: var(--text-gray);
+
+            font-size: 13px;
+            font-weight: 500;
+
+            margin: 0 0 4px;
+        }
+
+
+        .stat-value {
+            color: var(--text-dark);
+
+            font-size: 27px;
+            font-weight: 700;
+
+            margin: 0 0 5px;
+        }
+
+
+        .stat-description {
+            color: var(--text-gray);
+
+            font-size: 11px;
+        }
+
+
+        /* =========================================================
+           SECTIONS
+           ========================================================= */
+
+        .section-header {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 18px;
+        }
+
+
+        .section-title {
+            margin: 0;
+
+            color: ;
+
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+
+        .section-title i {
+            color: var(--brown-700);
+
+            margin-right: 8px;
+        }
+
+
+        .section-description {
+            margin: 5px 0 0;
+
+            color: var(--text-gray);
+
+            font-size: 13px;
+        }
+
+
+        /* =========================================================
+           ACTIONS RAPIDES
+           ========================================================= */
+
+        .actions-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 16px;
+
+            margin-bottom: 32px;
+        }
+
+
+        .action-card {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+
+            min-height: 190px;
+
+            padding: 22px;
+
+            background: var(--white);
+
+            border: 1px solid var(--brown-200);
+
+            border-radius: var(--radius-lg);
+
+            text-decoration: none;
+
+            color: var(--text-dark);
+
+            transition: var(--transition);
+        }
+
+
+        .action-card:hover {
+            transform: translateY(-5px);
+
+            box-shadow: var(--shadow-lg);
+
+            border-color: var(--brown-300);
+
+            color: var(--text-dark);
+        }
+
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--brown-100);
+
+            color: var(--brown-700);
+
+            border-radius: var(--radius-md);
+
+            font-size: 21px;
+
+            margin-bottom: 15px;
+
+            transition: var(--transition);
+        }
+
+
+        .action-card:hover .action-icon {
+            background: var(--brown-800);
+
+            color: white;
+
+            transform: scale(1.05);
+        }
+
+
+        .action-card h3 {
+            margin: 0 0 7px;
+
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+
+        .action-card p {
+            margin: 0;
+
+            color: var(--text-gray);
+
+            font-size: 13px;
+
+            line-height: 1.5;
+        }
+
+
+        .action-arrow {
+            margin-top: auto;
+
+            padding-top: 15px;
+
+            color: var(--brown-600);
+
+            font-size: 17px;
+
+            transition: var(--transition);
+        }
+
+
+        .action-card:hover .action-arrow {
+            transform: translateX(5px);
+
+            color: var(--brown-800);
+        }
+
+
+        /* =========================================================
+           ACTIVITE / INFORMATION
+           ========================================================= */
+
+        .dashboard-bottom {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .dashboard-card {
+            background: var(--white);
+
+            border: 1px solid var(--brown-200);
+
+            border-radius: var(--radius-lg);
+
+            padding: 24px;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+
+        .dashboard-card-header {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+        }
+
+
+        .dashboard-card-title {
+            margin: 0;
+
+            font-size: 17px;
+
+            font-weight: 650;
+
+            color: var(--text-dark);
+        }
+
+
+        .dashboard-card-title i {
+            color: var(--brown-700);
+
+            margin-right: 7px;
+        }
+
+
+        /* =========================================================
+           LISTE ACTIVITES
+           ========================================================= */
+
+        .activity-item {
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            padding: 12px 0;
+
+            border-bottom: 1px solid var(--brown-100);
+        }
+
+
+        .activity-item:last-child {
+            border-bottom: 0;
+        }
+
+
+        .activity-icon {
+            width: 38px;
+            height: 38px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background: var(--brown-100);
+
+            color: var(--brown-700);
+        }
+
+
+        .activity-text {
+            flex: 1;
+        }
+
+
+        .activity-text strong {
+            display: block;
+
+            font-size: 13px;
+
+            color: var(--text-dark);
+        }
+
+
+        .activity-text span {
+            display: block;
+
+            margin-top: 2px;
+
+            font-size: 11px;
+
+            color: var(--text-gray);
+        }
+
+
+        /* =========================================================
+           CONSEIL
+           ========================================================= */
+
+        .advice-card {
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--brown-50),
+                    white
+                );
+
+            border: 1px solid var(--brown-200);
+
+            border-radius: var(--radius-lg);
+
+            padding: 22px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .advice-icon {
+            width: 46px;
+            height: 46px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--brown-800);
+
+            color: white;
+
+            border-radius: var(--radius-md);
+
+            font-size: 20px;
+        }
+
+
+        .advice-content h3 {
+            margin: 0 0 5px;
+
+            color: var(--text-dark);
+
+            font-size: 15px;
+            font-weight: 650;
+        }
+
+
+        .advice-content p {
+            margin: 0;
+
+            color: var(--text-gray);
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+        @media (max-width: 1200px) {
+
+            .stats-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .actions-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+        }
+
+
+        @media (max-width: 900px) {
+
+            .dashboard-bottom {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-banner {
+                padding: 30px;
+            }
+
+            .welcome-banner h2 {
+                font-size: 27px;
+            }
+        }
+
+
+        @media (max-width: 650px) {
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-banner {
+                padding: 25px 20px;
+            }
+
+            .welcome-banner h2 {
+                font-size: 23px;
+            }
+
+            .welcome-banner p {
+                font-size: 13px;
+            }
+
+            .section-header {
+                align-items: flex-start;
+            }
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block body %}
+
+<div class="dashboard-page">
+
+    {# =========================================================
+       BIENVENUE
+       ========================================================= #}
+
+   
+
+
+    {# =========================================================
+       STATISTIQUES
+       ========================================================= #}
+
+    <section class="stats-grid">
+
+        {# PRODUITS #}
+
+        <div class="stat-card">
+
+            <div class="stat-icon products">
+                <i class="bi bi-boxes"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <p class="stat-label">
+                    Produits
+                </p>
+
+                <h3 class="stat-value">
+                    1 284
+                </h3>
+
+                <span class="stat-description">
+                    Produits enregistrés
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {# STOCK #}
+
+        <div class="stat-card">
+
+            <div class="stat-icon stock">
+                <i class="bi bi-box-seam"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <p class="stat-label">
+                    Stock total
+                </p>
+
+                <h3 class="stat-value">
+                    3 421
+                </h3>
+
+                <span class="stat-description">
+                    Articles disponibles
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {# ALERTES #}
+
+        <div class="stat-card">
+
+            <div class="stat-icon alert">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <p class="stat-label">
+                    Stock faible
+                </p>
+
+                <h3 class="stat-value">
+                    23
+                </h3>
+
+                <span class="stat-description">
+                    Produits à surveiller
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {# UTILISATEURS #}
+
+        <div class="stat-card">
+
+            <div class="stat-icon users">
+                <i class="bi bi-people"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <p class="stat-label">
+                    Utilisateurs
+                </p>
+
+                <h3 class="stat-value">
+                    18
+                </h3>
+
+                <span class="stat-description">
+                    Utilisateurs actifs
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    {# =========================================================
+       ACTIONS RAPIDES
+       ========================================================= #}
+
+    <section>
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    Actions rapides
+                </h2>
+
+                <p class="section-description">
+                    Accédez rapidement aux principales fonctions.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="actions-grid">
+
+            {# AJOUTER PRODUIT #}
+
+            <a
+                href="{{ path('app_produit_new') }}"
+                class="action-card"
+            >
+
+                <div class="action-icon">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+
+                <h3>
+                    Ajouter un produit
+                </h3>
+
+                <p>
+                    Enregistrer un nouveau produit dans votre stock.
+                </p>
+
+                <span class="action-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+
+            </a>
+
+
+            {# LISTE PRODUITS #}
+
+            <a
+                href="{{ path('app_produit_index') }}"
+                class="action-card"
+            >
+
+                <div class="action-icon">
+                    <i class="bi bi-boxes"></i>
+                </div>
+
+                <h3>
+                    Voir les produits
+                </h3>
+
+                <p>
+                    Consulter, modifier ou supprimer vos produits.
+                </p>
+
+                <span class="action-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+
+            </a>
+
+
+            {# STOCK #}
+
+            <a
+                href="#"
+                class="action-card"
+            >
+
+                <div class="action-icon">
+                    <i class="bi bi-clipboard-data"></i>
+                </div>
+
+                <h3>
+                    Gestion du stock
+                </h3>
+
+                <p>
+                    Consultez les quantités disponibles et les alertes.
+                </p>
+
+                <span class="action-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+
+            </a>
+
+
+            {# UTILISATEURS #}
+
+            <a
+                href="#"
+                class="action-card"
+            >
+
+                <div class="action-icon">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+
+                <h3>
+                    Utilisateurs
+                </h3>
+
+                <p>
+                    Gérez les utilisateurs et leurs accès.
+                </p>
+
+                <span class="action-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    {# =========================================================
+       INFORMATIONS
+       ========================================================= #}
+
+    <div class="dashboard-bottom">
+
+        {# ACTIVITE RECENTE #}
+
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-header">
+
+                <h3 class="dashboard-card-title">
+                    <i class="bi bi-clock-history"></i>
+                    Activité récente
+                </h3>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <div class="activity-icon">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+
+                <div class="activity-text">
+
+                    <strong>
+                        Nouveau produit ajouté
+                    </strong>
+
+                    <span>
+                        Il y a quelques minutes
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <div class="activity-icon">
+                    <i class="bi bi-arrow-down-circle"></i>
+                </div>
+
+                <div class="activity-text">
+
+                    <strong>
+                        Entrée de stock enregistrée
+                    </strong>
+
+                    <span>
+                        Aujourd'hui
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <div class="activity-icon">
+                    <i class="bi bi-pencil"></i>
+                </div>
+
+                <div class="activity-text">
+
+                    <strong>
+                        Produit modifié
+                    </strong>
+
+                    <span>
+                        Aujourd'hui
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <div class="activity-icon">
+                    <i class="bi bi-person"></i>
+                </div>
+
+                <div class="activity-text">
+
+                    <strong>
+                        Connexion utilisateur
+                    </strong>
+
+                    <span>
+                        Aujourd'hui
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# CONSEIL #}
+
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-header">
+
+                <h3 class="dashboard-card-title">
+                    <i class="bi bi-lightbulb"></i>
+                    Conseil
+                </h3>
+
+            </div>
+
+
+            <div class="advice-card">
+
+                <div class="advice-icon">
+                    <i class="bi bi-bar-chart-line"></i>
+                </div>
+
+                <div class="advice-content">
+
+                    <h3>
+                        Surveillez votre stock
+                    </h3>
+
+                    <p>
+                        Pensez à vérifier régulièrement les produits
+                        dont la quantité est faible. Cela permet
+                        d'éviter les ruptures de stock et de maintenir
+                        une bonne disponibilité des produits.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="advice-card">
+
+                <div class="advice-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <div class="advice-content">
+
+                    <h3>
+                        Gestion simplifiée
+                    </h3>
+
+                    <p>
+                        Utilisez le menu en haut de l'écran pour
+                        accéder rapidement aux différents modules
+                        de votre application.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
