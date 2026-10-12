@@ -1,0 +1,1654 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord stock{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4 px-3 px-lg-4">
+
+    {# =========================================================
+       EN-TÊTE
+       ========================================================= #}
+    <div class="page-header mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+
+                <div class="page-badge">
+                    <i class="bi bi-bar-chart-line me-2"></i>
+                    Gestion du stock
+                </div>
+
+                <h1 class="page-title mt-2 mb-1">
+                    Tableau de bord stock
+                </h1>
+
+                <p class="page-subtitle mb-0">
+                    Vue générale des produits, stocks, entrées et sorties.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <a
+                    href="{{ path('app_produit_new') }}"
+                    class="btn btn-primary header-btn"
+                >
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Nouveau produit
+                </a>
+
+                <a
+                    href="{{ path('app_mouvement_stock_index') }}"
+                    class="btn btn-light header-btn"
+                >
+                    <i class="bi bi-arrow-left-right me-2"></i>
+                    Mouvements
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       GRANDES STATISTIQUES
+       ========================================================= #}
+    <div class="row g-3 mb-4">
+
+        {# PRODUITS #}
+        <div class="col-xl-3 col-md-6">
+
+            <div class="main-stat-card">
+
+                <div class="main-stat-top">
+
+                    <div>
+
+                        <div class="main-stat-label">
+                            Produits
+                        </div>
+
+                        <div class="main-stat-value">
+                            {{ nombreProduits }}
+                        </div>
+
+                        <div class="main-stat-info">
+                            {{ produitsActifs }} actifs
+                        </div>
+
+                    </div>
+
+
+                    <div class="main-stat-icon icon-purple">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# QUANTITÉ STOCK #}
+        <div class="col-xl-3 col-md-6">
+
+            <div class="main-stat-card">
+
+                <div class="main-stat-top">
+
+                    <div>
+
+                        <div class="main-stat-label">
+                            Stock disponible
+                        </div>
+
+                        <div class="main-stat-value">
+                            {{ quantiteTotaleStock }}
+                        </div>
+
+                        <div class="main-stat-info">
+                            unités actuellement en stock
+                        </div>
+
+                    </div>
+
+
+                    <div class="main-stat-icon icon-blue">
+                        <i class="bi bi-stack"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# VALEUR ACHAT #}
+        <div class="col-xl-3 col-md-6">
+
+            <div class="main-stat-card">
+
+                <div class="main-stat-top">
+
+                    <div>
+
+                        <div class="main-stat-label">
+                            Valeur du stock
+                        </div>
+
+                        <div class="main-stat-value money-value">
+                            {{ valeurAchatStock|number_format(0, ',', ' ') }}
+                        </div>
+
+                        <div class="money-currency">
+                            MGA — prix d'achat
+                        </div>
+
+                    </div>
+
+
+                    <div class="main-stat-icon icon-green">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# ALERTES #}
+        <div class="col-xl-3 col-md-6">
+
+            <div class="main-stat-card">
+
+                <div class="main-stat-top">
+
+                    <div>
+
+                        <div class="main-stat-label">
+                            Alertes stock
+                        </div>
+
+                        <div class="main-stat-value alert-value">
+                            {{ produitsStockFaible|length + produitsStockEpuise|length }}
+                        </div>
+
+                        <div class="main-stat-info">
+                            {{ produitsStockEpuise|length }} épuisé(s)
+                        </div>
+
+                    </div>
+
+
+                    <div class="main-stat-icon icon-orange">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       RÉSUMÉ ENTRÉES / SORTIES
+       ========================================================= #}
+    <div class="row g-3 mb-4">
+
+        {# ENTRÉES #}
+        <div class="col-lg-6">
+
+            <div class="summary-card summary-entry">
+
+                <div class="summary-top">
+
+                    <div class="summary-icon">
+                        <i class="bi bi-arrow-down-circle"></i>
+                    </div>
+
+                    <div class="summary-content">
+
+                        <div class="summary-label">
+                            Entrées de stock
+                        </div>
+
+                        <div class="summary-value">
+                            {{ quantiteEntreeTotale }}
+                            <span>unités</span>
+                        </div>
+
+                        <div class="summary-money">
+
+                            Valeur :
+                            {{ valeurEntreeTotale|number_format(0, ',', ' ') }}
+
+                            MGA
+
+                        </div>
+
+                    </div>
+
+                    <div class="summary-count">
+
+                        {{ nombreEntrees }}
+
+                        {% if nombreEntrees > 1 %}
+                            mouvements
+                        {% else %}
+                            mouvement
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# SORTIES #}
+        <div class="col-lg-6">
+
+            <div class="summary-card summary-exit">
+
+                <div class="summary-top">
+
+                    <div class="summary-icon">
+                        <i class="bi bi-arrow-up-circle"></i>
+                    </div>
+
+                    <div class="summary-content">
+
+                        <div class="summary-label">
+                            Sorties de stock
+                        </div>
+
+                        <div class="summary-value">
+                            {{ quantiteSortieTotale }}
+                            <span>unités</span>
+                        </div>
+
+                        <div class="summary-money">
+
+                            Valeur :
+                            {{ valeurSortieTotale|number_format(0, ',', ' ') }}
+
+                            MGA
+
+                        </div>
+
+                    </div>
+
+                    <div class="summary-count">
+
+                        {{ nombreSorties }}
+
+                        {% if nombreSorties > 1 %}
+                            mouvements
+                        {% else %}
+                            mouvement
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       CONTENU PRINCIPAL
+       ========================================================= #}
+    <div class="row g-4">
+
+        {# =====================================================
+           ALERTES STOCK
+           ===================================================== #}
+        <div class="col-xl-7">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <div>
+
+                        <div class="dashboard-card-title">
+                            Alertes de stock
+                        </div>
+
+                        <div class="dashboard-card-subtitle">
+                            Produits nécessitant une attention.
+                        </div>
+
+                    </div>
+
+
+                    {% if produitsStockFaible is not empty or produitsStockEpuise is not empty %}
+
+                        <span class="small-counter danger-counter">
+
+                            {{ produitsStockFaible|length + produitsStockEpuise|length }}
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="dashboard-card-body">
+
+                    {% if produitsStockEpuise is not empty %}
+
+                        <div class="section-mini-title danger-title">
+
+                            <i class="bi bi-x-octagon-fill me-1"></i>
+
+                            Stock épuisé
+
+                        </div>
+
+
+                        {% for produit in produitsStockEpuise|slice(0, 5) %}
+
+                            <div class="alert-product-row">
+
+                                <div class="alert-product-icon danger-icon">
+                                    <i class="bi bi-box"></i>
+                                </div>
+
+                                <div class="alert-product-info">
+
+                                    <div class="alert-product-name">
+                                        {{ produit.nom }}
+                                    </div>
+
+                                    <div class="alert-product-reference">
+                                        {{ produit.reference }}
+                                    </div>
+
+                                </div>
+
+
+                                <div class="stock-number stock-danger">
+
+                                    {{ produit.quantiteStock }}
+
+                                    <span>
+                                        {{ produit.unite }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+
+                    {% if produitsStockFaible is not empty %}
+
+                        <div class="section-mini-title warning-title
+                            {% if produitsStockEpuise is not empty %}
+                                mt-4
+                            {% endif %}
+                        ">
+
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+                            Stock faible
+
+                        </div>
+
+
+                        {% for produit in produitsStockFaible|slice(0, 5) %}
+
+                            <div class="alert-product-row">
+
+                                <div class="alert-product-icon warning-icon">
+                                    <i class="bi bi-box"></i>
+                                </div>
+
+                                <div class="alert-product-info">
+
+                                    <div class="alert-product-name">
+                                        {{ produit.nom }}
+                                    </div>
+
+                                    <div class="alert-product-reference">
+                                        {{ produit.reference }}
+                                    </div>
+
+                                </div>
+
+
+                                <div class="stock-warning-wrapper">
+
+                                    <div class="stock-number stock-warning">
+                                        {{ produit.quantiteStock }}
+                                        <span>
+                                            {{ produit.unite }}
+                                        </span>
+                                    </div>
+
+                                    <div class="stock-threshold">
+
+                                        seuil :
+                                        {{ produit.seuilAlerte }}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+
+                    {% if produitsStockEpuise is empty and produitsStockFaible is empty %}
+
+                        <div class="empty-dashboard">
+
+                            <div class="empty-dashboard-icon success-empty">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+
+                            <strong>
+                                Aucun produit en alerte
+                            </strong>
+
+                            <span>
+                                Tous les stocks sont actuellement au-dessus des seuils définis.
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# =====================================================
+           TOP STOCKS
+           ===================================================== #}
+        <div class="col-xl-5">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <div>
+
+                        <div class="dashboard-card-title">
+                            Produits avec le plus de stock
+                        </div>
+
+                        <div class="dashboard-card-subtitle">
+                            Les 5 produits les plus disponibles.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-card-body">
+
+                    {% if topStocks is not empty %}
+
+                        {% for produit in topStocks %}
+
+                            <div class="top-stock-row">
+
+                                <div class="top-stock-number">
+                                    {{ loop.index }}
+                                </div>
+
+
+                                <div class="top-stock-info">
+
+                                    <div class="top-stock-name">
+                                        {{ produit.nom }}
+                                    </div>
+
+                                    <div class="top-stock-reference">
+                                        {{ produit.reference }}
+                                    </div>
+
+                                </div>
+
+
+                                <div class="top-stock-quantity">
+
+                                    {{ produit.quantiteStock }}
+
+                                    <span>
+                                        {{ produit.unite }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-dashboard">
+
+                            <div class="empty-dashboard-icon">
+                                <i class="bi bi-box"></i>
+                            </div>
+
+                            <strong>
+                                Aucun stock disponible
+                            </strong>
+
+                            <span>
+                                Ajoutez des produits ou des entrées de stock.
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# =====================================================
+           DERNIÈRES ENTRÉES
+           ===================================================== #}
+        <div class="col-xl-6">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <div>
+
+                        <div class="dashboard-card-title">
+                            Dernières entrées
+                        </div>
+
+                        <div class="dashboard-card-subtitle">
+                            Les derniers approvisionnements enregistrés.
+                        </div>
+
+                    </div>
+
+
+                    <a
+                        href="{{ path('app_entree_stock_index') }}"
+                        class="card-link"
+                    >
+                        Voir tout
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+
+                </div>
+
+
+                <div class="dashboard-card-body no-padding">
+
+                    {% if dernieresEntrees is not empty %}
+
+                        {% for entree in dernieresEntrees %}
+
+                            <div class="activity-row">
+
+                                <div class="activity-icon activity-entry">
+                                    <i class="bi bi-arrow-down"></i>
+                                </div>
+
+
+                                <div class="activity-main">
+
+                                    <div class="activity-title">
+
+                                        {% if entree.produit %}
+                                            {{ entree.produit.nom }}
+                                        {% else %}
+                                            Produit supprimé
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div class="activity-subtitle">
+
+                                        {% if entree.fournisseur %}
+                                            {{ entree.fournisseur.nom }}
+                                        {% else %}
+                                            Fournisseur non renseigné
+                                        {% endif %}
+
+                                        •
+
+                                        {% if entree.dateEntree %}
+                                            {{ entree.dateEntree|date('d/m/Y H:i') }}
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="activity-quantity entry-quantity">
+
+                                    +{{ entree.quantite }}
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-dashboard small-empty">
+
+                            <i class="bi bi-arrow-down-circle"></i>
+
+                            <strong>
+                                Aucune entrée enregistrée
+                            </strong>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# =====================================================
+           DERNIÈRES SORTIES
+           ===================================================== #}
+        <div class="col-xl-6">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <div>
+
+                        <div class="dashboard-card-title">
+                            Dernières sorties
+                        </div>
+
+                        <div class="dashboard-card-subtitle">
+                            Les dernières sorties de stock.
+                        </div>
+
+                    </div>
+
+
+                    <a
+                        href="{{ path('app_sortie_stock_index') }}"
+                        class="card-link"
+                    >
+                        Voir tout
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+
+                </div>
+
+
+                <div class="dashboard-card-body no-padding">
+
+                    {% if dernieresSorties is not empty %}
+
+                        {% for sortie in dernieresSorties %}
+
+                            <div class="activity-row">
+
+                                <div class="activity-icon activity-exit">
+                                    <i class="bi bi-arrow-up"></i>
+                                </div>
+
+
+                                <div class="activity-main">
+
+                                    <div class="activity-title">
+
+                                        {% if sortie.produit %}
+                                            {{ sortie.produit.nom }}
+                                        {% else %}
+                                            Produit supprimé
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div class="activity-subtitle">
+
+                                        {% if sortie.client %}
+
+                                            {{ sortie.client.nom }}
+
+                                            {% if sortie.client.prenom %}
+                                                {{ sortie.client.prenom }}
+                                            {% endif %}
+
+                                        {% else %}
+
+                                            Client non renseigné
+
+                                        {% endif %}
+
+                                        •
+
+                                        {% if sortie.dateSortie %}
+                                            {{ sortie.dateSortie|date('d/m/Y H:i') }}
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="activity-quantity exit-quantity">
+
+                                    -{{ sortie.quantite }}
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-dashboard small-empty">
+
+                            <i class="bi bi-arrow-up-circle"></i>
+
+                            <strong>
+                                Aucune sortie enregistrée
+                            </strong>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       RÉSUMÉ FINAL
+       ========================================================= #}
+    <div class="bottom-summary mt-4">
+
+        <div class="bottom-summary-item">
+
+            <div class="bottom-icon purple-bottom">
+                <i class="bi bi-arrow-left-right"></i>
+            </div>
+
+            <div>
+
+                <div class="bottom-label">
+                    Mouvements enregistrés
+                </div>
+
+                <div class="bottom-value">
+                    {{ nombreMouvements }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="bottom-divider"></div>
+
+
+        <div class="bottom-summary-item">
+
+            <div class="bottom-icon blue-bottom">
+                <i class="bi bi-box-arrow-in-down"></i>
+            </div>
+
+            <div>
+
+                <div class="bottom-label">
+                    Entrées totales
+                </div>
+
+                <div class="bottom-value">
+                    +{{ quantiteEntreeTotale }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="bottom-divider"></div>
+
+
+        <div class="bottom-summary-item">
+
+            <div class="bottom-icon red-bottom">
+                <i class="bi bi-box-arrow-up"></i>
+            </div>
+
+            <div>
+
+                <div class="bottom-label">
+                    Sorties totales
+                </div>
+
+                <div class="bottom-value">
+                    -{{ quantiteSortieTotale }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="bottom-divider"></div>
+
+
+        <div class="bottom-summary-item">
+
+            <div class="bottom-icon green-bottom">
+                <i class="bi bi-activity"></i>
+            </div>
+
+            <div>
+
+                <div class="bottom-label">
+                    Écart entrées / sorties
+                </div>
+
+                <div class="bottom-value
+                    {% if differenceQuantite > 0 %}
+                        positive-value
+                    {% elseif differenceQuantite < 0 %}
+                        negative-value
+                    {% else %}
+                        neutral-value
+                    {% endif %}
+                ">
+
+                    {% if differenceQuantite > 0 %}
+                        +{{ differenceQuantite }}
+                    {% else %}
+                        {{ differenceQuantite }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{# =============================================================
+   STYLE
+   ============================================================= #}
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .page-header {
+        padding: 4px 2px;
+    }
+
+    .page-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .page-title {
+        color: #172033;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .page-subtitle {
+        color: #8993a5;
+        font-size: 14px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .header-btn {
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       GRANDES STATISTIQUES
+       ========================================================= */
+
+    .main-stat-card {
+        min-height: 145px;
+        padding: 20px;
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 7px 25px rgba(15,23,42,.05);
+    }
+
+    .main-stat-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .main-stat-label {
+        color: #7b8495;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .main-stat-value {
+        margin-top: 8px;
+        color: #172033;
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .money-value {
+        font-size: 22px;
+    }
+
+    .main-stat-info,
+    .money-currency {
+        margin-top: 7px;
+        color: #9aa3b2;
+        font-size: 9px;
+    }
+
+    .alert-value {
+        color: #d97706;
+    }
+
+    .main-stat-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 12px;
+        font-size: 19px;
+    }
+
+    .icon-purple {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .icon-blue {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .icon-green {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .icon-orange {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+
+    /* =========================================================
+       RÉSUMÉ
+       ========================================================= */
+
+    .summary-card {
+        min-height: 105px;
+        padding: 20px;
+        border: 1px solid #edf0f5;
+        border-radius: 15px;
+        background: #ffffff;
+        box-shadow: 0 6px 22px rgba(15,23,42,.04);
+    }
+
+    .summary-entry {
+        border-left: 4px solid #10b981;
+    }
+
+    .summary-exit {
+        border-left: 4px solid #ef4444;
+    }
+
+    .summary-top {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .summary-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
+    .summary-entry .summary-icon {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .summary-exit .summary-icon {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .summary-content {
+        flex: 1;
+    }
+
+    .summary-label {
+        color: #8b95a5;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .summary-value {
+        margin-top: 3px;
+        color: #172033;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .summary-value span {
+        color: #98a1af;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .summary-money {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 9px;
+    }
+
+    .summary-count {
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       DASHBOARD CARD
+       ========================================================= */
+
+    .dashboard-card {
+        overflow: hidden;
+        border: 1px solid #edf0f5;
+        border-radius: 17px;
+        background: #ffffff;
+        box-shadow: 0 7px 25px rgba(15,23,42,.045);
+    }
+
+    .dashboard-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 19px 20px;
+        border-bottom: 1px solid #f1f4f8;
+    }
+
+    .dashboard-card-title {
+        color: #172033;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .dashboard-card-subtitle {
+        margin-top: 4px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+    .dashboard-card-body {
+        padding: 18px 20px;
+    }
+
+    .dashboard-card-body.no-padding {
+        padding: 0;
+    }
+
+    .small-counter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 25px;
+        height: 25px;
+        padding: 0 7px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .danger-counter {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .card-link {
+        color: #4f46e5;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .card-link:hover {
+        color: #3730a3;
+    }
+
+
+    /* =========================================================
+       ALERTES
+       ========================================================= */
+
+    .section-mini-title {
+        margin-bottom: 10px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .danger-title {
+        color: #dc2626;
+    }
+
+    .warning-title {
+        color: #d97706;
+    }
+
+    .alert-product-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f3f5f7;
+    }
+
+    .alert-product-row:last-child {
+        border-bottom: 0;
+    }
+
+    .alert-product-icon {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 9px;
+        font-size: 14px;
+    }
+
+    .danger-icon {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .warning-icon {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    .alert-product-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .alert-product-name {
+        color: #334155;
+        font-size: 11px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .alert-product-reference {
+        margin-top: 3px;
+        color: #a0a8b5;
+        font-size: 9px;
+    }
+
+    .stock-number {
+        font-size: 11px;
+        font-weight: 800;
+        text-align: right;
+    }
+
+    .stock-number span {
+        color: #9aa3b2;
+        font-size: 8px;
+        font-weight: 600;
+    }
+
+    .stock-danger {
+        color: #dc2626;
+    }
+
+    .stock-warning-wrapper {
+        min-width: 63px;
+        text-align: right;
+    }
+
+    .stock-warning {
+        color: #d97706;
+    }
+
+    .stock-threshold {
+        margin-top: 3px;
+        color: #a0a8b5;
+        font-size: 8px;
+    }
+
+
+    /* =========================================================
+       TOP STOCKS
+       ========================================================= */
+
+    .top-stock-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 0;
+        border-bottom: 1px solid #f3f5f7;
+    }
+
+    .top-stock-row:last-child {
+        border-bottom: 0;
+    }
+
+    .top-stock-number {
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 9px;
+        font-weight: 800;
+    }
+
+    .top-stock-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .top-stock-name {
+        color: #334155;
+        font-size: 11px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .top-stock-reference {
+        margin-top: 3px;
+        color: #a0a8b5;
+        font-size: 9px;
+    }
+
+    .top-stock-quantity {
+        color: #172033;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .top-stock-quantity span {
+        color: #9aa3b2;
+        font-size: 8px;
+    }
+
+
+    /* =========================================================
+       ACTIVITÉS
+       ========================================================= */
+
+    .activity-row {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 13px 20px;
+        border-bottom: 1px solid #f3f5f7;
+    }
+
+    .activity-row:last-child {
+        border-bottom: 0;
+    }
+
+    .activity-icon {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        flex-shrink: 0;
+        font-size: 14px;
+    }
+
+    .activity-entry {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .activity-exit {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .activity-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .activity-title {
+        color: #334155;
+        font-size: 11px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .activity-subtitle {
+        margin-top: 3px;
+        color: #a0a8b5;
+        font-size: 9px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .activity-quantity {
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .entry-quantity {
+        color: #059669;
+    }
+
+    .exit-quantity {
+        color: #dc2626;
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    .empty-dashboard {
+        padding: 28px 15px;
+        text-align: center;
+        color: #98a1af;
+    }
+
+    .empty-dashboard-icon {
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: #f1f5f9;
+        color: #94a3b8;
+        font-size: 22px;
+    }
+
+    .success-empty {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .empty-dashboard strong {
+        display: block;
+        color: #334155;
+        font-size: 11px;
+    }
+
+    .empty-dashboard span {
+        display: block;
+        max-width: 350px;
+        margin: 5px auto 0;
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+    .small-empty {
+        padding: 30px 15px;
+    }
+
+    .small-empty > i {
+        display: block;
+        margin-bottom: 8px;
+        color: #94a3b8;
+        font-size: 24px;
+    }
+
+
+    /* =========================================================
+       RÉSUMÉ FINAL
+       ========================================================= */
+
+    .bottom-summary {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 17px 20px;
+        border: 1px solid #edf0f5;
+        border-radius: 15px;
+        background: #ffffff;
+        box-shadow: 0 6px 22px rgba(15,23,42,.04);
+    }
+
+    .bottom-summary-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+    }
+
+    .bottom-icon {
+        width: 37px;
+        height: 37px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .purple-bottom {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .blue-bottom {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .red-bottom {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .green-bottom {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .bottom-label {
+        color: #98a1af;
+        font-size: 9px;
+    }
+
+    .bottom-value {
+        margin-top: 2px;
+        color: #172033;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .positive-value {
+        color: #059669;
+    }
+
+    .negative-value {
+        color: #dc2626;
+    }
+
+    .neutral-value {
+        color: #64748b;
+    }
+
+    .bottom-divider {
+        width: 1px;
+        height: 35px;
+        background: #edf0f4;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .header-actions {
+            width: 100%;
+        }
+
+        .header-btn {
+            flex: 1;
+        }
+
+        .bottom-summary {
+            flex-wrap: wrap;
+        }
+
+        .bottom-summary-item {
+            min-width: calc(50% - 10px);
+        }
+
+        .bottom-divider {
+            display: none;
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .page-title {
+            font-size: 25px;
+        }
+
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .header-btn {
+            width: 100%;
+        }
+
+        .summary-count {
+            display: none;
+        }
+
+        .bottom-summary-item {
+            min-width: 100%;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+

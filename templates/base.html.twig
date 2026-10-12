@@ -2,469 +2,1484 @@
 <html lang="fr">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1"
+        content="width=device-width, initial-scale=1.0"
     >
 
     <title>
-        {% block title %}Gestion de Stock{% endblock %}
+        {% block title %}NEXA{% endblock %}
     </title>
 
-    {# CSS personnel #}
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <meta
+        name="theme-color"
+        content="#070b17"
+    >
 
-    {# Bootstrap #}
+    {# =========================================================
+       BOOTSTRAP
+       ========================================================= #}
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
-    {# Bootstrap Icons #}
+    {# =========================================================
+       BOOTSTRAP ICONS
+       ========================================================= #}
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
         rel="stylesheet"
     >
 
+    {# =========================================================
+       STYLE NEXA
+       ========================================================= #}
+
     <style>
 
-        /* =========================================================
+        :root {
+            --nex-bg: #070b17;
+            --nex-bg-2: #0b1120;
+            --nex-bg-3: #10182b;
+
+            --nex-cyan: #22d3ee;
+            --nex-blue: #3b82f6;
+            --nex-violet: #8b5cf6;
+            --nex-purple: #a855f7;
+
+            --nex-white: #ffffff;
+            --nex-text: #e2e8f0;
+            --nex-muted: #94a3b8;
+
+            --nex-border: rgba(255,255,255,.08);
+        }
+
+
+        /* =====================================================
            GLOBAL
-           ========================================================= */
+           ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
             margin: 0;
-            background: #f5f7fb;
-            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
             color: #172033;
+
+            background:
+                radial-gradient(
+                    circle at 10% 0%,
+                    rgba(34, 211, 238, .035),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 10%,
+                    rgba(139, 92, 246, .035),
+                    transparent 30%
+                ),
+                #f5f7fb;
         }
 
-        /* =========================================================
-           NAVBAR PRINCIPALE
-           ========================================================= */
-
-        .main-navbar {
-            background: #172033;
-            min-height: 70px;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
-        }
-
-        .navbar-container {
-            width: 100%;
-            padding: 0 25px;
-        }
-
-        /* Logo */
-
-        .brand {
-            color: white;
-            font-size: 21px;
-            font-weight: 700;
+        a {
             text-decoration: none;
-            white-space: nowrap;
         }
 
-        .brand:hover {
-            color: white;
+
+        /* =====================================================
+           NAVBAR
+           ===================================================== */
+
+        .nex-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+
+            min-height: 76px;
+
+            background:
+                radial-gradient(
+                    circle at 5% 0%,
+                    rgba(34,211,238,.11),
+                    transparent 25%
+                ),
+                radial-gradient(
+                    circle at 85% 0%,
+                    rgba(139,92,246,.13),
+                    transparent 28%
+                ),
+                linear-gradient(
+                    135deg,
+                    #070b17 0%,
+                    #0a1020 50%,
+                    #080d19 100%
+                );
+
+            border-bottom: 1px solid rgba(255,255,255,.07);
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,.30),
+                0 0 35px rgba(59,130,246,.05);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
-        .brand-icon {
-            font-size: 25px;
-            margin-right: 8px;
-            vertical-align: middle;
+        .nex-navbar::after {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+            bottom: -1px;
+
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(34,211,238,.8),
+                    rgba(139,92,246,.8),
+                    transparent
+                );
+
+            box-shadow:
+                0 0 8px rgba(34,211,238,.5),
+                0 0 15px rgba(139,92,246,.25);
         }
 
-        /* =========================================================
-           MENU
-           ========================================================= */
+        .nex-navbar .container,
+        .nex-navbar .container-fluid {
+            min-height: 76px;
+        }
 
-        .main-menu {
+
+        /* =====================================================
+           LOGO
+           ===================================================== */
+
+        .nex-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+
+            margin-right: 26px;
+
+            color: #ffffff !important;
+        }
+
+        .nex-logo-icon {
+            width: 44px;
+            height: 44px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(34,211,238,.16),
+                    rgba(139,92,246,.20)
+                );
+
+            border: 1px solid rgba(34,211,238,.36);
+
+            color: var(--nex-cyan);
+
+            box-shadow:
+                0 0 10px rgba(34,211,238,.18),
+                0 0 25px rgba(139,92,246,.08),
+                inset 0 0 15px rgba(139,92,246,.06);
+
+            transition: .25s ease;
+        }
+
+        .nex-logo-icon i {
+            font-size: 1.25rem;
+        }
+
+        .nex-brand:hover .nex-logo-icon {
+            transform: scale(1.04);
+
+            border-color: rgba(34,211,238,.70);
+
+            box-shadow:
+                0 0 12px rgba(34,211,238,.42),
+                0 0 28px rgba(139,92,246,.15);
+        }
+
+        .nex-logo-text {
+            font-size: 1.18rem;
+            font-weight: 900;
+
+            letter-spacing: .20em;
+
+            color: #ffffff;
+
+            text-shadow:
+                0 0 7px rgba(255,255,255,.10),
+                0 0 18px rgba(34,211,238,.10);
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+           ===================================================== */
+
+        .nex-navbar .navbar-nav {
+            gap: 4px;
+        }
+
+        .nex-navbar .nav-link {
+            position: relative;
+
+            min-height: 46px;
+
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 0 14px !important;
+
+            color: #cbd5e1 !important;
+
+            font-size: .91rem;
+            font-weight: 600;
+
+            border-radius: 12px;
+
+            transition: .22s ease;
+        }
+
+        .nex-navbar .nav-link i {
+            font-size: 1rem;
+
+            transition: .22s ease;
+        }
+
+        .nex-navbar .nav-link:hover {
+            color: #ffffff !important;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(34,211,238,.08),
+                    rgba(139,92,246,.09)
+                );
+
+            box-shadow:
+                inset 0 0 0 1px rgba(255,255,255,.035),
+                0 0 18px rgba(34,211,238,.05);
+
+            transform: translateY(-1px);
+        }
+
+        .nex-navbar .nav-link:hover i {
+            color: var(--nex-cyan);
+
+            text-shadow:
+                0 0 8px rgba(34,211,238,.45);
+        }
+
+
+        /* =====================================================
+           LIEN ACTIF
+           ===================================================== */
+
+        .nex-navbar .nav-link.nex-active {
+            color: #ffffff !important;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(34,211,238,.12),
+                    rgba(139,92,246,.14)
+                );
+
+            box-shadow:
+                inset 0 0 0 1px rgba(34,211,238,.13),
+                0 0 18px rgba(34,211,238,.06);
+        }
+
+        .nex-navbar .nav-link.nex-active i {
+            color: var(--nex-cyan);
+
+            text-shadow:
+                0 0 8px rgba(34,211,238,.48);
+        }
+
+        .nex-navbar .nav-link.nex-active::after {
+            content: "";
+
+            position: absolute;
+
+            left: 14px;
+            right: 14px;
+            bottom: 5px;
+
+            height: 2px;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--nex-cyan),
+                    var(--nex-violet)
+                );
+
+            box-shadow:
+                0 0 7px rgba(34,211,238,.55),
+                0 0 12px rgba(139,92,246,.30);
+        }
+
+
+        /* =====================================================
+           DROPDOWN
+           ===================================================== */
+
+        .nex-navbar .dropdown-menu {
+            margin-top: 12px !important;
+
+            min-width: 245px;
+
+            padding: 8px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(10,16,32,.98),
+                    rgba(7,11,23,.98)
+                );
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            border-radius: 17px;
+
+            box-shadow:
+                0 20px 45px rgba(0,0,0,.48),
+                0 0 30px rgba(59,130,246,.07);
+
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .nex-navbar .dropdown-item {
             display: flex;
+            align-items: center;
+            gap: 11px;
+
+            padding: 11px 13px;
+
+            color: #cbd5e1;
+
+            font-size: .90rem;
+            font-weight: 500;
+
+            border-radius: 11px;
+
+            transition: .20s ease;
+        }
+
+        .nex-navbar .dropdown-item i {
+            width: 20px;
+
+            text-align: center;
+
+            color: #64748b;
+
+            transition: .20s ease;
+        }
+
+        .nex-navbar .dropdown-item:hover,
+        .nex-navbar .dropdown-item:focus {
+            color: #ffffff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(34,211,238,.10),
+                    rgba(139,92,246,.10)
+                );
+
+            transform: translateX(2px);
+        }
+
+        .nex-navbar .dropdown-item:hover i {
+            color: var(--nex-cyan);
+
+            text-shadow:
+                0 0 7px rgba(34,211,238,.42);
+        }
+
+        .nex-navbar .dropdown-divider {
+            border-color: rgba(255,255,255,.07);
+        }
+
+
+        /* =====================================================
+           PANIER
+           ===================================================== */
+
+        .nex-cart-link {
+            position: relative;
+        }
+
+        .nex-cart-badge {
+            position: absolute;
+
+            top: 3px;
+            right: 3px;
+
+            min-width: 19px;
+            height: 19px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0 5px;
+
+            border-radius: 999px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--nex-cyan),
+                    var(--nex-violet)
+                );
+
+            color: #ffffff;
+
+            border: 2px solid #0a1020;
+
+            font-size: .64rem;
+            font-weight: 800;
+
+            box-shadow:
+                0 0 7px rgba(34,211,238,.45),
+                0 0 15px rgba(139,92,246,.18);
+        }
+
+
+        /* =====================================================
+           UTILISATEUR
+           ===================================================== */
+
+        .nex-user-zone {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nex-user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            min-height: 46px;
+
+            padding: 5px 12px 5px 6px;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,.045),
+                    rgba(255,255,255,.018)
+                );
+
+            border: 1px solid rgba(255,255,255,.07);
+
+            transition: .22s ease;
+        }
+
+        .nex-user-pill:hover {
+            border-color: rgba(34,211,238,.18);
+
+            box-shadow:
+                0 0 18px rgba(34,211,238,.05);
+        }
+
+        .nex-user-avatar {
+            width: 35px;
+            height: 35px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--nex-cyan),
+                    var(--nex-violet)
+                );
+
+            color: white;
+
+            box-shadow:
+                0 0 10px rgba(34,211,238,.20),
+                0 0 16px rgba(139,92,246,.12);
+        }
+
+        .nex-user-info {
+            display: flex;
+            flex-direction: column;
+
+            line-height: 1.1;
+        }
+
+        .nex-user-name {
+            max-width: 150px;
+
+            color: #f8fafc;
+
+            font-size: .82rem;
+            font-weight: 700;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .nex-user-role {
+            margin-top: 4px;
+
+            font-size: .68rem;
+        }
+
+
+        /* =====================================================
+           BADGE ROLE
+           ===================================================== */
+
+        .nex-role-badge {
+            display: inline-flex;
             align-items: center;
             gap: 5px;
-            margin-left: 30px;
-        }
 
-        .main-menu .nav-link {
-            color: #b9c1d0;
-            padding: 10px 13px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
+            padding: 4px 8px;
 
-        .main-menu .nav-link i {
-            margin-right: 5px;
-        }
+            border-radius: 999px;
 
-        .main-menu .nav-link:hover {
-            color: white;
-            background: #263653;
-        }
-
-        .main-menu .nav-link.active {
-            color: white;
-            background: #34466b;
-        }
-
-        .main-menu .nav-link.disabled {
-            color: #697386;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        /* =========================================================
-           UTILISATEUR
-           ========================================================= */
-
-        .user-section {
-            display: flex;
-            align-items: center;
-            margin-left: auto;
-            gap: 12px;
-        }
-
-        .user-info {
-            color: #dce2ec;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .user-info i {
-            font-size: 18px;
-            margin-right: 5px;
-        }
-
-        .logout-btn {
-            border-radius: 8px;
-            font-size: 13px;
-            padding: 7px 12px;
-        }
-
-        /* =========================================================
-           CONTENU
-           ========================================================= */
-
-        .content {
-            padding: 30px;
-            max-width: 1600px;
-            margin: auto;
-        }
-
-        .page-title {
+            font-size: .65rem;
             font-weight: 700;
-            color: #172033;
         }
 
-        /* =========================================================
-           CARDS
-           ========================================================= */
+        .nex-role-badge.admin {
+            color: #cffafe;
 
-        .card {
-            border: 0;
+            background: rgba(34,211,238,.08);
+
+            border: 1px solid rgba(34,211,238,.20);
+        }
+
+        .nex-role-badge.client {
+            color: #ede9fe;
+
+            background: rgba(139,92,246,.08);
+
+            border: 1px solid rgba(139,92,246,.20);
+        }
+
+
+        /* =====================================================
+           DECONNEXION
+           ===================================================== */
+
+        .nex-logout {
+            width: 43px;
+            height: 43px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
             border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+
+            color: #94a3b8;
+
+            background:
+                rgba(255,255,255,.025);
+
+            border: 1px solid rgba(255,255,255,.07);
+
+            transition: .22s ease;
         }
 
-        /* =========================================================
-           TABLEAUX
-           ========================================================= */
+        .nex-logout:hover {
+            color: #ffffff;
 
-        .table th {
-            white-space: nowrap;
+            background:
+                rgba(239,68,68,.09);
+
+            border-color:
+                rgba(239,68,68,.25);
+
+            box-shadow:
+                0 0 16px rgba(239,68,68,.08);
         }
 
-        /* =========================================================
-           BADGES STOCK
-           ========================================================= */
 
-        .badge-stock-normal {
-            background: #d1fae5;
-            color: #065f46;
+        /* =====================================================
+           BOUTON MOBILE
+           ===================================================== */
+
+        .nex-toggler {
+            width: 45px;
+            height: 42px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 12px;
+
+            border: 1px solid rgba(255,255,255,.10);
+
+            background:
+                rgba(255,255,255,.035);
+
+            color: #ffffff;
+
+            box-shadow: none !important;
         }
 
-        .badge-stock-low {
-            background: #fef3c7;
-            color: #92400e;
+        .nex-toggler:hover {
+            color: var(--nex-cyan);
+
+            border-color: rgba(34,211,238,.25);
+
+            box-shadow:
+                0 0 15px rgba(34,211,238,.07) !important;
         }
 
-        .badge-stock-empty {
-            background: #fee2e2;
-            color: #991b1b;
+
+        /* =====================================================
+           ALERTS
+           ===================================================== */
+
+        .nex-alert-zone {
+            width: min(1400px, calc(100% - 30px));
+
+            margin: 22px auto 0;
         }
 
-        /* =========================================================
-           BOUTON MENU MOBILE
-           ========================================================= */
+        .nex-alert {
+            border-radius: 15px;
 
-        .mobile-menu-btn {
-            color: white;
-            border: 1px solid #4a5872;
+            box-shadow:
+                0 8px 25px rgba(15,23,42,.05);
         }
 
-        .mobile-menu-btn:hover {
-            background: #263653;
-            color: white;
+
+        /* =====================================================
+           MAIN
+           ===================================================== */
+
+        .nex-main {
+            min-height: calc(100vh - 76px);
+
+            padding: 25px 0 45px;
         }
 
-        /* =========================================================
+        .nex-content {
+            width: min(1400px, calc(100% - 30px));
+
+            margin: 0 auto;
+        }
+
+
+        /* =====================================================
+           SCROLLBAR
+           ===================================================== */
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #eef1f6;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    var(--nex-cyan),
+                    var(--nex-violet)
+                );
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background:
+                linear-gradient(
+                    180deg,
+                    var(--nex-blue),
+                    var(--nex-purple)
+                );
+        }
+
+
+        /* =====================================================
            RESPONSIVE
-           ========================================================= */
+           ===================================================== */
 
-        @media (max-width: 1199px) {
+        @media (max-width: 1199.98px) {
 
-            .main-menu {
-                margin-left: 10px;
+            .nex-navbar .navbar-collapse {
+                margin-top: 12px;
+
+                padding: 12px;
+
+                border-radius: 18px;
+
+                background:
+                    linear-gradient(
+                        145deg,
+                        rgba(11,17,32,.98),
+                        rgba(7,11,23,.98)
+                    );
+
+                border:
+                    1px solid rgba(255,255,255,.07);
+
+                box-shadow:
+                    0 20px 35px rgba(0,0,0,.35);
             }
 
-            .main-menu .nav-link {
-                padding: 9px 9px;
-                font-size: 13px;
+            .nex-navbar .nav-link {
+                width: 100%;
             }
 
-            .user-info {
+            .nex-navbar .dropdown-menu {
+                margin-top: 4px !important;
+            }
+
+            .nex-user-zone {
+                margin-top: 10px;
+
+                padding-top: 10px;
+
+                border-top:
+                    1px solid rgba(255,255,255,.07);
+
+                justify-content: space-between;
+            }
+
+        }
+
+
+        @media (max-width: 575.98px) {
+
+            .nex-brand {
+                margin-right: 0;
+            }
+
+            .nex-logo-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .nex-logo-text {
+                font-size: 1rem;
+            }
+
+            .nex-user-info {
                 display: none;
             }
-        }
 
-        @media (max-width: 991px) {
-
-            .navbar-container {
-                padding: 0 15px;
+            .nex-user-pill {
+                padding-right: 6px;
             }
 
-            .main-menu {
-                margin-left: 0;
-                padding: 15px 0;
+            .nex-content {
+                width: calc(100% - 20px);
             }
 
-            .main-menu .nav-link {
-                margin-bottom: 4px;
+            .nex-alert-zone {
+                width: calc(100% - 20px);
             }
 
-            .user-section {
-                margin-left: 0;
-                padding-bottom: 15px;
-            }
-
-            .content {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 575px) {
-
-            .content {
-                padding: 15px;
-            }
-
-            .brand {
-                font-size: 18px;
-            }
-
-            .brand-icon {
-                font-size: 21px;
-            }
         }
 
     </style>
 
     {% block stylesheets %}{% endblock %}
+
 </head>
 
 
 <body>
 
-{# ==============================================================
-   MENU HORIZONTAL
-   ============================================================== #}
 
-<nav class="navbar navbar-expand-lg main-navbar">
+{# =============================================================
+   ROUTE COURANTE
+   ============================================================= #}
 
-    <div class="navbar-container">
+{% set current_route = app.request.attributes.get('_route')|default('') %}
 
-        <div class="d-flex align-items-center">
 
-            {# LOGO #}
+{# =============================================================
+   NAVBAR
+   ============================================================= #}
+
+<nav class="navbar navbar-expand-xl nex-navbar">
+
+    <div class="container-fluid px-3 px-lg-4">
+
+
+        {# =====================================================
+           LOGO
+           ===================================================== #}
+
+        {% if is_granted('ROLE_ADMIN') %}
 
             <a
-                href="{{ path('app_dashboard') }}"
-                class="brand"
+                href="{{ path('app_stock_dashboard') }}"
+                class="navbar-brand nex-brand"
             >
-                <i class="bi bi-box-seam brand-icon"></i>
-                Gestion Stock
+
+                <span class="nex-logo-icon">
+                    <i class="bi bi-boxes"></i>
+                </span>
+
+                <span class="nex-logo-text">
+                    NEXA
+                </span>
+
             </a>
 
+        {% else %}
 
-            {# BOUTON MOBILE #}
-
-            <button
-                class="navbar-toggler mobile-menu-btn ms-auto"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#mainMenu"
-                aria-controls="mainMenu"
-                aria-expanded="false"
-                aria-label="Ouvrir le menu"
+            <a
+                href="{{ path('app_client_home') }}"
+                class="navbar-brand nex-brand"
             >
-                <i class="bi bi-list fs-4"></i>
-            </button>
 
-        </div>
+                <span class="nex-logo-icon">
+                    <i class="bi bi-boxes"></i>
+                </span>
+
+                <span class="nex-logo-text">
+                    NEXA
+                </span>
+
+            </a>
+
+        {% endif %}
 
 
-        {# ==========================================================
-           MENU
-           ========================================================== #}
+        {# =====================================================
+           MOBILE BUTTON
+           ===================================================== #}
+
+        <button
+            class="navbar-toggler nex-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#nexMainNavbar"
+            aria-controls="nexMainNavbar"
+            aria-expanded="false"
+            aria-label="Ouvrir le menu"
+        >
+
+            <i class="bi bi-list fs-4"></i>
+
+        </button>
+
 
         <div
             class="collapse navbar-collapse"
-            id="mainMenu"
+            id="nexMainNavbar"
         >
 
-            <div class="main-menu">
 
-                {# TABLEAU DE BORD #}
+            {# =================================================
+               ADMIN
+               ================================================= #}
 
-                <a
-                    href="{{ path('app_dashboard') }}"
-                    class="nav-link
-                    {% if app.request.attributes.get('_route') == 'app_dashboard' %}
-                        active
-                    {% endif %}"
-                >
-                    <i class="bi bi-speedometer2"></i>
-                    Tableau de bord
-                </a>
+            {% if is_granted('ROLE_ADMIN') %}
+
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0">
 
 
-                {# PRODUITS #}
+                    {# DASHBOARD #}
 
-                <a
-                    href="{{ path('app_produit_index') }}"
-                    class="nav-link
-                    {% if app.request.attributes.get('_route') starts with 'app_produit_' %}
-                        active
-                    {% endif %}"
-                >
-                    <i class="bi bi-box"></i>
-                    Produits
-                </a>
+                    <li class="nav-item">
 
+                        <a
+                            href="{{ path('app_stock_dashboard') }}"
+                            class="nav-link
+                            {% if current_route == 'app_stock_dashboard' %}
+                                nex-active
+                            {% endif %}"
+                        >
 
-                {# CATEGORIES #}
+                            <i class="bi bi-grid-1x2-fill"></i>
 
-                <a
-                    href="#"
-                    class="nav-link disabled"
-                    onclick="return false;"
-                    title="Module en préparation"
-                >
-                    <i class="bi bi-tags"></i>
-                    Catégories
-                </a>
+                            <span>
+                                Dashboard
+                            </span>
+
+                        </a>
+
+                    </li>
 
 
-                {# ENTREES #}
+                    {# =================================================
+                       STOCK
+                       ================================================= #}
 
-                <a
-                    href="#"
-                    class="nav-link disabled"
-                    onclick="return false;"
-                    title="Module en préparation"
-                >
-                    <i class="bi bi-arrow-down-circle"></i>
-                    Entrées
-                </a>
+                    <li class="nav-item dropdown">
 
+                        <a
+                            href="#"
+                            class="nav-link dropdown-toggle
+                            {% if current_route starts with 'app_produit_'
+                                or current_route starts with 'app_categorie_'
+                                or current_route starts with 'app_entree_stock_'
+                                or current_route starts with 'app_sortie_stock_'
+                                or current_route starts with 'app_fournisseur_'
+                                or current_route starts with 'app_mouvement_stock_'
+                                or current_route == 'app_stock_dashboard'
+                            %}
+                                nex-active
+                            {% endif %}"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
 
-                {# SORTIES #}
+                            <i class="bi bi-box-seam-fill"></i>
 
-                <a
-                    href="#"
-                    class="nav-link disabled"
-                    onclick="return false;"
-                    title="Module en préparation"
-                >
-                    <i class="bi bi-arrow-up-circle"></i>
-                    Sorties
-                </a>
+                            <span>
+                                Stock
+                            </span>
 
-
-                {# CLIENTS #}
-
-                <a
-                    href="#"
-                    class="nav-link disabled"
-                    onclick="return false;"
-                    title="Module en préparation"
-                >
-                    <i class="bi bi-people"></i>
-                    Clients
-                </a>
+                        </a>
 
 
-                {# FOURNISSEURS #}
-
-                <a
-                    href="#"
-                    class="nav-link disabled"
-                    onclick="return false;"
-                    title="Module en préparation"
-                >
-                    <i class="bi bi-truck"></i>
-                    Fournisseurs
-                </a>
+                        <ul class="dropdown-menu">
 
 
-                {# UTILISATEURS #}
+                            <li>
 
-                <a
-                    href="#"
-                    class="nav-link disabled"
-                    onclick="return false;"
-                    title="Module en préparation"
-                >
-                    <i class="bi bi-person"></i>
-                    Utilisateurs
-                </a>
+                                <a
+                                    href="{{ path('app_produit_index') }}"
+                                    class="dropdown-item"
+                                >
 
-            </div>
+                                    <i class="bi bi-box2-fill"></i>
+
+                                    <span>
+                                        Produits
+                                    </span>
+
+                                </a>
+
+                            </li>
 
 
-            {# ======================================================
-               UTILISATEUR / DECONNEXION
-               ====================================================== #}
+                            <li>
 
-            <div class="user-section">
+                                <a
+                                    href="{{ path('app_categorie_index') }}"
+                                    class="dropdown-item"
+                                >
 
-                {% if app.user %}
+                                    <i class="bi bi-tags-fill"></i>
 
-                    <span class="user-info">
+                                    <span>
+                                        Catégories
+                                    </span>
 
-                        <i class="bi bi-person-circle"></i>
+                                </a>
 
-                        {{ app.user.prenom }}
-                        {{ app.user.nom }}
+                            </li>
 
-                    </span>
 
+                            <li>
+
+                                <a
+                                    href="{{ path('app_fournisseur_index') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-truck"></i>
+
+                                    <span>
+                                        Fournisseurs
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a
+                                    href="{{ path('app_entree_stock_index') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-box-arrow-in-down"></i>
+
+                                    <span>
+                                        Entrées stock
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a
+                                    href="{{ path('app_sortie_stock_index') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-box-arrow-up"></i>
+
+                                    <span>
+                                        Sorties stock
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a
+                                    href="{{ path('app_mouvement_stock_index') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-arrow-left-right"></i>
+
+                                    <span>
+                                        Mouvements
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <hr class="dropdown-divider">
+
+                            </li>
+
+
+                            <li>
+
+                                <a
+                                    href="{{ path('app_stock_dashboard') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-bar-chart-fill"></i>
+
+                                    <span>
+                                        Tableau de stock
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                        </ul>
+
+                    </li>
+
+
+                    {# =================================================
+                       VENTES
+                       ================================================= #}
+
+                    <li class="nav-item dropdown">
+
+                        <a
+                            href="#"
+                            class="nav-link dropdown-toggle
+                            {% if current_route starts with 'app_admin_commande_'
+                                or current_route starts with 'app_admin_client_'
+                            %}
+                                nex-active
+                            {% endif %}"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+
+                            <i class="bi bi-cart-check-fill"></i>
+
+                            <span>
+                                Ventes
+                            </span>
+
+                        </a>
+
+
+                        <ul class="dropdown-menu">
+
+
+                            <li>
+
+                                <a
+                                    href="{{ path('app_admin_commande_index') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-receipt"></i>
+
+                                    <span>
+                                        Commandes
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a
+                                    href="{{ path('app_admin_client_index') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-people-fill"></i>
+
+                                    <span>
+                                        Clients
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                        </ul>
+
+                    </li>
+
+
+                    {# =================================================
+                       ADMINISTRATION
+                       ================================================= #}
+
+                    <li class="nav-item dropdown">
+
+                        <a
+                            href="#"
+                            class="nav-link dropdown-toggle
+                            {% if current_route starts with 'app_admin_user_' %}
+                                nex-active
+                            {% endif %}"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+
+                            <i class="bi bi-shield-lock-fill"></i>
+
+                            <span>
+                                Administration
+                            </span>
+
+                        </a>
+
+
+                        <ul class="dropdown-menu">
+
+
+                            <li>
+
+                                <a
+                                    href="{{ path('app_admin_user_index') }}"
+                                    class="dropdown-item"
+                                >
+
+                                    <i class="bi bi-person-gear"></i>
+
+                                    <span>
+                                        Utilisateurs
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                        </ul>
+
+                    </li>
+
+
+                </ul>
+
+
+            {# =====================================================
+               CLIENT
+               ===================================================== #}
+
+            {% else %}
+
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+
+
+                    {# DASHBOARD CLIENT #}
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ path('app_client_home') }}"
+                            class="nav-link
+                            {% if current_route == 'app_client_home' %}
+                                nex-active
+                            {% endif %}"
+                        >
+
+                            <i class="bi bi-grid-1x2-fill"></i>
+
+                            <span>
+                                Dashboard
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    {# PRODUITS CLIENT #}
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ path('app_client_produit_index') }}"
+                            class="nav-link
+                            {% if current_route starts with 'app_client_produit_' %}
+                                nex-active
+                            {% endif %}"
+                        >
+
+                            <i class="bi bi-shop"></i>
+
+                            <span>
+                                Produits
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    {# PANIER CLIENT #}
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ path('app_client_cart') }}"
+                            class="nav-link nex-cart-link
+                            {% if current_route starts with 'app_client_cart' %}
+                                nex-active
+                            {% endif %}"
+                        >
+
+                            <i class="bi bi-cart3"></i>
+
+                            <span>
+                                Panier
+                            </span>
+
+
+                            {% if panier_count is defined and panier_count > 0 %}
+
+                                <span class="nex-cart-badge">
+                                    {{ panier_count }}
+                                </span>
+
+                            {% endif %}
+
+                        </a>
+
+                    </li>
+
+
+                    {# COMMANDES CLIENT #}
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ path('app_client_commandes') }}"
+                            class="nav-link
+                            {% if current_route starts with 'app_client_commande' %}
+                                nex-active
+                            {% endif %}"
+                        >
+
+                            <i class="bi bi-receipt"></i>
+
+                            <span>
+                                Mes commandes
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    {# PROFIL CLIENT #}
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ path('app_client_profile') }}"
+                            class="nav-link
+                            {% if current_route starts with 'app_client_profile' %}
+                                nex-active
+                            {% endif %}"
+                        >
+
+                            <i class="bi bi-person-circle"></i>
+
+                            <span>
+                                Mon profil
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                </ul>
+
+            {% endif %}
+
+
+            {# =====================================================
+               USER CONNECTÉ
+               ===================================================== #}
+
+            {% if app.user %}
+
+                <div class="nex-user-zone">
+
+
+                    <div class="nex-user-pill">
+
+
+                        <span class="nex-user-avatar">
+
+                            <i class="bi bi-person-fill"></i>
+
+                        </span>
+
+
+                        <span class="nex-user-info">
+
+
+                            <span class="nex-user-name">
+
+                                {{ app.user.email|split('@')|first }}
+
+                            </span>
+
+
+                            <span class="nex-user-role">
+
+
+                                {% if is_granted('ROLE_ADMIN') %}
+
+                                    <span class="nex-role-badge admin">
+
+                                        <i class="bi bi-shield-check"></i>
+
+                                        Administrateur
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="nex-role-badge client">
+
+                                        <i class="bi bi-person-check"></i>
+
+                                        Client
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </span>
+
+
+                        </span>
+
+
+                    </div>
+
+
+                    {# LOGOUT #}
 
                     <a
                         href="{{ path('app_logout') }}"
-                        class="btn btn-outline-danger logout-btn"
+                        class="nex-logout"
+                        title="Déconnexion"
+                        aria-label="Déconnexion"
                     >
+
                         <i class="bi bi-box-arrow-right"></i>
-                        Déconnexion
+
                     </a>
 
-                {% endif %}
 
-            </div>
+                </div>
+
+            {% endif %}
+
 
         </div>
 
@@ -473,17 +1488,13 @@
 </nav>
 
 
-{# ==============================================================
-   CONTENU PRINCIPAL
-   ============================================================== #}
+{# =============================================================
+   FLASH MESSAGES
+   ============================================================= #}
 
-<main>
+{% if app.flashes|length > 0 %}
 
-    <div class="content">
-
-        {# ==========================================================
-           MESSAGES FLASH
-           ========================================================== #}
+    <div class="nex-alert-zone">
 
         {% for label, messages in app.flashes %}
 
@@ -491,14 +1502,51 @@
 
                 <div
                     class="alert
-                    alert-{{ label == 'error' ? 'danger' : label }}
+                    {% if label == 'success' %}
+                        alert-success
+                    {% elseif label == 'danger' or label == 'error' %}
+                        alert-danger
+                    {% elseif label == 'warning' %}
+                        alert-warning
+                    {% else %}
+                        alert-info
+                    {% endif %}
                     alert-dismissible
                     fade
-                    show"
+                    show
+                    nex-alert
+                    mb-2"
                     role="alert"
                 >
 
-                    {{ message }}
+                    <div class="d-flex align-items-center gap-2">
+
+
+                        {% if label == 'success' %}
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                        {% elseif label == 'danger' or label == 'error' %}
+
+                            <i class="bi bi-x-circle-fill"></i>
+
+                        {% elseif label == 'warning' %}
+
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+
+                        {% else %}
+
+                            <i class="bi bi-info-circle-fill"></i>
+
+                        {% endif %}
+
+
+                        <span>
+                            {{ message }}
+                        </span>
+
+                    </div>
+
 
                     <button
                         type="button"
@@ -513,17 +1561,20 @@
 
         {% endfor %}
 
+    </div>
 
-        {# ==========================================================
-           TITRE DE LA PAGE
-           ========================================================== #}
+{% endif %}
+
+
+{# =============================================================
+   CONTENU PRINCIPAL
+   ============================================================= #}
+
+<main class="nex-main">
+
+    <div class="nex-content">
 
         {% block header_title %}{% endblock %}
-
-
-        {# ==========================================================
-           CONTENU DE LA PAGE
-           ========================================================== #}
 
         {% block body %}{% endblock %}
 
@@ -532,9 +1583,9 @@
 </main>
 
 
-{# ==============================================================
-   BOOTSTRAP JS
-   ============================================================== #}
+{# =============================================================
+   BOOTSTRAP JAVASCRIPT
+   ============================================================= #}
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -546,3 +1597,4 @@
 </body>
 
 </html>
+

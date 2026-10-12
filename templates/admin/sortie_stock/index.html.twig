@@ -1,0 +1,1270 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sorties de stock{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4 px-3 px-lg-4">
+
+    {# =========================================================
+       HEADER
+       ========================================================= #}
+    <div class="page-header mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+
+                <div class="page-badge">
+                    <i class="bi bi-arrow-up-circle me-2"></i>
+                    Gestion du stock
+                </div>
+
+                <h1 class="page-title mt-2 mb-1">
+                    Sorties de stock
+                </h1>
+
+                <p class="page-subtitle mb-0">
+                    Consultez et gérez les sorties de produits du stock.
+                </p>
+
+            </div>
+
+
+            <a href="{{ path('app_sortie_stock_new') }}"
+               class="btn btn-primary new-btn">
+
+                <i class="bi bi-plus-lg me-2"></i>
+                Nouvelle sortie
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       FLASH SUCCESS
+       ========================================================= #}
+    {% for message in app.flashes('success') %}
+
+        <div class="alert alert-success custom-alert mb-4">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    {# =========================================================
+       FLASH ERROR
+       ========================================================= #}
+    {% for message in app.flashes('error') %}
+
+        <div class="alert alert-danger custom-alert mb-4">
+
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    {# =========================================================
+       STATISTIQUES
+       ========================================================= #}
+    <div class="row g-3 mb-4">
+
+        {# NOMBRE DE SORTIES #}
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Nombre de sorties
+                        </div>
+
+                        <div class="stat-value">
+                            {{ nombreSorties }}
+                        </div>
+
+                        <div class="stat-info">
+                            mouvements enregistrés
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon icon-purple">
+                        <i class="bi bi-arrow-up-circle"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# QUANTITE TOTALE #}
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Quantité sortie
+                        </div>
+
+                        <div class="stat-value">
+                            {{ quantiteTotale }}
+                        </div>
+
+                        <div class="stat-info">
+                            pièces sorties
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon icon-orange">
+                        <i class="bi bi-box-arrow-up"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# VALEUR TOTALE #}
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Valeur totale
+                        </div>
+
+                        <div class="stat-value money-value">
+                            {{ valeurTotale|number_format(0, ',', ' ') }} Ar
+                        </div>
+
+                        <div class="stat-info">
+                            valeur des sorties
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon icon-green">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       TABLE CARD
+       ========================================================= #}
+    <div class="table-card">
+
+        {# TABLE HEADER #}
+        <div class="table-header">
+
+            <div>
+
+                <div class="table-title">
+                    Historique des sorties
+                </div>
+
+                <div class="table-subtitle">
+                    Liste de tous les mouvements de sortie de stock.
+                </div>
+
+            </div>
+
+
+            {# RECHERCHE #}
+            <form method="get"
+                  action="{{ path('app_sortie_stock_index') }}"
+                  class="search-form">
+
+                <div class="search-box">
+
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ recherche }}"
+                        class="search-input"
+                        placeholder="Rechercher..."
+                        autocomplete="off"
+                    >
+
+                    {% if recherche %}
+
+                        <a
+                            href="{{ path('app_sortie_stock_index') }}"
+                            class="search-clear"
+                            title="Effacer la recherche"
+                        >
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-dark search-btn">
+
+                    Rechercher
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        {# =====================================================
+           TABLE
+           ===================================================== #}
+        <div class="table-responsive">
+
+            <table class="table custom-table align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Sortie
+                        </th>
+
+                        <th>
+                            Produit
+                        </th>
+
+                        <th>
+                            Client
+                        </th>
+
+                        <th class="text-center">
+                            Quantité
+                        </th>
+
+                        <th class="text-end">
+                            Prix unitaire
+                        </th>
+
+                        <th class="text-end">
+                            Valeur
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Document
+                        </th>
+
+                        <th>
+                            Utilisateur
+                        </th>
+
+                        <th class="text-end">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% if sorties is not empty %}
+
+                    {% for sortie in sorties %}
+
+                        <tr>
+
+                            {# SORTIE ID #}
+                            <td>
+
+                                <div class="movement-id">
+                                    #{{ sortie.id }}
+                                </div>
+
+                                <div class="movement-type">
+                                    <span class="type-badge">
+                                        <i class="bi bi-arrow-up-circle me-1"></i>
+                                        Sortie
+                                    </span>
+                                </div>
+
+                            </td>
+
+
+                            {# PRODUIT #}
+                            <td>
+
+                                {% if sortie.produit %}
+
+                                    <div class="product-cell">
+
+                                        <div class="product-icon">
+                                            <i class="bi bi-box-seam"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <div class="product-name">
+                                                {{ sortie.produit.nom }}
+                                            </div>
+
+                                            <div class="product-reference">
+                                                {{ sortie.produit.reference }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Produit supprimé
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# CLIENT #}
+                            <td>
+
+                                {% if sortie.client %}
+
+                                    <div class="client-cell">
+
+                                        <div class="client-avatar">
+
+                                            {% set initiales = '' %}
+
+                                            {% if sortie.client.prenom %}
+                                                {% set initiales = initiales ~ sortie.client.prenom|slice(0, 1)|upper %}
+                                            {% endif %}
+
+                                            {% if sortie.client.nom %}
+                                                {% set initiales = initiales ~ sortie.client.nom|slice(0, 1)|upper %}
+                                            {% endif %}
+
+                                            {{ initiales|default('CL') }}
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <div class="client-name">
+
+                                                {{ sortie.client.prenom }}
+                                                {{ sortie.client.nom }}
+
+                                            </div>
+
+                                            <div class="client-small">
+                                                Client
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="client-empty">
+                                        <i class="bi bi-dash-circle me-1"></i>
+                                        Aucun client
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# QUANTITE #}
+                            <td class="text-center">
+
+                                <span class="quantity-badge">
+                                    -{{ sortie.quantite }}
+                                </span>
+
+                            </td>
+
+
+                            {# PRIX UNITAIRE #}
+                            <td class="text-end">
+
+                                <div class="price-cell">
+
+                                    {{ sortie.prixUnitaire|default('0')|number_format(0, ',', ' ') }}
+
+                                    <span>Ar</span>
+
+                                </div>
+
+                            </td>
+
+
+                            {# VALEUR #}
+                            <td class="text-end">
+
+                                {% set valeurSortie =
+    sortie.quantite
+    * (sortie.prixUnitaire|default('0'))
+%}
+
+                                <div class="value-cell">
+
+                                    {{ valeurSortie|number_format(0, ',', ' ') }}
+
+                                    <span>Ar</span>
+
+                                </div>
+
+                            </td>
+
+
+                            {# DATE #}
+                            <td>
+
+                                {% if sortie.dateSortie %}
+
+                                    <div class="date-cell">
+
+                                        <div class="date-main">
+                                            {{ sortie.dateSortie|date('d/m/Y') }}
+                                        </div>
+
+                                        <div class="date-time">
+                                            {{ sortie.dateSortie|date('H:i') }}
+                                        </div>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# DOCUMENT #}
+                            <td>
+
+                                {% if sortie.referenceDocument %}
+
+                                    <span class="document-badge">
+
+                                        <i class="bi bi-file-earmark-text me-1"></i>
+
+                                        {{ sortie.referenceDocument }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# UTILISATEUR #}
+                            <td>
+
+                                {% if sortie.utilisateur %}
+
+                                    <div class="user-cell">
+
+                                        <i class="bi bi-person-circle"></i>
+
+                                        <span>
+                                            {{ sortie.utilisateur.prenom }}
+                                            {{ sortie.utilisateur.nom }}
+                                        </span>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# ACTION #}
+                            <td class="text-end">
+
+                                <a
+                                    href="{{ path('app_sortie_stock_edit', {
+                                        id: sortie.id
+                                    }) }}"
+                                    class="action-btn"
+                                    title="Modifier"
+                                >
+
+                                    <i class="bi bi-pencil-square"></i>
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="10">
+
+                            <div class="empty-state">
+
+                                <div class="empty-icon">
+                                    <i class="bi bi-box-arrow-up"></i>
+                                </div>
+
+                                <h3>
+                                    Aucune sortie de stock
+                                </h3>
+
+                                {% if recherche %}
+
+                                    <p>
+                                        Aucun résultat ne correspond à
+                                        <strong>« {{ recherche }} »</strong>.
+                                    </p>
+
+                                    <a
+                                        href="{{ path('app_sortie_stock_index') }}"
+                                        class="btn btn-light border"
+                                    >
+                                        Effacer la recherche
+                                    </a>
+
+                                {% else %}
+
+                                    <p>
+                                        Aucune sortie de stock n'a encore été enregistrée.
+                                    </p>
+
+                                    <a
+                                        href="{{ path('app_sortie_stock_new') }}"
+                                        class="btn btn-primary"
+                                    >
+                                        <i class="bi bi-plus-lg me-2"></i>
+                                        Enregistrer une sortie
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {# =====================================================
+           FOOTER
+           ===================================================== #}
+        {% if sorties is not empty %}
+
+            <div class="table-footer">
+
+                <div class="result-info">
+
+                    <i class="bi bi-info-circle me-1"></i>
+
+                    {{ nombreSorties }}
+
+                    {% if nombreSorties > 1 %}
+                        sorties affichées
+                    {% else %}
+                        sortie affichée
+                    {% endif %}
+
+                </div>
+
+
+                <a
+                    href="{{ path('app_sortie_stock_new') }}"
+                    class="btn btn-primary footer-new-btn"
+                >
+
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Nouvelle sortie
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+{# =============================================================
+   STYLE
+   ============================================================= #}
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .page-header {
+        padding: 4px 2px;
+    }
+
+    .page-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .page-title {
+        color: #172033;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .page-subtitle {
+        color: #8993a5;
+        font-size: 14px;
+    }
+
+    .new-btn {
+        padding: 12px 18px;
+        border-radius: 11px;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(13, 110, 253, .18);
+    }
+
+
+    /* =========================================================
+       ALERT
+       ========================================================= */
+
+    .custom-alert {
+        border: 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       STATS
+       ========================================================= */
+
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+        padding: 20px;
+        min-height: 145px;
+        box-shadow: 0 7px 25px rgba(15, 23, 42, .05);
+    }
+
+    .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .stat-label {
+        color: #7b8495;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .stat-value {
+        margin-top: 8px;
+        color: #172033;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .money-value {
+        font-size: 21px;
+    }
+
+    .stat-info {
+        margin-top: 7px;
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .icon-purple {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .icon-orange {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    .icon-green {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+
+    /* =========================================================
+       TABLE CARD
+       ========================================================= */
+
+    .table-card {
+        background: #ffffff;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, .05);
+    }
+
+    .table-header {
+        padding: 22px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        border-bottom: 1px solid #f1f4f8;
+    }
+
+    .table-title {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .table-subtitle {
+        margin-top: 4px;
+        color: #98a1af;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       RECHERCHE
+       ========================================================= */
+
+    .search-form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .search-box {
+        width: 270px;
+        height: 42px;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-box > i {
+        position: absolute;
+        left: 13px;
+        color: #9ca3af;
+        font-size: 14px;
+        z-index: 2;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 100%;
+        padding: 0 38px;
+        border: 1px solid #e0e5eb;
+        border-radius: 10px;
+        outline: none;
+        color: #172033;
+        font-size: 13px;
+        transition: .2s;
+    }
+
+    .search-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 12px;
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .search-clear:hover {
+        color: #ef4444;
+    }
+
+    .search-btn {
+        height: 42px;
+        border-radius: 10px;
+        padding: 0 15px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .custom-table {
+        min-width: 1200px;
+    }
+
+    .custom-table thead th {
+        background: #f8fafc;
+        color: #768195;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e9edf2;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        white-space: nowrap;
+    }
+
+    .custom-table tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f3f6;
+        vertical-align: middle;
+    }
+
+    .custom-table tbody tr {
+        transition: .18s;
+    }
+
+    .custom-table tbody tr:hover {
+        background: #fbfcfe;
+    }
+
+
+    /* =========================================================
+       SORTIE
+       ========================================================= */
+
+    .movement-id {
+        color: #172033;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .movement-type {
+        margin-top: 5px;
+    }
+
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: #fff7ed;
+        color: #c2410c;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+
+    /* =========================================================
+       PRODUIT
+       ========================================================= */
+
+    .product-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 190px;
+    }
+
+    .product-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #eef2ff;
+        color: #4f46e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .product-name {
+        color: #172033;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .product-reference {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       CLIENT
+       ========================================================= */
+
+    .client-cell {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 150px;
+    }
+
+    .client-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #eef2ff;
+        color: #4f46e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .client-name {
+        color: #172033;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .client-small {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 9px;
+    }
+
+    .client-empty {
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+       QUANTITE
+       ========================================================= */
+
+    .quantity-badge {
+        display: inline-flex;
+        min-width: 48px;
+        justify-content: center;
+        padding: 6px 9px;
+        border-radius: 8px;
+        background: #fff1f2;
+        color: #be123c;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+
+    /* =========================================================
+       PRIX
+       ========================================================= */
+
+    .price-cell,
+    .value-cell {
+        color: #172033;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .price-cell span,
+    .value-cell span {
+        color: #9aa3b2;
+        font-size: 9px;
+        font-weight: 600;
+    }
+
+    .value-cell {
+        color: #b45309;
+    }
+
+
+    /* =========================================================
+       DATE
+       ========================================================= */
+
+    .date-main {
+        color: #172033;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .date-time {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       DOCUMENT
+       ========================================================= */
+
+    .document-badge {
+        display: inline-flex;
+        align-items: center;
+        max-width: 140px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 10px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       UTILISATEUR
+       ========================================================= */
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #64748b;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    .user-cell i {
+        color: #94a3b8;
+        font-size: 17px;
+    }
+
+
+    /* =========================================================
+       ACTION
+       ========================================================= */
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+        text-decoration: none;
+        transition: .2s;
+    }
+
+    .action-btn:hover {
+        background: #eef2ff;
+        border-color: #c7d2fe;
+        color: #4f46e5;
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    .empty-state {
+        padding: 70px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        background: #fff7ed;
+        color: #ea580c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 29px;
+    }
+
+    .empty-state h3 {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        max-width: 480px;
+        margin: 8px auto 20px;
+        color: #98a1af;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .table-footer {
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        border-top: 1px solid #f1f4f7;
+    }
+
+    .result-info {
+        color: #8d97a7;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .footer-new-btn {
+        border-radius: 9px;
+        padding: 9px 13px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .table-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .search-form {
+            width: 100%;
+        }
+
+        .search-box {
+            width: 100%;
+            flex: 1;
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .page-title {
+            font-size: 25px;
+        }
+
+        .new-btn {
+            width: 100%;
+        }
+
+        .table-footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .footer-new-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+

@@ -1,69 +1,1662 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau de bord{% endblock %}
+{% block title %}
+    Dashboard - Gestion de Stock
+{% endblock %}
+
+{% block header_title %}
+    <div class="modern-header">
+
+        <div>
+            <div class="header-eyebrow">
+                <span class="status-pulse"></span>
+                SYSTÈME OPÉRATIONNEL
+            </div>
+
+            <h1 class="modern-title">
+                Tableau de bord
+            </h1>
+
+            <p class="modern-subtitle">
+                Gérez votre activité, vos commandes, vos paiements
+                et vos livraisons depuis un seul espace.
+            </p>
+        </div>
+
+        <div class="header-actions">
+
+            <div class="live-date">
+                <i class="bi bi-calendar3"></i>
+                <span id="currentDate">
+                    {{ "now"|date("d/m/Y") }}
+                </span>
+            </div>
+
+            <button
+                type="button"
+                id="themeToggle"
+                class="theme-toggle"
+                aria-label="Changer le thème"
+                title="Changer le thème"
+            >
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+            </button>
+
+        </div>
+
+    </div>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
 
-    <div class="mb-4">
-        <h1 class="h3 fw-bold">Tableau de bord</h1>
-        <p class="text-muted mb-0">
-            Bienvenue dans votre système de gestion de stock.
-        </p>
-    </div>
+<style>
+    /* =========================================================
+       VARIABLES
+    ========================================================= */
+
+    :root {
+        --dashboard-bg: #f5f7fb;
+        --dashboard-card: rgba(255, 255, 255, 0.92);
+        --dashboard-card-solid: #ffffff;
+        --dashboard-border: rgba(15, 23, 42, 0.08);
+
+        --dashboard-text: #172033;
+        --dashboard-text-secondary: #6b7280;
+        --dashboard-muted: #94a3b8;
+
+        --dashboard-primary: #2563eb;
+        --dashboard-primary-soft: rgba(37, 99, 235, 0.10);
+
+        --dashboard-success: #10b981;
+        --dashboard-success-soft: rgba(16, 185, 129, 0.10);
+
+        --dashboard-warning: #f59e0b;
+        --dashboard-warning-soft: rgba(245, 158, 11, 0.12);
+
+        --dashboard-danger: #ef4444;
+        --dashboard-danger-soft: rgba(239, 68, 68, 0.10);
+
+        --dashboard-info: #06b6d4;
+        --dashboard-info-soft: rgba(6, 182, 212, 0.10);
+
+        --dashboard-purple: #8b5cf6;
+        --dashboard-purple-soft: rgba(139, 92, 246, 0.10);
+
+        --dashboard-shadow:
+            0 10px 30px rgba(15, 23, 42, 0.06);
+
+        --dashboard-shadow-hover:
+            0 18px 45px rgba(15, 23, 42, 0.10);
+
+        --dashboard-radius: 20px;
+        --dashboard-transition: 0.25s ease;
+    }
+
+    body.dashboard-dark,
+    html.dashboard-dark body {
+        --dashboard-bg: #0b1120;
+        --dashboard-card: rgba(15, 23, 42, 0.88);
+        --dashboard-card-solid: #111827;
+        --dashboard-border: rgba(255, 255, 255, 0.07);
+
+        --dashboard-text: #f8fafc;
+        --dashboard-text-secondary: #94a3b8;
+        --dashboard-muted: #64748b;
+
+        --dashboard-shadow:
+            0 12px 35px rgba(0, 0, 0, 0.20);
+
+        --dashboard-shadow-hover:
+            0 20px 50px rgba(0, 0, 0, 0.30);
+    }
+
+    /* =========================================================
+       CONTENEUR PRINCIPAL
+    ========================================================= */
+
+    .modern-dashboard {
+        position: relative;
+        padding: 10px 0 50px;
+        min-height: 100%;
+        background:
+            radial-gradient(
+                circle at 0% 0%,
+                var(--dashboard-primary-soft),
+                transparent 26%
+            ),
+            radial-gradient(
+                circle at 100% 10%,
+                var(--dashboard-purple-soft),
+                transparent 25%
+            );
+        color: var(--dashboard-text);
+        transition:
+            background var(--dashboard-transition),
+            color var(--dashboard-transition);
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .modern-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .header-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--dashboard-success);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .status-pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--dashboard-success);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+        animation: pulse 2s infinite;
+    }
+
+    .modern-title {
+        margin: 0;
+        color: var(--dashboard-text);
+        font-size: clamp(28px, 4vw, 40px);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -1.2px;
+    }
+
+    .modern-subtitle {
+        max-width: 700px;
+        margin: 10px 0 0;
+        color: var(--dashboard-text-secondary);
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .live-date,
+    .theme-toggle {
+        min-height: 44px;
+        border: 1px solid var(--dashboard-border);
+        background: var(--dashboard-card);
+        color: var(--dashboard-text-secondary);
+        box-shadow: var(--dashboard-shadow);
+        backdrop-filter: blur(14px);
+    }
+
+    .live-date {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 15px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .theme-toggle {
+        width: 44px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        cursor: pointer;
+        transition:
+            transform var(--dashboard-transition),
+            border-color var(--dashboard-transition),
+            background var(--dashboard-transition);
+    }
+
+    .theme-toggle:hover {
+        transform: translateY(-2px);
+        border-color: var(--dashboard-primary);
+        background: var(--dashboard-primary-soft);
+        color: var(--dashboard-primary);
+    }
+
+    /* =========================================================
+       KPI
+    ========================================================= */
+
+    .kpi-card {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+        padding: 24px;
+        border: 1px solid var(--dashboard-border);
+        border-radius: var(--dashboard-radius);
+        background: var(--dashboard-card);
+        box-shadow: var(--dashboard-shadow);
+        backdrop-filter: blur(14px);
+        transition:
+            transform var(--dashboard-transition),
+            box-shadow var(--dashboard-transition),
+            border-color var(--dashboard-transition);
+        animation: fadeUp 0.45s ease both;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--dashboard-shadow-hover);
+    }
+
+    .kpi-card::after {
+        content: "";
+        position: absolute;
+        right: -35px;
+        top: -35px;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        opacity: 0.45;
+        filter: blur(8px);
+    }
+
+    .kpi-card.warning::after {
+        background: var(--dashboard-warning-soft);
+    }
+
+    .kpi-card.primary::after {
+        background: var(--dashboard-primary-soft);
+    }
+
+    .kpi-card.info::after {
+        background: var(--dashboard-info-soft);
+    }
+
+    .kpi-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .kpi-icon {
+        width: 54px;
+        height: 54px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        font-size: 24px;
+    }
+
+    .kpi-icon.warning {
+        color: var(--dashboard-warning);
+        background: var(--dashboard-warning-soft);
+    }
+
+    .kpi-icon.primary {
+        color: var(--dashboard-primary);
+        background: var(--dashboard-primary-soft);
+    }
+
+    .kpi-icon.info {
+        color: var(--dashboard-info);
+        background: var(--dashboard-info-soft);
+    }
+
+    .kpi-tag {
+        padding: 6px 9px;
+        border-radius: 999px;
+        background: var(--dashboard-bg);
+        color: var(--dashboard-text-secondary);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+    }
+
+    .kpi-title {
+        margin-top: 24px;
+        color: var(--dashboard-text-secondary);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .kpi-value {
+        margin: 6px 0 0;
+        color: var(--dashboard-text);
+        font-size: 38px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -1px;
+    }
+
+    .kpi-description {
+        margin-top: 8px;
+        color: var(--dashboard-muted);
+        font-size: 12px;
+    }
+
+    .kpi-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 22px;
+        padding-top: 16px;
+        border-top: 1px solid var(--dashboard-border);
+    }
+
+    .mini-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .mini-stat-label {
+        color: var(--dashboard-muted);
+        font-size: 11px;
+    }
+
+    .mini-stat-value {
+        color: var(--dashboard-text);
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    /* =========================================================
+       SECTION
+    ========================================================= */
+
+    .dashboard-section {
+        margin-top: 32px;
+    }
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 15px;
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        margin: 0;
+        color: var(--dashboard-text);
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+    }
+
+    .section-subtitle {
+        margin: 5px 0 0;
+        color: var(--dashboard-text-secondary);
+        font-size: 13px;
+    }
+
+    /* =========================================================
+       MODULE CARDS
+    ========================================================= */
+
+    .module-card {
+        height: 100%;
+        padding: 22px;
+        border: 1px solid var(--dashboard-border);
+        border-radius: 18px;
+        background: var(--dashboard-card);
+        box-shadow: var(--dashboard-shadow);
+        transition:
+            transform var(--dashboard-transition),
+            box-shadow var(--dashboard-transition),
+            border-color var(--dashboard-transition);
+        animation: fadeUp 0.55s ease both;
+    }
+
+    .module-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--dashboard-shadow-hover);
+    }
+
+    .module-icon {
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        margin-bottom: 17px;
+        font-size: 21px;
+    }
+
+    .module-icon.blue {
+        background: var(--dashboard-primary-soft);
+        color: var(--dashboard-primary);
+    }
+
+    .module-icon.green {
+        background: var(--dashboard-success-soft);
+        color: var(--dashboard-success);
+    }
+
+    .module-icon.cyan {
+        background: var(--dashboard-info-soft);
+        color: var(--dashboard-info);
+    }
+
+    .module-icon.purple {
+        background: var(--dashboard-purple-soft);
+        color: var(--dashboard-purple);
+    }
+
+    .module-title {
+        margin: 0;
+        color: var(--dashboard-text);
+        font-size: 16px;
+        font-weight: 750;
+    }
+
+    .module-text {
+        min-height: 48px;
+        margin: 9px 0 18px;
+        color: var(--dashboard-text-secondary);
+        font-size: 13px;
+        line-height: 1.65;
+    }
+
+    .modern-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 100%;
+        min-height: 42px;
+        border-radius: 11px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+            transform var(--dashboard-transition),
+            box-shadow var(--dashboard-transition),
+            background var(--dashboard-transition);
+    }
+
+    .modern-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .modern-btn.blue {
+        background: var(--dashboard-primary);
+        color: #ffffff;
+        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
+    }
+
+    .modern-btn.blue:hover {
+        color: #ffffff;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.28);
+    }
+
+    .modern-btn.green {
+        background: var(--dashboard-success);
+        color: #ffffff;
+        box-shadow: 0 8px 18px rgba(16, 185, 129, 0.18);
+    }
+
+    .modern-btn.green:hover {
+        color: #ffffff;
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.28);
+    }
+
+    .modern-btn.cyan {
+        background: var(--dashboard-info);
+        color: #ffffff;
+        box-shadow: 0 8px 18px rgba(6, 182, 212, 0.18);
+    }
+
+    .modern-btn.cyan:hover {
+        color: #ffffff;
+        box-shadow: 0 10px 25px rgba(6, 182, 212, 0.28);
+    }
+
+    .modern-btn.purple {
+        background: var(--dashboard-purple);
+        color: #ffffff;
+        box-shadow: 0 8px 18px rgba(139, 92, 246, 0.18);
+    }
+
+    .modern-btn.purple:hover {
+        color: #ffffff;
+        box-shadow: 0 10px 25px rgba(139, 92, 246, 0.28);
+    }
+
+    /* =========================================================
+       ACTIVITY / STATUS
+    ========================================================= */
+
+    .activity-card {
+        height: 100%;
+        padding: 24px;
+        border: 1px solid var(--dashboard-border);
+        border-radius: 20px;
+        background: var(--dashboard-card);
+        box-shadow: var(--dashboard-shadow);
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--dashboard-border);
+    }
+
+    .activity-item:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .activity-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+
+    .activity-icon.yellow {
+        color: var(--dashboard-warning);
+        background: var(--dashboard-warning-soft);
+    }
+
+    .activity-icon.blue {
+        color: var(--dashboard-primary);
+        background: var(--dashboard-primary-soft);
+    }
+
+    .activity-icon.green {
+        color: var(--dashboard-success);
+        background: var(--dashboard-success-soft);
+    }
+
+    .activity-name {
+        color: var(--dashboard-text);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .activity-info {
+        color: var(--dashboard-text-secondary);
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .activity-number {
+        min-width: 35px;
+        height: 35px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 10px;
+        border-radius: 10px;
+        background: var(--dashboard-bg);
+        color: var(--dashboard-text);
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    /* =========================================================
+       QUICK ACTIONS
+    ========================================================= */
+
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--dashboard-border);
+        border-radius: 14px;
+        background: var(--dashboard-card-solid);
+        color: var(--dashboard-text);
+        text-decoration: none;
+        transition:
+            transform var(--dashboard-transition),
+            border-color var(--dashboard-transition),
+            box-shadow var(--dashboard-transition);
+    }
+
+    .quick-action:hover {
+        color: var(--dashboard-text);
+        transform: translateX(3px);
+        border-color: rgba(37, 99, 235, 0.22);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .quick-action-icon {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 11px;
+    }
+
+    .quick-action-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .quick-action-title {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .quick-action-text {
+        margin-top: 2px;
+        color: var(--dashboard-text-secondary);
+        font-size: 11px;
+    }
+
+    .quick-action-arrow {
+        color: var(--dashboard-muted);
+    }
+
+    /* =========================================================
+       FOOTER INFO
+    ========================================================= */
+
+    .system-banner {
+        margin-top: 32px;
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid var(--dashboard-border);
+        border-radius: 16px;
+        background: var(--dashboard-card);
+        box-shadow: var(--dashboard-shadow);
+    }
+
+    .system-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--dashboard-text);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .system-status small {
+        color: var(--dashboard-text-secondary);
+        font-weight: 500;
+    }
+
+    .system-badge {
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: var(--dashboard-success-soft);
+        color: var(--dashboard-success);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+
+    /* =========================================================
+       ANIMATIONS
+    ========================================================= */
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+        }
+
+        70% {
+            box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 991.98px) {
+        .modern-header {
+            flex-direction: column;
+        }
+
+        .header-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+
+        .modern-dashboard {
+            padding-bottom: 30px;
+        }
+
+        .modern-title {
+            font-size: 30px;
+        }
+
+        .modern-subtitle {
+            font-size: 13px;
+        }
+
+        .header-actions {
+            align-items: stretch;
+        }
+
+        .live-date {
+            flex: 1;
+        }
+
+        .kpi-card,
+        .module-card,
+        .activity-card {
+            border-radius: 16px;
+        }
+
+        .kpi-value {
+            font-size: 33px;
+        }
+
+        .section-heading {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .system-banner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 480px) {
+
+        .header-actions {
+            flex-wrap: wrap;
+        }
+
+        .live-date {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="container-fluid modern-dashboard">
+
+    <!-- =====================================================
+         KPI
+    ====================================================== -->
 
     <div class="row g-4">
 
-        <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Produits</h6>
-                    <h2 class="fw-bold">—</h2>
-                    <a href="{{ path('app_produit_index') }}"
-                       class="btn btn-primary btn-sm">
-                        Voir les produits
+        <!-- COMMANDES -->
+        <div class="col-xl-4 col-md-6">
+
+            <div class="kpi-card warning">
+
+                <div class="kpi-top">
+
+                    <div class="kpi-icon warning">
+                        <i class="bi bi-cart-check"></i>
+                    </div>
+
+                    <span class="kpi-tag">
+                        COMMANDES
+                    </span>
+
+                </div>
+
+                <div class="kpi-title">
+                    Commandes en attente
+                </div>
+
+                <div
+                    class="kpi-value counter"
+                    data-target="{{ commandesEnAttente }}"
+                >
+                    0
+                </div>
+
+                <div class="kpi-description">
+                    Commandes nécessitant une vérification.
+                </div>
+
+                <div class="kpi-bottom">
+
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">
+                            Confirmées
+                        </span>
+
+                        <span class="mini-stat-value text-success">
+                            {{ commandesConfirmees }}
+                        </span>
+                    </div>
+
+                    <div class="mini-stat text-end">
+                        <span class="mini-stat-label">
+                            Annulées
+                        </span>
+
+                        <span class="mini-stat-value text-danger">
+                            {{ commandesAnnulees }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAIEMENTS -->
+        <div class="col-xl-4 col-md-6">
+
+            <div class="kpi-card primary">
+
+                <div class="kpi-top">
+
+                    <div class="kpi-icon primary">
+                        <i class="bi bi-credit-card-2-front"></i>
+                    </div>
+
+                    <span class="kpi-tag">
+                        PAIEMENTS
+                    </span>
+
+                </div>
+
+                <div class="kpi-title">
+                    Paiements à valider
+                </div>
+
+                <div
+                    class="kpi-value counter"
+                    data-target="{{ paiementsEnAttente }}"
+                >
+                    0
+                </div>
+
+                <div class="kpi-description">
+                    Paiements déclarés par les clients.
+                </div>
+
+                <div class="kpi-bottom">
+
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">
+                            Payés
+                        </span>
+
+                        <span class="mini-stat-value text-success">
+                            {{ paiementsPayes }}
+                        </span>
+                    </div>
+
+                    <div class="mini-stat text-end">
+                        <span class="mini-stat-label">
+                            Refusés
+                        </span>
+
+                        <span class="mini-stat-value text-danger">
+                            {{ paiementsRefuses }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LIVRAISONS -->
+        <div class="col-xl-4 col-md-12">
+
+            <div class="kpi-card info">
+
+                <div class="kpi-top">
+
+                    <div class="kpi-icon info">
+                        <i class="bi bi-truck"></i>
+                    </div>
+
+                    <span class="kpi-tag">
+                        LIVRAISONS
+                    </span>
+
+                </div>
+
+                <div class="kpi-title">
+                    Livraisons en cours
+                </div>
+
+                <div
+                    class="kpi-value counter"
+                    data-target="{{ livraisonsEnCours }}"
+                >
+                    0
+                </div>
+
+                <div class="kpi-description">
+                    Commandes actuellement en livraison.
+                </div>
+
+                <div class="kpi-bottom">
+
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">
+                            En attente
+                        </span>
+
+                        <span class="mini-stat-value text-warning">
+                            {{ livraisonsEnAttente }}
+                        </span>
+                    </div>
+
+                    <div class="mini-stat text-end">
+                        <span class="mini-stat-label">
+                            Livrées
+                        </span>
+
+                        <span class="mini-stat-value text-success">
+                            {{ livraisonsLivrees }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MODULES
+    ====================================================== -->
+
+    <div class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2 class="section-title">
+                    Modules principaux
+                </h2>
+
+                <p class="section-subtitle">
+                    Accédez rapidement aux fonctions essentielles.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- PRODUITS -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="module-card">
+
+                    <div class="module-icon blue">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                    <h3 class="module-title">
+                        Produits
+                    </h3>
+
+                    <p class="module-text">
+                        Gérez les références, les prix, les catégories
+                        et les quantités disponibles.
+                    </p>
+
+                    <a
+                        href="{{ path('app_produit_index') }}"
+                        class="modern-btn blue"
+                    >
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        Gérer les produits
                     </a>
+
                 </div>
+
             </div>
+
+
+            <!-- COMMANDES -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="module-card">
+
+                    <div class="module-icon green">
+                        <i class="bi bi-cart-check"></i>
+                    </div>
+
+                    <h3 class="module-title">
+                        Commandes
+                    </h3>
+
+                    <p class="module-text">
+                        Consultez les commandes et mettez à jour
+                        leur statut.
+                    </p>
+
+                    <a
+                        href="{{ path('app_admin_commande_index') }}"
+                        class="modern-btn green"
+                    >
+                        <i class="bi bi-arrow-right-circle"></i>
+                        Gérer les commandes
+                    </a>
+                    
+
+                </div>
+
+            </div>
+
+
+            <!-- PAIEMENTS -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="module-card">
+
+                    <div class="module-icon purple">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+
+                    <h3 class="module-title">
+                        Paiements
+                    </h3>
+
+                    <p class="module-text">
+                        Vérifiez les paiements déclarés et validez
+                        les transactions.
+                    </p>
+
+                    <a
+                        href="{{ path('app_admin_paiement_index') }}"
+                        class="modern-btn purple"
+                    >
+                        <i class="bi bi-arrow-right-circle"></i>
+                        Gérer les paiements
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- LIVRAISONS -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="module-card">
+
+                    <div class="module-icon cyan">
+                        <i class="bi bi-truck"></i>
+                    </div>
+
+                    <h3 class="module-title">
+                        Livraisons
+                    </h3>
+
+                    <p class="module-text">
+                        Suivez l'expédition et la livraison des commandes.
+                    </p>
+
+                    <a
+                        href="{{ path('app_admin_livraison_index') }}"
+                        class="modern-btn cyan"
+                    >
+                        <i class="bi bi-arrow-right-circle"></i>
+                        Gérer les livraisons
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Catégories</h6>
-                    <h2 class="fw-bold">—</h2>
-                    <span class="text-muted small">
-                        Module en préparation
-                    </span>
-                </div>
+    </div>
+
+
+    <!-- =====================================================
+         ACTIVITÉ
+    ====================================================== -->
+
+    <div class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2 class="section-title">
+                    Vue opérationnelle
+                </h2>
+
+                <p class="section-subtitle">
+                    Suivi rapide des éléments nécessitant votre attention.
+                </p>
             </div>
+
         </div>
 
-        <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Entrées de stock</h6>
-                    <h2 class="fw-bold">—</h2>
-                    <span class="text-muted small">
-                        Module en préparation
-                    </span>
+        <div class="row g-4">
+
+            <!-- ÉTAT -->
+            <div class="col-lg-7">
+
+                <div class="activity-card">
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+
+                        <div>
+                            <h3 class="section-title" style="font-size: 17px;">
+                                État de l'activité
+                            </h3>
+
+                            <p class="section-subtitle">
+                                Données provenant de la base de données.
+                            </p>
+                        </div>
+
+                        <i class="bi bi-bar-chart-line fs-4 text-primary"></i>
+
+                    </div>
+
+
+                    <!-- COMMANDES -->
+
+                    <div class="activity-item">
+
+                        <div class="activity-left">
+
+                            <div class="activity-icon yellow">
+                                <i class="bi bi-cart-check"></i>
+                            </div>
+
+                            <div>
+                                <div class="activity-name">
+                                    Commandes en attente
+                                </div>
+
+                                <div class="activity-info">
+                                    À traiter par l'administrateur
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="activity-number">
+                            {{ commandesEnAttente }}
+                        </div>
+
+                    </div>
+
+
+                    <!-- PAIEMENTS -->
+
+                    <div class="activity-item">
+
+                        <div class="activity-left">
+
+                            <div class="activity-icon blue">
+                                <i class="bi bi-credit-card"></i>
+                            </div>
+
+                            <div>
+                                <div class="activity-name">
+                                    Paiements à valider
+                                </div>
+
+                                <div class="activity-info">
+                                    Déclarations reçues
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="activity-number">
+                            {{ paiementsEnAttente }}
+                        </div>
+
+                    </div>
+
+
+                    <!-- LIVRAISONS -->
+
+                    <div class="activity-item">
+
+                        <div class="activity-left">
+
+                            <div class="activity-icon green">
+                                <i class="bi bi-truck"></i>
+                            </div>
+
+                            <div>
+                                <div class="activity-name">
+                                    Livraisons en cours
+                                </div>
+
+                                <div class="activity-info">
+                                    Commandes actuellement expédiées
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="activity-number">
+                            {{ livraisonsEnCours }}
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
+
+            <!-- ACTIONS RAPIDES -->
+
+            <div class="col-lg-5">
+
+                <div class="activity-card">
+
+                    <h3 class="section-title" style="font-size: 17px;">
+                        Actions rapides
+                    </h3>
+
+                    <p class="section-subtitle mb-3">
+                        Accès direct aux fonctions principales.
+                    </p>
+
+
+                    <div class="d-grid gap-2">
+
+                        <a
+                            href="{{ path('app_produit_new') }}"
+                            class="quick-action"
+                        >
+
+                            <div
+                                class="quick-action-icon"
+                                style="
+                                    background: var(--dashboard-primary-soft);
+                                    color: var(--dashboard-primary);
+                                "
+                            >
+                                <i class="bi bi-plus-lg"></i>
+                            </div>
+
+                            <div class="quick-action-content">
+
+                                <div class="quick-action-title">
+                                    Nouveau produit
+                                </div>
+
+                                <div class="quick-action-text">
+                                    Ajouter un produit au stock
+                                </div>
+
+                            </div>
+
+                            <i class="bi bi-chevron-right quick-action-arrow"></i>
+
+                        </a>
+
+
+                        <a
+                            href="{{ path('app_admin_commande_index') }}"
+                            class="quick-action"
+                        >
+
+                            <div
+                                class="quick-action-icon"
+                                style="
+                                    background: var(--dashboard-warning-soft);
+                                    color: var(--dashboard-warning);
+                                "
+                            >
+                                <i class="bi bi-cart-check"></i>
+                            </div>
+
+                            <div class="quick-action-content">
+
+                                <div class="quick-action-title">
+                                    Commandes
+                                </div>
+
+                                <div class="quick-action-text">
+                                    Voir les commandes clients
+                                </div>
+
+                            </div>
+
+                            <i class="bi bi-chevron-right quick-action-arrow"></i>
+
+                        </a>
+
+
+                        <a
+                            href="{{ path('app_admin_paiement_index') }}"
+                            class="quick-action"
+                        >
+
+                            <div
+                                class="quick-action-icon"
+                                style="
+                                    background: var(--dashboard-purple-soft);
+                                    color: var(--dashboard-purple);
+                                "
+                            >
+                                <i class="bi bi-credit-card"></i>
+                            </div>
+
+                            <div class="quick-action-content">
+
+                                <div class="quick-action-title">
+                                    Paiements
+                                </div>
+
+                                <div class="quick-action-text">
+                                    Vérifier les paiements
+                                </div>
+
+                            </div>
+
+                            <i class="bi bi-chevron-right quick-action-arrow"></i>
+
+                        </a>
+
+
+                        <a
+                            href="{{ path('app_admin_livraison_index') }}"
+                            class="quick-action"
+                        >
+
+                            <div
+                                class="quick-action-icon"
+                                style="
+                                    background: var(--dashboard-info-soft);
+                                    color: var(--dashboard-info);
+                                "
+                            >
+                                <i class="bi bi-truck"></i>
+                            </div>
+
+                            <div class="quick-action-content">
+
+                                <div class="quick-action-title">
+                                    Livraisons
+                                </div>
+
+                                <div class="quick-action-text">
+                                    Suivre les expéditions
+                                </div>
+
+                            </div>
+
+                            <i class="bi bi-chevron-right quick-action-arrow"></i>
+
+                        </a>
+                        <a
+    href="{{ path('app_admin_user_index') }}"
+    class="quick-action"
+>
+
+    <div
+        class="quick-action-icon"
+        style="
+            background: var(--dashboard-purple-soft);
+            color: var(--dashboard-purple);
+        "
+    >
+        <i class="bi bi-people"></i>
+    </div>
+
+    <div class="quick-action-content">
+
+        <div class="quick-action-title">
+            Administrateurs
         </div>
 
-        <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Sorties de stock</h6>
-                    <h2 class="fw-bold">—</h2>
-                    <span class="text-muted small">
-                        Module en préparation
-                    </span>
+        <div class="quick-action-text">
+            Gérer les comptes administrateurs
+        </div>
+
+    </div>
+
+    <i class="bi bi-chevron-right quick-action-arrow"></i>
+
+</a>
+
+                    </div>
+
                 </div>
+
             </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         BANNIÈRE SYSTÈME
+    ====================================================== -->
+
+    <div class="system-banner">
+
+        <div class="system-status">
+
+            <span class="status-pulse"></span>
+
+            <div>
+                Plateforme opérationnelle
+                <small class="d-block">
+                    Gestion de stock · Commandes · Paiements · Livraisons
+                </small>
+            </div>
+
+        </div>
+
+        <div class="system-badge">
+            ONLINE
         </div>
 
     </div>
 
 </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* =====================================================
+           MODE CLAIR / SOMBRE
+        ====================================================== */
+
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function applyTheme(theme) {
+
+            if (theme === 'dark') {
+
+                document.body.classList.add('dashboard-dark');
+                document.documentElement.classList.add('dashboard-dark');
+
+                themeIcon.className = 'bi bi-sun-fill';
+
+            } else {
+
+                document.body.classList.remove('dashboard-dark');
+                document.documentElement.classList.remove('dashboard-dark');
+
+                themeIcon.className = 'bi bi-moon-stars-fill';
+            }
+        }
+
+        const savedTheme = localStorage.getItem('dashboard-theme');
+
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme('light');
+        }
+
+        themeToggle.addEventListener('click', function () {
+
+            const darkMode =
+                document.body.classList.contains('dashboard-dark');
+
+            const nextTheme = darkMode ? 'light' : 'dark';
+
+            localStorage.setItem(
+                'dashboard-theme',
+                nextTheme
+            );
+
+            applyTheme(nextTheme);
+        });
+
+
+        /* =====================================================
+           COMPTEURS ANIMÉS
+        ====================================================== */
+
+        const counters = document.querySelectorAll('.counter');
+
+        counters.forEach(function (counter) {
+
+            const target =
+                parseInt(counter.dataset.target, 10) || 0;
+
+            const duration = 900;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+
+                const progress = Math.min(
+                    (currentTime - startTime) / duration,
+                    1
+                );
+
+                const easedProgress =
+                    1 - Math.pow(1 - progress, 3);
+
+                const currentValue =
+                    Math.floor(target * easedProgress);
+
+                counter.textContent =
+                    currentValue.toLocaleString('fr-FR');
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent =
+                        target.toLocaleString('fr-FR');
+                }
+            }
+
+            requestAnimationFrame(updateCounter);
+        });
+
+
+        /* =====================================================
+           DATE / HEURE EN DIRECT
+        ====================================================== */
+
+        const dateElement =
+            document.getElementById('currentDate');
+
+        function updateDate() {
+
+            const now = new Date();
+
+            const day = String(
+                now.getDate()
+            ).padStart(2, '0');
+
+            const month = String(
+                now.getMonth() + 1
+            ).padStart(2, '0');
+
+            const year =
+                now.getFullYear();
+
+            dateElement.textContent =
+                `${day}/${month}/${year}`;
+        }
+
+        updateDate();
+
+
+        /* =====================================================
+           ANIMATION D'ENTRÉE
+        ====================================================== */
+
+        const animatedElements =
+            document.querySelectorAll(
+                '.kpi-card, .module-card, .activity-card'
+            );
+
+        animatedElements.forEach(function (element, index) {
+
+            element.style.animationDelay =
+                `${index * 70}ms`;
+
+        });
+
+    });
+</script>
+
 {% endblock %}
+

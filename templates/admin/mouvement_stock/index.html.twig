@@ -1,0 +1,1460 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mouvements de stock{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4 px-3 px-lg-4">
+
+    {# =========================================================
+       EN-TÊTE
+       ========================================================= #}
+    <div class="page-header mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+
+                <div class="page-badge">
+                    <i class="bi bi-arrow-left-right me-2"></i>
+                    Gestion du stock
+                </div>
+
+                <h1 class="page-title mt-2 mb-1">
+                    Mouvements de stock
+                </h1>
+
+                <p class="page-subtitle mb-0">
+                    Consultez l'historique complet des entrées et sorties de stock.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       STATISTIQUES
+       ========================================================= #}
+    <div class="row g-3 mb-4">
+
+        {# TOTAL MOUVEMENTS #}
+        <div class="col-md-4 col-xl-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Total mouvements
+                        </div>
+
+                        <div class="stat-value">
+                            {{ nombreMouvements }}
+                        </div>
+
+                        <div class="stat-info">
+                            entrées et sorties enregistrées
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon icon-purple">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# ENTRÉES #}
+        <div class="col-md-4 col-xl-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Entrées
+                        </div>
+
+                        <div class="stat-value">
+                            {{ nombreEntrees }}
+                        </div>
+
+                        <div class="stat-info">
+                            +{{ quantiteEntree }} unités
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon icon-green">
+                        <i class="bi bi-arrow-down-circle"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# SORTIES #}
+        <div class="col-md-4 col-xl-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Sorties
+                        </div>
+
+                        <div class="stat-value">
+                            {{ nombreSorties }}
+                        </div>
+
+                        <div class="stat-info">
+                            -{{ quantiteSortie }} unités
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon icon-red">
+                        <i class="bi bi-arrow-up-circle"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       RÉSUMÉ VALEUR
+       ========================================================= #}
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-6">
+
+            <div class="value-card value-entry">
+
+                <div class="value-icon">
+                    <i class="bi bi-box-arrow-in-down"></i>
+                </div>
+
+                <div>
+
+                    <div class="value-label">
+                        Valeur des entrées
+                    </div>
+
+                    <div class="value-number">
+                        {{ valeurEntree|number_format(2, ',', ' ') }} MGA
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="value-card value-exit">
+
+                <div class="value-icon">
+                    <i class="bi bi-box-arrow-up"></i>
+                </div>
+
+                <div>
+
+                    <div class="value-label">
+                        Valeur des sorties
+                    </div>
+
+                    <div class="value-number">
+                        {{ valeurSortie|number_format(2, ',', ' ') }} MGA
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       CARTE PRINCIPALE
+       ========================================================= #}
+    <div class="table-card">
+
+        {# =====================================================
+           HEADER
+           ===================================================== #}
+        <div class="table-header">
+
+            <div>
+
+                <div class="table-title">
+                    Historique des mouvements
+                </div>
+
+                <div class="table-subtitle">
+                    Les mouvements les plus récents apparaissent en premier.
+                </div>
+
+            </div>
+
+
+            {# =================================================
+               FILTRES
+               ================================================= #}
+            <div class="filter-buttons">
+
+                <a
+                    href="{{ path('app_mouvement_stock_index', {
+                        q: recherche,
+                        type: 'TOUS'
+                    }) }}"
+                    class="filter-btn
+                    {% if type == 'TOUS' %}
+                        filter-active
+                    {% endif %}"
+                >
+                    <i class="bi bi-grid me-1"></i>
+                    Tous
+                </a>
+
+
+                <a
+                    href="{{ path('app_mouvement_stock_index', {
+                        q: recherche,
+                        type: 'ENTREE'
+                    }) }}"
+                    class="filter-btn filter-entry
+                    {% if type == 'ENTREE' %}
+                        filter-entry-active
+                    {% endif %}"
+                >
+                    <i class="bi bi-arrow-down-circle me-1"></i>
+                    Entrées
+                </a>
+
+
+                <a
+                    href="{{ path('app_mouvement_stock_index', {
+                        q: recherche,
+                        type: 'SORTIE'
+                    }) }}"
+                    class="filter-btn filter-exit
+                    {% if type == 'SORTIE' %}
+                        filter-exit-active
+                    {% endif %}"
+                >
+                    <i class="bi bi-arrow-up-circle me-1"></i>
+                    Sorties
+                </a>
+
+            </div>
+
+        </div>
+
+
+        {# =====================================================
+           BARRE DE RECHERCHE
+           ===================================================== #}
+        <div class="search-container">
+
+            <form
+                method="get"
+                action="{{ path('app_mouvement_stock_index') }}"
+                class="movement-search-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="type"
+                    value="{{ type }}"
+                >
+
+                <div class="movement-search-box">
+
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ recherche }}"
+                        placeholder="Rechercher par produit, fournisseur, client ou référence..."
+                        autocomplete="off"
+                    >
+
+                    {% if recherche %}
+
+                        <a
+                            href="{{ path('app_mouvement_stock_index', {
+                                type: type
+                            }) }}"
+                            class="search-clear"
+                            title="Effacer"
+                        >
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-dark movement-search-btn"
+                >
+                    <i class="bi bi-search me-1"></i>
+                    Rechercher
+                </button>
+
+            </form>
+
+        </div>
+
+
+        {# =====================================================
+           TABLEAU
+           ===================================================== #}
+        <div class="table-responsive">
+
+            <table class="table movement-table align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Mouvement
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Produit
+                        </th>
+
+                        <th>
+                            Fournisseur / Client
+                        </th>
+
+                        <th class="text-center">
+                            Quantité
+                        </th>
+
+                        <th class="text-end">
+                            Prix unitaire
+                        </th>
+
+                        <th class="text-end">
+                            Valeur
+                        </th>
+
+                        <th>
+                            Référence
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% if mouvements is not empty %}
+
+                    {% for mouvement in mouvements %}
+
+                        <tr>
+
+                            {# =================================================
+                               TYPE
+                               ================================================= #}
+                            <td>
+
+                                {% if mouvement.type == 'ENTREE' %}
+
+                                    <span class="movement-badge movement-entry">
+
+                                        <i class="bi bi-arrow-down-circle-fill me-1"></i>
+
+                                        Entrée
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="movement-badge movement-exit">
+
+                                        <i class="bi bi-arrow-up-circle-fill me-1"></i>
+
+                                        Sortie
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               DATE
+                               ================================================= #}
+                            <td>
+
+                                {% if mouvement.date %}
+
+                                    <div class="date-main">
+                                        {{ mouvement.date|date('d/m/Y') }}
+                                    </div>
+
+                                    <div class="date-time">
+                                        {{ mouvement.date|date('H:i') }}
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               PRODUIT
+                               ================================================= #}
+                            <td>
+
+                                {% if mouvement.produit %}
+
+                                    <div class="product-cell">
+
+                                        <div class="product-icon">
+
+                                            <i class="bi bi-box-seam"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="product-name">
+                                                {{ mouvement.produit.nom }}
+                                            </div>
+
+                                            <div class="product-reference">
+                                                {{ mouvement.produit.reference }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Produit supprimé
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               FOURNISSEUR / CLIENT
+                               ================================================= #}
+                            <td>
+
+                                {% if mouvement.partenaire %}
+
+                                    {% if mouvement.partenaireType == 'FOURNISSEUR' %}
+
+                                        <div class="partner-cell">
+
+                                            <div class="partner-icon partner-supplier">
+
+                                                <i class="bi bi-truck"></i>
+
+                                            </div>
+
+                                            <div>
+
+                                                <div class="partner-name">
+                                                    {{ mouvement.partenaire.nom }}
+                                                </div>
+
+                                                <div class="partner-type">
+                                                    Fournisseur
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <div class="partner-cell">
+
+                                            <div class="partner-icon partner-client">
+
+                                                <i class="bi bi-person"></i>
+
+                                            </div>
+
+                                            <div>
+
+                                                <div class="partner-name">
+
+                                                    {{ mouvement.partenaire.nom }}
+
+                                                    {% if mouvement.partenaire.prenom %}
+                                                        {{ mouvement.partenaire.prenom }}
+                                                    {% endif %}
+
+                                                </div>
+
+                                                <div class="partner-type">
+                                                    Client
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="text-muted small">
+                                        Non renseigné
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               QUANTITÉ
+                               ================================================= #}
+                            <td class="text-center">
+
+                                {% if mouvement.type == 'ENTREE' %}
+
+                                    <span class="quantity-entry">
+                                        +{{ mouvement.quantite }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="quantity-exit">
+                                        -{{ mouvement.quantite }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               PRIX
+                               ================================================= #}
+                            <td class="text-end">
+
+                                {% if mouvement.prix is not null %}
+
+                                    {{ mouvement.prix|number_format(2, ',', ' ') }}
+                                    <small class="currency">
+                                        MGA
+                                    </small>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               VALEUR
+                               ================================================= #}
+                            <td class="text-end">
+
+                                <div class="value-cell
+                                    {% if mouvement.type == 'ENTREE' %}
+                                        value-entry-text
+                                    {% else %}
+                                        value-exit-text
+                                    {% endif %}
+                                ">
+
+                                    {{ mouvement.valeur|number_format(2, ',', ' ') }}
+
+                                </div>
+
+                                <div class="currency">
+                                    MGA
+                                </div>
+
+                            </td>
+
+
+                            {# =================================================
+                               RÉFÉRENCE
+                               ================================================= #}
+                            <td>
+
+                                {% if mouvement.reference %}
+
+                                    <span class="reference-badge">
+                                        {{ mouvement.reference }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted small">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+
+                        {# COMMENTAIRE OPTIONNEL #}
+                        {% if mouvement.commentaire %}
+
+                            <tr class="comment-row">
+
+                                <td></td>
+
+                                <td colspan="7">
+
+                                    <div class="comment-box">
+
+                                        <i class="bi bi-chat-left-text me-2"></i>
+
+                                        {{ mouvement.commentaire }}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="8">
+
+                            <div class="empty-state">
+
+                                <div class="empty-icon">
+
+                                    <i class="bi bi-arrow-left-right"></i>
+
+                                </div>
+
+                                <h3>
+                                    Aucun mouvement trouvé
+                                </h3>
+
+                                {% if recherche %}
+
+                                    <p>
+
+                                        Aucun mouvement ne correspond à
+
+                                        <strong>
+                                            « {{ recherche }} »
+                                        </strong>.
+
+                                    </p>
+
+                                    <a
+                                        href="{{ path('app_mouvement_stock_index', {
+                                            type: type
+                                        }) }}"
+                                        class="btn btn-light border"
+                                    >
+
+                                        <i class="bi bi-arrow-counterclockwise me-2"></i>
+
+                                        Effacer la recherche
+
+                                    </a>
+
+                                {% elseif type != 'TOUS' %}
+
+                                    <p>
+                                        Aucun mouvement de type
+                                        <strong>{{ type == 'ENTREE' ? 'entrée' : 'sortie' }}</strong>
+                                        n'est enregistré.
+                                    </p>
+
+                                    <a
+                                        href="{{ path('app_mouvement_stock_index') }}"
+                                        class="btn btn-light border"
+                                    >
+
+                                        <i class="bi bi-grid me-2"></i>
+
+                                        Afficher tous les mouvements
+
+                                    </a>
+
+                                {% else %}
+
+                                    <p>
+                                        Aucun mouvement de stock n'est encore enregistré.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {# =====================================================
+           FOOTER
+           ===================================================== #}
+        {% if mouvements is not empty %}
+
+            <div class="table-footer">
+
+                <div class="result-info">
+
+                    <i class="bi bi-clock-history me-1"></i>
+
+                    {{ nombreMouvements }}
+
+                    {% if nombreMouvements > 1 %}
+                        mouvements affichés
+                    {% else %}
+                        mouvement affiché
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+{# =============================================================
+   STYLE
+   ============================================================= #}
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .page-header {
+        padding: 4px 2px;
+    }
+
+    .page-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .page-title {
+        color: #172033;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .page-subtitle {
+        color: #8993a5;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+       STATISTIQUES
+       ========================================================= */
+
+    .stat-card {
+        min-height: 135px;
+        padding: 20px;
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 7px 25px rgba(15,23,42,.05);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .stat-label {
+        color: #7b8495;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .stat-value {
+        margin-top: 8px;
+        color: #172033;
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .stat-info {
+        margin-top: 7px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 12px;
+        font-size: 19px;
+    }
+
+    .icon-purple {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .icon-green {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .icon-red {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+
+    /* =========================================================
+       VALEUR
+       ========================================================= */
+
+    .value-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-height: 90px;
+        padding: 18px 20px;
+        border: 1px solid #edf0f5;
+        border-radius: 15px;
+        background: #ffffff;
+        box-shadow: 0 6px 22px rgba(15,23,42,.04);
+    }
+
+    .value-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .value-entry .value-icon {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .value-exit .value-icon {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .value-label {
+        color: #8b95a5;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .value-number {
+        margin-top: 5px;
+        color: #172033;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+
+    /* =========================================================
+       TABLE CARD
+       ========================================================= */
+
+    .table-card {
+        overflow: hidden;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 8px 30px rgba(15,23,42,.05);
+    }
+
+    .table-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #f1f4f8;
+    }
+
+    .table-title {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .table-subtitle {
+        margin-top: 4px;
+        color: #98a1af;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       FILTRES
+       ========================================================= */
+
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    .filter-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        background: #ffffff;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 700;
+        transition: .2s;
+    }
+
+    .filter-btn:hover {
+        background: #f8fafc;
+        color: #334155;
+    }
+
+    .filter-active {
+        background: #eef2ff;
+        border-color: #c7d2fe;
+        color: #4f46e5;
+    }
+
+    .filter-entry-active {
+        background: #ecfdf5;
+        border-color: #bbf7d0;
+        color: #047857;
+    }
+
+    .filter-exit-active {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #b91c1c;
+    }
+
+
+    /* =========================================================
+       RECHERCHE
+       ========================================================= */
+
+    .search-container {
+        padding: 16px 24px;
+        border-bottom: 1px solid #f1f4f8;
+        background: #fbfcfe;
+    }
+
+    .movement-search-form {
+        display: flex;
+        gap: 8px;
+    }
+
+    .movement-search-box {
+        position: relative;
+        flex: 1;
+    }
+
+    .movement-search-box > i {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        z-index: 2;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    .movement-search-box input {
+        width: 100%;
+        height: 43px;
+        padding: 0 42px;
+        border: 1px solid #e0e5eb;
+        border-radius: 10px;
+        outline: none;
+        background: #ffffff;
+        color: #172033;
+        font-size: 12px;
+        transition: .2s;
+    }
+
+    .movement-search-box input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+    }
+
+    .search-clear {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        text-decoration: none;
+    }
+
+    .search-clear:hover {
+        color: #ef4444;
+    }
+
+    .movement-search-btn {
+        height: 43px;
+        padding: 0 15px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       TABLEAU
+       ========================================================= */
+
+    .movement-table {
+        min-width: 1250px;
+    }
+
+    .movement-table thead th {
+        padding: 14px 15px;
+        border-bottom: 1px solid #e9edf2;
+        background: #f8fafc;
+        color: #768195;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        white-space: nowrap;
+    }
+
+    .movement-table tbody td {
+        padding: 14px 15px;
+        border-bottom: 1px solid #f1f3f6;
+    }
+
+    .movement-table tbody tr:not(.comment-row) {
+        transition: .18s;
+    }
+
+    .movement-table tbody tr:not(.comment-row):hover {
+        background: #fbfcfe;
+    }
+
+
+    /* =========================================================
+       BADGES MOUVEMENT
+       ========================================================= */
+
+    .movement-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 9px;
+        border-radius: 999px;
+        font-size: 9px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .movement-entry {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .movement-exit {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+
+    /* =========================================================
+       DATE
+       ========================================================= */
+
+    .date-main {
+        color: #334155;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .date-time {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       PRODUIT
+       ========================================================= */
+
+    .product-cell {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 175px;
+    }
+
+    .product-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 9px;
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .product-name {
+        max-width: 165px;
+        color: #172033;
+        font-size: 11px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .product-reference {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 9px;
+    }
+
+
+    /* =========================================================
+       PARTENAIRE
+       ========================================================= */
+
+    .partner-cell {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 160px;
+    }
+
+    .partner-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 9px;
+        font-size: 13px;
+    }
+
+    .partner-supplier {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .partner-client {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .partner-name {
+        max-width: 145px;
+        color: #475569;
+        font-size: 10px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .partner-type {
+        margin-top: 3px;
+        color: #a0a8b5;
+        font-size: 9px;
+    }
+
+
+    /* =========================================================
+       QUANTITÉ
+       ========================================================= */
+
+    .quantity-entry,
+    .quantity-exit {
+        display: inline-block;
+        min-width: 55px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .quantity-entry {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .quantity-exit {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+
+    /* =========================================================
+       PRIX / VALEUR
+       ========================================================= */
+
+    .currency {
+        color: #9aa3b2;
+        font-size: 9px;
+    }
+
+    .value-cell {
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .value-entry-text {
+        color: #047857;
+    }
+
+    .value-exit-text {
+        color: #b91c1c;
+    }
+
+
+    /* =========================================================
+       RÉFÉRENCE
+       ========================================================= */
+
+    .reference-badge {
+        display: inline-block;
+        max-width: 130px;
+        padding: 5px 8px;
+        border-radius: 7px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 9px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       COMMENTAIRE
+       ========================================================= */
+
+    .comment-row td {
+        padding-top: 0 !important;
+        border-bottom: 1px solid #f1f3f6;
+    }
+
+    .comment-box {
+        padding: 8px 12px;
+        border-left: 3px solid #cbd5e1;
+        border-radius: 0 7px 7px 0;
+        background: #f8fafc;
+        color: #7b8495;
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    .empty-state {
+        padding: 70px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 28px;
+    }
+
+    .empty-state h3 {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        max-width: 500px;
+        margin: 8px auto 20px;
+        color: #98a1af;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .table-footer {
+        display: flex;
+        align-items: center;
+        padding: 15px 24px;
+        border-top: 1px solid #f1f4f7;
+    }
+
+    .result-info {
+        color: #8d97a7;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1000px) {
+
+        .table-header {
+            flex-direction: column;
+        }
+
+        .filter-buttons {
+            width: 100%;
+        }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+        .page-title {
+            font-size: 25px;
+        }
+
+        .movement-search-form {
+            flex-direction: column;
+        }
+
+        .movement-search-btn {
+            width: 100%;
+        }
+
+        .search-container {
+            padding: 14px;
+        }
+
+        .table-header {
+            padding: 18px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+

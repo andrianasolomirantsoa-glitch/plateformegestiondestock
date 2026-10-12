@@ -1,0 +1,524 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Mon profil - Gestion de Stock
+{% endblock %}
+
+{% block header_title %}
+    <div class="dashboard-heading">
+
+        <div>
+            <h1 class="page-title">
+                Mon profil
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Consultez et modifiez vos informations personnelles.
+            </p>
+        </div>
+
+        <div class="dashboard-date">
+            <i class="bi bi-calendar3"></i>
+            {{ "now"|date("d/m/Y") }}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    .profile-page {
+        padding-bottom: 40px;
+    }
+
+    .profile-card {
+        border: 0;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+    }
+
+    .profile-header {
+        position: relative;
+        padding: 40px 30px 70px;
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb,
+                #4f46e5
+            );
+        color: #ffffff;
+    }
+
+    .profile-header::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        top: -70px;
+        right: -50px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.10);
+    }
+
+    .profile-avatar-wrapper {
+        position: absolute;
+        left: 30px;
+        bottom: -42px;
+        z-index: 2;
+    }
+
+    .profile-avatar {
+        width: 88px;
+        height: 88px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #2563eb;
+        border: 5px solid #ffffff;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.16);
+        font-size: 38px;
+    }
+
+    .profile-body {
+        padding: 70px 30px 30px;
+        background: #ffffff;
+    }
+
+    .profile-name {
+        color: #172033;
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+
+    .profile-role {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .profile-section {
+        margin-top: 28px;
+    }
+
+    .profile-section-title {
+        margin-bottom: 15px;
+        color: #172033;
+        font-size: 16px;
+        font-weight: 750;
+    }
+
+    .profile-info {
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .profile-info-label {
+        margin-bottom: 5px;
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-info-value {
+        color: #172033;
+        font-size: 14px;
+        font-weight: 650;
+        word-break: break-word;
+    }
+
+    .profile-form-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 22px;
+        background: #ffffff;
+    }
+
+    .profile-form-card .form-label {
+        font-size: 13px;
+        font-weight: 650;
+        color: #334155;
+    }
+
+    .profile-form-card .form-control {
+        min-height: 46px;
+        border-radius: 12px;
+    }
+
+    .profile-form-card .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.12);
+    }
+
+    @media (max-width: 767.98px) {
+
+        .profile-header {
+            padding: 30px 20px 65px;
+        }
+
+        .profile-avatar-wrapper {
+            left: 20px;
+        }
+
+        .profile-body {
+            padding: 65px 20px 25px;
+        }
+
+        .profile-name {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<div class="container py-4 profile-page">
+
+    <div class="mb-4">
+
+        <a
+            href="{{ path('app_client_home') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Retour à l'espace client
+        </a>
+
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-9">
+
+            <div class="profile-card">
+
+                <!-- HEADER PROFIL -->
+                <div class="profile-header">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-white-50">
+                                ESPACE CLIENT
+                            </small>
+
+                            <h2 class="mt-2 mb-0 fw-bold">
+                                Informations du compte
+                            </h2>
+
+                        </div>
+
+                        <i
+                            class="bi bi-person-vcard"
+                            style="font-size: 35px;"
+                        ></i>
+
+                    </div>
+
+                    <div class="profile-avatar-wrapper">
+
+                        <div class="profile-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CORPS -->
+                <div class="profile-body">
+
+                    <div class="profile-name">
+                        {{ user.prenom }} {{ user.nom }}
+                    </div>
+
+                    <div class="profile-role">
+                        <i class="bi bi-shield-check"></i>
+                        Compte client
+                    </div>
+
+
+                    <!-- INFORMATIONS -->
+                    <div class="profile-section">
+
+                        <h3 class="profile-section-title">
+                            Informations du compte
+                        </h3>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <div class="profile-info">
+
+                                    <div class="profile-info-label">
+                                        Nom
+                                    </div>
+
+                                    <div class="profile-info-value">
+                                        {{ user.nom }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="profile-info">
+
+                                    <div class="profile-info-label">
+                                        Prénom
+                                    </div>
+
+                                    <div class="profile-info-value">
+                                        {{ user.prenom }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="profile-info">
+
+                                    <div class="profile-info-label">
+                                        Adresse e-mail
+                                    </div>
+
+                                    <div class="profile-info-value">
+                                        {{ user.email }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="profile-info">
+
+                                    <div class="profile-info-label">
+                                        Statut du compte
+                                    </div>
+
+                                    <div class="profile-info-value">
+
+                                        {% if user.actif %}
+
+                                            <span class="badge bg-success">
+                                                Actif
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-danger">
+                                                Inactif
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MODIFICATION -->
+                    <div class="profile-section">
+
+                        <h3 class="profile-section-title">
+                            Modifier mes informations
+                        </h3>
+
+                        <div class="profile-form-card">
+
+                            <form method="post">
+
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value="{{ csrf_token('modifier_profil') }}"
+                                >
+
+                                <div class="row g-4">
+
+                                    <div class="col-md-6">
+
+                                        <label
+                                            for="nom"
+                                            class="form-label"
+                                        >
+                                            Nom
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="nom"
+                                            name="nom"
+                                            class="form-control"
+                                            value="{{ user.nom }}"
+                                            maxlength="100"
+                                            required
+                                        >
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <label
+                                            for="prenom"
+                                            class="form-label"
+                                        >
+                                            Prénom
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="prenom"
+                                            name="prenom"
+                                            class="form-control"
+                                            value="{{ user.prenom }}"
+                                            maxlength="100"
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-4">
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary px-4"
+                                    >
+                                        <i class="bi bi-check-circle"></i>
+                                        Enregistrer
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+<div class="profile-section">
+
+    <h3 class="profile-section-title">
+        Sécurité du compte
+    </h3>
+
+    <div class="profile-info">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+
+                <div class="profile-info-label">
+                    Mot de passe
+                </div>
+
+                <div class="profile-info-value">
+                    Modifier le mot de passe de votre compte
+                </div>
+
+            </div>
+
+            <a
+                href="{{ path('app_client_password') }}"
+                class="btn btn-outline-primary"
+            >
+                <i class="bi bi-shield-lock"></i>
+                Modifier
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+                    <!-- INFORMATIONS TECHNIQUES -->
+                    <div class="profile-section">
+
+                        <h3 class="profile-section-title">
+                            Informations complémentaires
+                        </h3>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <div class="profile-info">
+
+                                    <div class="profile-info-label">
+                                        Compte créé le
+                                    </div>
+
+                                    <div class="profile-info-value">
+
+                                        {% if user.createdAt %}
+                                            {{ user.createdAt|date('d/m/Y H:i') }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="profile-info">
+
+                                    <div class="profile-info-label">
+                                        Dernière modification
+                                    </div>
+
+                                    <div class="profile-info-value">
+
+                                        {% if user.updatedAt %}
+                                            {{ user.updatedAt|date('d/m/Y H:i') }}
+                                        {% else %}
+                                            Aucune modification
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+

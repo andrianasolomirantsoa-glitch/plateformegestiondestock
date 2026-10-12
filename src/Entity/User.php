@@ -16,7 +16,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)] 
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -40,10 +40,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'updated_at', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * Un compte User peut être lié à un seul profil Client.
+     */
+    #[ORM\OneToOne(
+        mappedBy: 'user',
+        targetEntity: Client::class
+    )]
+    private ?Client $client = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->roles = ['ROLE_USER'];
+
+        /*
+         * Tous les nouveaux utilisateurs sont des clients
+         * par défaut. Le RegistrationController peut ensuite
+         * définir ROLE_ADMIN pour un administrateur.
+         */
+        $this->roles = ['ROLE_CLIENT'];
     }
 
     public function getId(): ?int
@@ -63,9 +78,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * Identifiant utilisé par Symfony Security.
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -75,7 +87,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
 
-        // Garantit que chaque utilisateur possède au minimum ROLE_USER.
+        /*
+         * ROLE_USER est toujours présent pour Symfony.
+         */
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -88,6 +102,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function hasRole(string $role): bool
+    {
+        return in_array(
+            $role,
+            $this->getRoles(),
+            true
+        );
+    }
+
     public function getPassword(): ?string
     {
         return $this->password;
@@ -98,6 +121,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->password = $password;
 
         return $this;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Rien à effacer.
     }
 
     public function getNom(): ?string
@@ -141,8 +169,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
+    public function setCreatedAt(
+        \DateTimeImmutable $createdAt
+    ): static {
         $this->createdAt = $createdAt;
 
         return $this;
@@ -153,19 +182,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
+    public function setUpdatedAt(
+        ?\DateTimeImmutable $updatedAt
+    ): static {
         $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
-    /**
-     * Symfony UserInterface.
-     */
-    public function eraseCredentials(): void
+    public function getClient(): ?Client
     {
-        // Si nous stockons un mot de passe temporaire,
-        // il pourra être supprimé ici après authentification.
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): static
+    {
+        $this->client = $client;
+
+        if (
+            $client !== null &&
+            $client->getUser() !== $this
+        ) {
+            $client->setUser($this);
+        }
+
+        return $this;
     }
 }
+

@@ -7,8 +7,6 @@ security:
 
     # ============================================================
     # FOURNISSEUR D'UTILISATEURS
-    # Symfony cherche les utilisateurs dans la table users
-    # en utilisant la colonne email.
     # ============================================================
     providers:
         app_user_provider:
@@ -30,6 +28,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
 
             # ----------------------------------------------------
             # CONNEXION
@@ -37,6 +36,7 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
+                success_handler: App\Security\LoginSuccessHandler
 
             # ----------------------------------------------------
             # DECONNEXION
@@ -50,16 +50,20 @@ security:
     # ============================================================
     access_control:
 
-        # Ces pages sont accessibles sans être connecté
+        # Pages publiques
+        - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
-
-        # Logout
         - { path: ^/logout, roles: PUBLIC_ACCESS }
+
+               # Espace administrateur
+        - { path: ^/admin, roles: ROLE_ADMIN }
+
+        # Gestion des produits réservée à l'administrateur
+        - { path: ^/produits, roles: ROLE_ADMIN }
 
         # Toutes les autres pages nécessitent une connexion
         - { path: ^/, roles: ROLE_USER }
-
 # ================================================================
 # CONFIGURATION POUR LES TESTS
 # ================================================================

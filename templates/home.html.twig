@@ -1,472 +1,774 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
 
-{% block title %}
-    Tableau de bord - Gestion de Stock
-{% endblock %}
+<head>
 
-{% block header_title %}
-    <div class="dashboard-heading">
-        <div>
-            <h1 class="page-title">
-                Tableau de bord
-            </h1>
+    <meta charset="UTF-8">
 
-            <p class="dashboard-subtitle">
-                Vue d'ensemble de votre gestion de stock
-            </p>
-        </div>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-        <div class="dashboard-date">
-            <i class="bi bi-calendar3"></i>
-            {{ "now"|date("d/m/Y") }}
-        </div>
-    </div>
-{% endblock %}
+    <title>Bueble Mania — La fraîcheur qui fait sourire</title>
 
+    <meta
+        name="description"
+        content="Bueble Mania à Antanimena, Madagascar — découvrez nos glaces et préparez votre prochaine commande."
+    >
 
-{% block stylesheets %}
-    {{ parent() }}
+    <!-- Google Fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Pacifico&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
 
     <style>
 
-        /* =========================================================
-           VARIABLES
-        ========================================================= */
-
         :root {
-            --dashboard-bg: #f4f7fb;
+            --bm-dark: #141225;
+            --bm-dark-2: #1d1937;
 
-            --navy-950: #081525;
-            --navy-900: #0b1b30;
-            --navy-850: #10243d;
-            --navy-800: #142c48;
-            --navy-700: #1b3a5c;
+            --bm-pink: #ff5fa2;
+            --bm-pink-light: #ff8fbd;
 
-            --blue: #3b82f6;
-            --blue-light: #60a5fa;
-            --cyan: #22d3ee;
+            --bm-blue: #5ed8ff;
+            --bm-purple: #9477ff;
 
-            --green: #34d399;
-            --orange: #f59e0b;
-            --red: #ef4444;
-            --purple: #8b5cf6;
+            --bm-cream: #fffaf4;
+            --bm-white: #ffffff;
 
-            --text-dark: #172033;
-            --text-medium: #526176;
-            --text-light: #8290a3;
+            --bm-text: #27243a;
+            --bm-muted: #76738a;
 
-            --white: #ffffff;
-
-            --border: #e4eaf2;
-
-            --shadow-sm:
-                0 2px 8px rgba(15, 35, 60, .05);
-
-            --shadow-md:
-                0 8px 25px rgba(15, 35, 60, .09);
-
-            --shadow-lg:
-                0 15px 40px rgba(15, 35, 60, .13);
-
-            --radius-sm: 10px;
-            --radius-md: 14px;
-            --radius-lg: 18px;
-            --radius-xl: 22px;
-
-            --transition:
-                all .25s ease;
+            --bm-border: #eeeaf4;
         }
 
 
-        /* =========================================================
-           PAGE
-        ========================================================= */
+        /* =====================================================
+           GLOBAL
+           ===================================================== */
 
-        .dashboard-page {
-            width: 100%;
-            min-height: 100%;
-            background: var(--dashboard-bg);
+        * {
+            box-sizing: border-box;
         }
 
-
-        /* =========================================================
-           HEADER
-        ========================================================= */
-
-        .dashboard-heading {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 26px;
+        html {
+            scroll-behavior: smooth;
         }
 
-        .dashboard-heading .page-title {
-            margin: 0;
-            color: var(--navy-950);
-            font-size: 30px;
-            font-weight: 750;
-            letter-spacing: -.7px;
-        }
-
-        .dashboard-subtitle {
-            margin: 6px 0 0;
-            color: var(--text-medium);
-            font-size: 14px;
-        }
-
-        .dashboard-date {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            padding: 10px 15px;
-
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-
-            color: var(--text-medium);
-            font-size: 13px;
-
-            box-shadow: var(--shadow-sm);
-        }
-
-        .dashboard-date i {
-            color: var(--blue);
-        }
-
-
-        /* =========================================================
-           MAIN GRID
-        ========================================================= */
-
-        .dashboard-content {
-            width: 100%;
-        }
-
-
-        /* =========================================================
-           STATISTIQUES
-        ========================================================= */
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-
-        .stat-card {
-            position: relative;
-            overflow: hidden;
-
-            min-height: 145px;
-
-            padding: 20px;
-
-            background: var(--navy-900);
-            border: 1px solid rgba(255,255,255,.06);
-            border-radius: var(--radius-lg);
-
-            color: white;
-
-            box-shadow: var(--shadow-md);
-
-            transition: var(--transition);
-        }
-
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-
-        .stat-card::before {
-            content: "";
-
-            position: absolute;
-
-            width: 120px;
-            height: 120px;
-
-            right: -40px;
-            top: -45px;
-
-            border-radius: 50%;
-
-            background: rgba(255,255,255,.035);
-        }
-
-
-        .stat-card::after {
-            content: "";
-
-            position: absolute;
-
-            width: 90px;
-            height: 90px;
-
-            right: 35px;
-            bottom: -55px;
-
-            border-radius: 50%;
-
-            background: rgba(255,255,255,.025);
-        }
-
-
-        .stat-top {
-            position: relative;
-            z-index: 2;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            margin-bottom: 12px;
-        }
-
-
-        .stat-label {
+        body {
             margin: 0;
 
-            color: #a9b9cc;
-
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-
-        .stat-icon {
-            width: 42px;
-            height: 42px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 12px;
-
-            font-size: 19px;
-        }
-
-
-        .stat-icon.products {
-            color: #60a5fa;
-            background: rgba(59,130,246,.16);
-        }
-
-
-        .stat-icon.stock {
-            color: #22d3ee;
-            background: rgba(34,211,238,.14);
-        }
-
-
-        .stat-icon.alert {
-            color: #fbbf24;
-            background: rgba(245,158,11,.15);
-        }
-
-
-        .stat-icon.users {
-            color: #c4b5fd;
-            background: rgba(139,92,246,.15);
-        }
-
-
-        .stat-value {
-            position: relative;
-            z-index: 2;
-
-            margin: 0;
-
-            color: white;
-
-            font-size: 29px;
-            line-height: 1;
-
-            font-weight: 750;
-
-            letter-spacing: -.5px;
-        }
-
-
-        .stat-bottom {
-            position: relative;
-            z-index: 2;
-
-            display: flex;
-            align-items: center;
-            gap: 6px;
-
-            margin-top: 10px;
-
-            color: #91a2b7;
-
-            font-size: 11px;
-        }
-
-
-        .stat-trend {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-
-            color: var(--green);
-
-            font-weight: 600;
-        }
-
-
-        .stat-trend.warning {
-            color: var(--orange);
-        }
-
-
-        /* =========================================================
-           ACTION HEADER
-        ========================================================= */
-
-        .section-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-
-            margin-bottom: 14px;
-        }
-
-
-        .section-title {
-            margin: 0;
-
-            color: var(--text-dark);
-
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-
-        .section-title i {
-            margin-right: 7px;
-            color: var(--blue);
-        }
-
-
-        .section-description {
-            margin: 5px 0 0;
-
-            color: var(--text-light);
-
-            font-size: 12px;
-        }
-
-
-        /* =========================================================
-           ACTIONS
-        ========================================================= */
-
-        .actions-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, minmax(0, 1fr));
-
-            gap: 15px;
-
-            margin-bottom: 24px;
-        }
-
-
-        .action-card {
-            position: relative;
-            overflow: hidden;
-
-            min-height: 150px;
-
-            display: flex;
-            flex-direction: column;
-
-            padding: 0;
-
-            background: white;
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-
-            color: var(--text-dark);
-            text-decoration: none;
-
-            box-shadow: var(--shadow-sm);
-
-            transition: var(--transition);
-        }
-
-
-        .action-card:hover {
-            transform: translateY(-5px);
-
-            color: var(--text-dark);
-
-            border-color: #cbd8e8;
-
-            box-shadow: var(--shadow-lg);
-        }
-
-
-        .action-image {
-            position: relative;
-
-            height: 78px;
-
-            overflow: hidden;
-
-            background: var(--navy-900);
-        }
-
-
-        .action-image::after {
-            content: "";
-
-            position: absolute;
-
-            inset: 0;
+            font-family:
+                "Inter",
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            color: var(--bm-text);
 
             background:
                 linear-gradient(
                     180deg,
-                    rgba(8,21,37,.05),
-                    rgba(8,21,37,.50)
+                    #fffaff 0%,
+                    #fffdf9 50%,
+                    #f8f7ff 100%
                 );
         }
 
-
-        .action-image img {
-            width: 100%;
-            height: 100%;
-
-            object-fit: cover;
-
-            transition: transform .45s ease;
+        a {
+            text-decoration: none;
         }
 
 
-        .action-card:hover .action-image img {
-            transform: scale(1.08);
+        /* =====================================================
+           NAVBAR
+           ===================================================== */
+
+        .bm-navbar {
+            position: fixed;
+
+            top: 0;
+            left: 0;
+            right: 0;
+
+            z-index: 1000;
+
+            padding: 14px 0;
+
+            background:
+                rgba(20, 18, 37, .82);
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, .09);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 10px 40px rgba(19, 16, 39, .14);
         }
 
+        .bm-navbar::after {
+            content: "";
 
-        .action-icon {
             position: absolute;
 
-            z-index: 3;
+            left: 0;
+            right: 0;
+            bottom: 0;
 
-            left: 14px;
-            bottom: -18px;
+            height: 1px;
 
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(94, 216, 255, .55),
+                    rgba(255, 95, 162, .60),
+                    rgba(148, 119, 255, .55),
+                    transparent
+                );
+
+            box-shadow:
+                0 0 10px rgba(94, 216, 255, .25);
+        }
+
+        .bm-nav-inner {
+            width: min(1220px, calc(100% - 32px));
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+
+        /* =====================================================
+           LOGO
+           ===================================================== */
+
+        .bm-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+
+            color: #ffffff !important;
+
+            font-weight: 900;
+
+            white-space: nowrap;
+        }
+
+        .bm-brand-icon {
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--bm-pink),
+                    var(--bm-purple)
+                );
+
+            color: white;
+
+            border:
+                1px solid rgba(255, 255, 255, .15);
+
+            box-shadow:
+                0 0 16px rgba(255, 95, 162, .30),
+                0 0 28px rgba(148, 119, 255, .16);
+
+            transition: .25s ease;
+        }
+
+        .bm-brand-icon i {
+            font-size: 21px;
+        }
+
+        .bm-brand:hover .bm-brand-icon {
+            transform: translateY(-1px) scale(1.03);
+
+            box-shadow:
+                0 0 20px rgba(255, 95, 162, .42),
+                0 0 32px rgba(148, 119, 255, .20);
+        }
+
+        .bm-brand-text {
+            font-family: "Pacifico", cursive;
+
+            font-size: 22px;
+
+            letter-spacing: .02em;
+        }
+
+
+        /* =====================================================
+           MENU
+           ===================================================== */
+
+        .bm-nav-links {
+            display: flex;
+            align-items: center;
+
+            gap: 4px;
+        }
+
+        .bm-nav-links a {
+            padding: 10px 13px;
+
+            color: #dcd9e9;
+
+            border-radius: 11px;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            transition: .2s ease;
+        }
+
+        .bm-nav-links a:hover {
+            color: #ffffff;
+
+            background:
+                rgba(255, 255, 255, .07);
+        }
+
+
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
+
+        .bm-nav-actions {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+        }
+
+        .bm-login {
+            padding: 10px 14px;
+
+            color: #ffffff;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            border:
+                1px solid rgba(255, 255, 255, .16);
+
+            border-radius: 11px;
+
+            transition: .2s ease;
+        }
+
+        .bm-login:hover {
+            color: #ffffff;
+
+            background:
+                rgba(255, 255, 255, .08);
+        }
+
+        .bm-register {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 10px 15px;
+
+            color: #ffffff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--bm-pink),
+                    var(--bm-purple)
+                );
+
+            border-radius: 11px;
+
+            font-size: 12px;
+            font-weight: 800;
+
+            box-shadow:
+                0 8px 24px rgba(255, 95, 162, .22);
+
+            transition: .2s ease;
+        }
+
+        .bm-register:hover {
+            color: #ffffff;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 12px 30px rgba(255, 95, 162, .30);
+        }
+
+
+        /* =====================================================
+           HERO
+           ===================================================== */
+
+        .bm-hero {
+            min-height: 760px;
+
+            padding:
+                150px 0
+                80px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 75% 30%,
+                    rgba(94, 216, 255, .18),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 20% 25%,
+                    rgba(255, 95, 162, .14),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 85% 90%,
+                    rgba(148, 119, 255, .18),
+                    transparent 32%
+                ),
+                linear-gradient(
+                    135deg,
+                    #171329 0%,
+                    #252044 55%,
+                    #171329 100%
+                );
+
+            color: white;
+        }
+
+        .bm-hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 420px;
+            height: 420px;
+
+            top: 90px;
+            right: -120px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255, 95, 162, .09);
+
+            filter: blur(50px);
+        }
+
+        .bm-hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 300px;
+            height: 300px;
+
+            bottom: -120px;
+            left: -80px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(94, 216, 255, .09);
+
+            filter: blur(45px);
+        }
+
+        .bm-hero-inner {
+            width: min(1220px, calc(100% - 32px));
+
+            margin: auto;
+
+            position: relative;
+            z-index: 2;
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.05fr)
+                minmax(350px, .95fr);
+
+            align-items: center;
+
+            gap: 65px;
+        }
+
+
+        /* =====================================================
+           HERO TEXT
+           ===================================================== */
+
+        .bm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 12px;
+
+            margin-bottom: 18px;
+
+            border-radius: 999px;
+
+            color: #dffaff;
+
+            background:
+                rgba(94, 216, 255, .08);
+
+            border:
+                1px solid rgba(94, 216, 255, .20);
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .bm-badge i {
+            color: var(--bm-blue);
+
+            text-shadow:
+                0 0 10px rgba(94, 216, 255, .70);
+        }
+
+        .bm-hero h1 {
+            margin: 0;
+
+            font-size: clamp(45px, 6vw, 76px);
+
+            line-height: 1.02;
+
+            font-weight: 900;
+
+            letter-spacing: -.045em;
+        }
+
+        .bm-script {
+            display: block;
+
+            margin-top: 4px;
+
+            color: var(--bm-pink-light);
+
+            font-family: "Pacifico", cursive;
+
+            font-size: clamp(35px, 5vw, 64px);
+
+            font-weight: 400;
+
+            text-shadow:
+                0 0 24px rgba(255, 95, 162, .18);
+        }
+
+        .bm-hero-description {
+            max-width: 600px;
+
+            margin: 23px 0 0;
+
+            color: #cbc7db;
+
+            font-size: 15px;
+
+            line-height: 1.8;
+        }
+
+
+        /* =====================================================
+           HERO BUTTONS
+           ===================================================== */
+
+        .bm-hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 12px;
+
+            margin-top: 30px;
+        }
+
+        .bm-primary-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 13px 19px;
+
+            color: #221a32 !important;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #f9efff
+                );
+
+            border-radius: 13px;
+
+            font-size: 12px;
+            font-weight: 900;
+
+            box-shadow:
+                0 12px 30px rgba(0, 0, 0, .18);
+
+            transition: .22s ease;
+        }
+
+        .bm-primary-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 15px 35px rgba(0, 0, 0, .24);
+        }
+
+        .bm-secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 13px 19px;
+
+            color: white !important;
+
+            background:
+                rgba(255, 255, 255, .045);
+
+            border:
+                1px solid rgba(255, 255, 255, .13);
+
+            border-radius: 13px;
+
+            font-size: 12px;
+            font-weight: 800;
+
+            transition: .22s ease;
+        }
+
+        .bm-secondary-btn:hover {
+            color: white !important;
+
+            background:
+                rgba(255, 255, 255, .09);
+        }
+
+
+        /* =====================================================
+           HERO VISUAL
+           ===================================================== */
+
+        .bm-visual {
+            min-height: 480px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+        }
+
+        .bm-ice-card {
+            width: min(390px, 100%);
+
+            padding: 30px;
+
+            position: relative;
+
+            border-radius: 32px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, .13),
+                    rgba(255, 255, 255, .035)
+                );
+
+            border:
+                1px solid rgba(255, 255, 255, .12);
+
+            box-shadow:
+                0 35px 90px rgba(0, 0, 0, .28),
+                inset 0 1px 0 rgba(255, 255, 255, .07);
+
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .bm-ice-circle {
+            width: 230px;
+            height: 230px;
+
+            margin: 0 auto 25px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle at 35% 30%,
+                    #fff9fd 0%,
+                    #ffd5e7 38%,
+                    #ff7fb6 68%,
+                    #8c63f8 100%
+                );
+
+            box-shadow:
+                0 0 35px rgba(255, 95, 162, .24),
+                0 18px 45px rgba(0, 0, 0, .25);
+        }
+
+        .bm-ice-circle i {
+            font-size: 105px;
+
+            color: white;
+
+            filter:
+                drop-shadow(
+                    0 10px 10px
+                    rgba(89, 54, 110, .25)
+                );
+        }
+
+        .bm-ice-card-title {
+            text-align: center;
+
+            font-family: "Pacifico", cursive;
+
+            font-size: 28px;
+        }
+
+        .bm-ice-card-subtitle {
+            margin-top: 7px;
+
+            text-align: center;
+
+            color: #cbc7db;
+
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .bm-floating-tag {
+            position: absolute;
+
+            padding: 9px 12px;
+
+            border-radius: 12px;
+
+            color: white;
+
+            background:
+                rgba(20, 18, 37, .78);
+
+            border:
+                1px solid rgba(255, 255, 255, .12);
+
+            box-shadow:
+                0 15px 35px rgba(0, 0, 0, .20);
+
+            backdrop-filter: blur(12px);
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .bm-floating-tag.one {
+            top: 35px;
+            left: -20px;
+        }
+
+        .bm-floating-tag.two {
+            right: -15px;
+            bottom: 100px;
+        }
+
+
+        /* =====================================================
+           BENEFITS
+           ===================================================== */
+
+        .bm-benefits {
+            margin-top: -45px;
+
+            position: relative;
+
+            z-index: 5;
+        }
+
+        .bm-benefits-inner {
+            width: min(1100px, calc(100% - 32px));
+
+            margin: auto;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 14px;
+        }
+
+        .bm-benefit {
+            padding: 20px;
+
+            border-radius: 18px;
+
+            background: white;
+
+            border:
+                1px solid var(--bm-border);
+
+            box-shadow:
+                0 12px 30px rgba(42, 31, 65, .07);
+        }
+
+        .bm-benefit-icon {
             width: 42px;
             height: 42px;
 
@@ -474,1337 +776,1416 @@
             align-items: center;
             justify-content: center;
 
-            border-radius: 11px;
+            margin-bottom: 12px;
 
-            background: white;
+            border-radius: 12px;
 
-            color: var(--blue);
-
-            font-size: 18px;
-
-            box-shadow: 0 5px 15px rgba(0,0,0,.14);
-        }
-
-
-        .action-body {
-            padding: 25px 15px 15px;
-        }
-
-
-        .action-body h3 {
-            margin: 0 0 5px;
-
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-
-        .action-body p {
-            margin: 0;
-
-            color: var(--text-light);
-
-            font-size: 11px;
-
-            line-height: 1.5;
-        }
-
-
-        .action-arrow {
-            position: absolute;
-
-            right: 15px;
-            bottom: 14px;
-
-            color: #9aa8b9;
-
-            transition: var(--transition);
-        }
-
-
-        .action-card:hover .action-arrow {
-            color: var(--blue);
-            transform: translateX(4px);
-        }
-
-
-        /* =========================================================
-           BOTTOM GRID
-        ========================================================= */
-
-        .dashboard-grid {
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1.7fr)
-                minmax(300px, .8fr);
-
-            gap: 18px;
-
-            margin-bottom: 25px;
-        }
-
-
-        .dashboard-card {
-            background: white;
-
-            border: 1px solid var(--border);
-
-            border-radius: var(--radius-lg);
-
-            box-shadow: var(--shadow-sm);
-
-            overflow: hidden;
-        }
-
-
-        .dashboard-card-header {
-            display: flex;
-
-            align-items: center;
-            justify-content: space-between;
-
-            padding: 18px 20px;
-
-            border-bottom: 1px solid var(--border);
-        }
-
-
-        .dashboard-card-title {
-            display: flex;
-            align-items: center;
-
-            gap: 8px;
-
-            margin: 0;
-
-            color: var(--text-dark);
-
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-
-        .dashboard-card-title i {
-            color: var(--blue);
-        }
-
-
-        .dashboard-card-link {
-            color: var(--blue);
-
-            font-size: 11px;
-            font-weight: 600;
-
-            text-decoration: none;
-        }
-
-
-        .dashboard-card-link:hover {
-            text-decoration: underline;
-        }
-
-
-        /* =========================================================
-           GRAPHIQUE
-        ========================================================= */
-
-        .chart-container {
-            padding: 15px 20px 20px;
-        }
-
-
-        .chart-legend {
-            display: flex;
-            justify-content: flex-end;
-            gap: 18px;
-
-            margin-bottom: 8px;
-
-            font-size: 10px;
-            color: var(--text-light);
-        }
-
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-
-        .legend-dot {
-            width: 7px;
-            height: 7px;
-
-            border-radius: 50%;
-        }
-
-
-        .legend-sales {
-            background: #22c55e;
-        }
-
-
-        .legend-orders {
-            background: #3b82f6;
-        }
-
-
-        .legend-stock {
-            background: #ef4444;
-        }
-
-
-        .performance-chart {
-            width: 100%;
-            height: 220px;
-
-            display: block;
-        }
-
-
-        /* =========================================================
-           SVG GRAPH
-        ========================================================= */
-
-        .chart-grid-line {
-            stroke: #e9eef5;
-            stroke-width: 1;
-        }
-
-
-        .chart-line-sales {
-            fill: none;
-            stroke: #22c55e;
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-
-        .chart-line-orders {
-            fill: none;
-            stroke: #3b82f6;
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-
-        .chart-line-stock {
-            fill: none;
-            stroke: #ef4444;
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            opacity: .75;
-        }
-
-
-        .chart-area {
-            fill: rgba(59,130,246,.06);
-        }
-
-
-        .chart-point {
-            fill: white;
-            stroke-width: 3;
-        }
-
-
-        /* =========================================================
-           ACTIVITES
-        ========================================================= */
-
-        .activity-list {
-            padding: 7px 20px 12px;
-        }
-
-
-        .activity-item {
-            display: flex;
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 13px 0;
-
-            border-bottom: 1px solid #edf1f6;
-        }
-
-
-        .activity-item:last-child {
-            border-bottom: 0;
-        }
-
-
-        .activity-icon {
-            width: 37px;
-            height: 37px;
-
-            flex-shrink: 0;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 10px;
-
-            background: #edf5ff;
-
-            color: var(--blue);
-
-            font-size: 15px;
-        }
-
-
-        .activity-icon.green {
-            color: #059669;
-            background: #ecfdf5;
-        }
-
-
-        .activity-icon.orange {
-            color: #d97706;
-            background: #fff7ed;
-        }
-
-
-        .activity-icon.purple {
-            color: #7c3aed;
-            background: #f5f3ff;
-        }
-
-
-        .activity-text {
-            flex: 1;
-            min-width: 0;
-        }
-
-
-        .activity-text strong {
-            display: block;
-
-            color: var(--text-dark);
-
-            font-size: 12px;
-            font-weight: 650;
-        }
-
-
-        .activity-text span {
-            display: block;
-
-            margin-top: 3px;
-
-            color: var(--text-light);
-
-            font-size: 10px;
-        }
-
-
-        .activity-time {
-            color: #9aa7b7;
-
-            font-size: 9px;
-            white-space: nowrap;
-        }
-
-
-        /* =========================================================
-           STOCK ALERT
-        ========================================================= */
-
-        .stock-alert {
-            margin: 15px 20px 20px;
-
-            padding: 15px;
+            color: white;
 
             background:
                 linear-gradient(
                     135deg,
-                    #fff8eb,
-                    #fffdf8
+                    var(--bm-pink),
+                    var(--bm-purple)
                 );
+        }
 
-            border: 1px solid #fde6b5;
+        .bm-benefit h3 {
+            margin: 0;
 
-            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .bm-benefit p {
+            margin: 6px 0 0;
+
+            color: var(--bm-muted);
+
+            font-size: 11px;
+            line-height: 1.6;
         }
 
 
-        .stock-alert-header {
-            display: flex;
-            align-items: center;
-            gap: 9px;
+        /* =====================================================
+           SECTIONS
+           ===================================================== */
 
-            margin-bottom: 10px;
+        .bm-section {
+            padding: 95px 0;
+        }
+
+        .bm-section-inner {
+            width: min(1180px, calc(100% - 32px));
+
+            margin: auto;
+        }
+
+        .bm-kicker {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: var(--bm-pink);
+
+            font-size: 11px;
+            font-weight: 900;
+
+            text-transform: uppercase;
+
+            letter-spacing: .15em;
+        }
+
+        .bm-section-title {
+            margin: 0;
+
+            font-size: clamp(30px, 4vw, 46px);
+
+            line-height: 1.1;
+
+            font-weight: 900;
+
+            letter-spacing: -.035em;
+        }
+
+        .bm-section-description {
+            max-width: 680px;
+
+            margin: 12px 0 0;
+
+            color: var(--bm-muted);
+
+            font-size: 13px;
+
+            line-height: 1.8;
         }
 
 
-        .stock-alert-icon {
-            width: 35px;
-            height: 35px;
+        /* =====================================================
+           PRODUITS
+           ===================================================== */
+
+        .bm-product-preview {
+            margin-top: 38px;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 16px;
+        }
+
+        .bm-product-card {
+            padding: 17px;
+
+            border-radius: 19px;
+
+            background: white;
+
+            border:
+                1px solid var(--bm-border);
+
+            box-shadow:
+                0 8px 25px rgba(42, 31, 65, .05);
+
+            transition:
+                transform .22s ease,
+                box-shadow .22s ease;
+        }
+
+        .bm-product-card:hover {
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 18px 35px rgba(42, 31, 65, .10);
+        }
+
+        .bm-product-visual {
+            height: 150px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            border-radius: 9px;
+            margin-bottom: 15px;
 
-            background: #fff0c9;
+            border-radius: 15px;
 
-            color: #d97706;
+            background:
+                linear-gradient(
+                    135deg,
+                    #fff0f7,
+                    #eef8ff
+                );
         }
 
+        .bm-product-visual i {
+            font-size: 63px;
 
-        .stock-alert-header h4 {
-            margin: 0;
+            color: var(--bm-pink);
 
-            color: #704d12;
-
-            font-size: 12px;
-            font-weight: 700;
+            text-shadow:
+                0 0 20px rgba(255, 95, 162, .12);
         }
 
-
-        .stock-alert p {
+        .bm-product-card h3 {
             margin: 0;
 
-            color: #896f3b;
+            color: var(--bm-text);
+
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .bm-product-description {
+            min-height: 35px;
+
+            margin: 5px 0 0;
+
+            color: var(--bm-muted);
 
             font-size: 10px;
 
-            line-height: 1.55;
+            line-height: 1.6;
         }
 
+        .bm-product-price {
+            margin-top: 13px;
 
-        .alert-products {
-            margin-top: 11px;
+            color: var(--bm-purple);
+
+            font-size: 15px;
+
+            font-weight: 900;
         }
 
+        .bm-product-bottom {
+            margin-top: 10px;
 
-        .alert-product {
             display: flex;
             align-items: center;
             justify-content: space-between;
 
-            padding: 7px 0;
+            gap: 8px;
+        }
 
-            border-top: 1px solid rgba(217,119,6,.12);
+        .bm-stock-badge {
+            display: inline-flex;
+            align-items: center;
 
+            padding: 5px 8px;
+
+            border-radius: 999px;
+
+            font-size: 9px;
+
+            font-weight: 800;
+        }
+
+        .bm-stock-badge.available {
+            color: #16834b;
+
+            background: #edfff5;
+        }
+
+        .bm-stock-badge.empty {
+            color: #c53030;
+
+            background: #fff0f0;
+        }
+
+        .bm-product-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
+            margin-top: 12px;
+
+            color: var(--bm-purple);
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: .2s ease;
+        }
+
+        .bm-product-link:hover {
+            color: var(--bm-pink);
+        }
+
+        .bm-catalog-button {
+            display: flex;
+
+            justify-content: center;
+
+            margin-top: 32px;
+        }
+
+
+        /* =====================================================
+           EMPTY PRODUCTS
+           ===================================================== */
+
+        .bm-empty-products {
+            grid-column: 1 / -1;
+
+            padding: 45px 25px;
+
+            text-align: center;
+
+            border-radius: 20px;
+
+            background: white;
+
+            border:
+                1px solid var(--bm-border);
+        }
+
+        .bm-empty-products > i {
+            font-size: 40px;
+
+            color: var(--bm-purple);
+        }
+
+        .bm-empty-products h3 {
+            margin-top: 15px;
+
+            font-size: 18px;
+
+            font-weight: 900;
+        }
+
+        .bm-empty-products p {
+            max-width: 450px;
+
+            margin: 8px auto 0;
+
+            color: var(--bm-muted);
+
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           LOCALISATION
+           ===================================================== */
+
+        .bm-location {
+            padding: 30px;
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 30px;
+
+            border-radius: 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1b1731,
+                    #29234c
+                );
+
+            color: white;
+
+            box-shadow:
+                0 25px 60px rgba(38, 29, 69, .16);
+        }
+
+        .bm-location-icon {
+            width: 50px;
+            height: 50px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 15px;
+
+            border-radius: 15px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--bm-pink),
+                    var(--bm-purple)
+                );
+
+            box-shadow:
+                0 0 20px rgba(255, 95, 162, .20);
+        }
+
+        .bm-location h2 {
+            margin: 0;
+
+            font-size: 28px;
+
+            font-weight: 900;
+        }
+
+        .bm-location p {
+            margin: 12px 0 0;
+
+            color: #cbc7db;
+
+            font-size: 12px;
+
+            line-height: 1.8;
+        }
+
+        .bm-location-map {
+            min-height: 270px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 19px;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(94, 216, 255, .18),
+                    transparent 55%
+                ),
+                rgba(255, 255, 255, .045);
+
+            border:
+                1px solid rgba(255, 255, 255, .09);
+        }
+
+        .bm-location-map-content {
+            text-align: center;
+        }
+
+        .bm-location-map-content i {
+            display: block;
+
+            margin-bottom: 12px;
+
+            color: var(--bm-blue);
+
+            font-size: 45px;
+
+            text-shadow:
+                0 0 18px rgba(94, 216, 255, .65);
+        }
+
+        .bm-map-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-top: 15px;
+
+            padding: 11px 15px;
+
+            color: #20192d !important;
+
+            background: white;
+
+            border-radius: 11px;
+
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .bm-map-button:hover {
+            color: #20192d !important;
+
+            background: #f7f4ff;
+        }
+
+
+        /* =====================================================
+           FINAL CTA
+           ===================================================== */
+
+        .bm-final-cta {
+            padding: 80px 20px;
+
+            text-align: center;
+        }
+
+        .bm-final-cta h2 {
+            margin: 0;
+
+            font-size: clamp(30px, 4vw, 48px);
+
+            font-weight: 900;
+        }
+
+        .bm-final-cta p {
+            max-width: 590px;
+
+            margin: 13px auto 0;
+
+            color: var(--bm-muted);
+
+            font-size: 13px;
+
+            line-height: 1.8;
+        }
+
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        .bm-footer {
+            padding: 28px 0;
+
+            background: var(--bm-dark);
+
+            color: #b8b4c9;
+        }
+
+        .bm-footer-inner {
+            width: min(1180px, calc(100% - 32px));
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .bm-footer-brand {
+            color: white;
+
+            font-family: "Pacifico", cursive;
+
+            font-size: 18px;
+        }
+
+        .bm-footer small {
             font-size: 10px;
         }
 
 
-        .alert-product-name {
-            color: #60451b;
-        }
-
-
-        .alert-product-stock {
-            color: #dc2626;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================================================
+        /* =====================================================
            RESPONSIVE
-        ========================================================= */
+           ===================================================== */
 
-        @media (max-width: 1200px) {
+        @media (max-width: 1000px) {
 
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .bm-nav-links {
+                display: none;
             }
 
-            .actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .dashboard-grid {
+            .bm-hero-inner {
                 grid-template-columns: 1fr;
-            }
-        }
 
-
-        @media (max-width: 768px) {
-
-            .dashboard-heading {
-                align-items: flex-start;
-                flex-direction: column;
+                text-align: center;
             }
 
-            .dashboard-heading .page-title {
-                font-size: 25px;
+            .bm-hero-description {
+                margin-left: auto;
+                margin-right: auto;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .actions-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .dashboard-date {
-                width: 100%;
+            .bm-hero-actions {
                 justify-content: center;
             }
 
-            .chart-legend {
-                justify-content: flex-start;
-                flex-wrap: wrap;
+            .bm-visual {
+                min-height: 420px;
             }
+
+            .bm-product-preview {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .bm-navbar {
+                padding: 10px 0;
+            }
+
+            .bm-register {
+                display: none;
+            }
+
+            .bm-brand-text {
+                font-size: 18px;
+            }
+
+            .bm-hero {
+                min-height: auto;
+
+                padding:
+                    130px 0
+                    70px;
+            }
+
+            .bm-benefits-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .bm-product-preview {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .bm-location {
+                grid-template-columns: 1fr;
+
+                padding: 22px;
+            }
+
+            .bm-footer-inner {
+                flex-direction: column;
+
+                text-align: center;
+            }
+
         }
 
 
         @media (max-width: 480px) {
 
-            .stat-card {
-                min-height: 130px;
+            .bm-nav-inner {
+                width: calc(100% - 20px);
             }
 
-            .stat-value {
-                font-size: 25px;
+            .bm-login {
+                padding: 8px 10px;
             }
 
-            .action-image {
-                height: 90px;
+            .bm-product-preview {
+                grid-template-columns: 1fr;
             }
 
-            .performance-chart {
-                height: 180px;
+            .bm-ice-card {
+                padding: 22px;
             }
+
+            .bm-ice-circle {
+                width: 190px;
+                height: 190px;
+            }
+
+            .bm-ice-circle i {
+                font-size: 80px;
+            }
+
+            .bm-floating-tag.one {
+                left: 0;
+            }
+
+            .bm-floating-tag.two {
+                right: 0;
+            }
+
         }
+        
+.bm-product-visual {
+    height: 220px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    background: linear-gradient(
+        135deg,
+        #fff0f7,
+        #eef8ff
+    );
+}
+
+
+.bm-product-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+
+    object-fit: contain;
+    object-position: center;
+
+    border-radius: 14px;
+
+    transition: transform .35s ease;
+}
+
+.bm-product-card:hover .bm-product-image {
+    transform: scale(1.04);
+}
+
+.bm-product-placeholder {
+    width: 120px;
+    height: 120px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffe4f0,
+            #e5f6ff
+        );
+
+    color: #8b5cf6;
+}
+
+.bm-product-placeholder i {
+    font-size: 55px;
+}
+
+
+.bm-product-card:hover .bm-product-image {
+    transform: scale(1.06);
+}
+
+
 
     </style>
-{% endblock %}
 
+</head>
 
-{% block body %}
 
-<div class="dashboard-page">
+<body>
 
-    <div class="dashboard-content">
 
+<!-- ==========================================================
+     NAVBAR
+     ========================================================== -->
 
-        {# =====================================================
-           STATISTIQUES
-        ====================================================== #}
+<header class="bm-navbar">
 
-        <section class="stats-grid">
+    <div class="bm-nav-inner">
 
 
-            {# PRODUITS #}
+        <!-- LOGO -->
 
-            <div class="stat-card">
+        <a
+            href="{{ path('app_home') }}"
+            class="bm-brand"
+        >
 
-                <div class="stat-top">
+            <span class="bm-brand-icon">
 
-                    <p class="stat-label">
-                        Produits
-                    </p>
+                <i class="bi bi-snow2"></i>
 
-                    <div class="stat-icon products">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
+            </span>
 
-                </div>
+            <span class="bm-brand-text">
 
-                <h2 class="stat-value">
-                    1 284
-                </h2>
+                Bueble Mania
 
-                <div class="stat-bottom">
+            </span>
 
-                    <span class="stat-trend">
-                        <i class="bi bi-arrow-up"></i>
-                        8.2%
-                    </span>
+        </a>
 
-                    <span>
-                        produits enregistrés
-                    </span>
 
-                </div>
+        <!-- MENU -->
 
-            </div>
+        <nav class="bm-nav-links">
 
+            <a href="#accueil">
+                Accueil
+            </a>
 
-            {# STOCK #}
+            <a href="#glaces">
+                Nos glaces
+            </a>
 
-            <div class="stat-card">
+            <a href="#localisation">
+                Nous trouver
+            </a>
 
-                <div class="stat-top">
+            <a href="#contact">
+                Contact
+            </a>
 
-                    <p class="stat-label">
-                        Stock total
-                    </p>
+        </nav>
 
-                    <div class="stat-icon stock">
-                        <i class="bi bi-boxes"></i>
-                    </div>
 
-                </div>
+        <!-- ACTIONS -->
 
-                <h2 class="stat-value">
-                    3 421
-                </h2>
+        <div class="bm-nav-actions">
 
-                <div class="stat-bottom">
+            <a
+                href="{{ path('app_login') }}"
+                class="bm-login"
+            >
 
-                    <span class="stat-trend">
-                        <i class="bi bi-arrow-up"></i>
-                        5.4%
-                    </span>
+                Se connecter
 
-                    <span>
-                        articles disponibles
-                    </span>
+            </a>
 
-                </div>
 
-            </div>
+            <a
+                href="{{ path('app_register') }}"
+                class="bm-register"
+            >
 
+                <i class="bi bi-person-plus-fill"></i>
 
-            {# STOCK FAIBLE #}
+                Créer un compte
 
-            <div class="stat-card">
+            </a>
 
-                <div class="stat-top">
-
-                    <p class="stat-label">
-                        Stock faible
-                    </p>
-
-                    <div class="stat-icon alert">
-                        <i class="bi bi-exclamation-triangle"></i>
-                    </div>
-
-                </div>
-
-                <h2 class="stat-value">
-                    23
-                </h2>
-
-                <div class="stat-bottom">
-
-                    <span class="stat-trend warning">
-                        <i class="bi bi-exclamation-circle"></i>
-                        Attention
-                    </span>
-
-                    <span>
-                        produits à surveiller
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            {# UTILISATEURS #}
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <p class="stat-label">
-                        Utilisateurs
-                    </p>
-
-                    <div class="stat-icon users">
-                        <i class="bi bi-people"></i>
-                    </div>
-
-                </div>
-
-                <h2 class="stat-value">
-                    18
-                </h2>
-
-                <div class="stat-bottom">
-
-                    <span class="stat-trend">
-                        <i class="bi bi-check-circle"></i>
-                        Actifs
-                    </span>
-
-                    <span>
-                        utilisateurs
-                    </span>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        {# =====================================================
-           ACTIONS RAPIDES
-        ====================================================== #}
-
-        <section>
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2 class="section-title">
-                        <i class="bi bi-lightning-charge-fill"></i>
-                        Actions rapides
-                    </h2>
-
-                    <p class="section-description">
-                        Accédez rapidement aux principales fonctions
-                        de votre gestion de stock.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="actions-grid">
-
-
-                {# AJOUTER PRODUIT #}
-
-                <a
-                    href="{{ path('app_produit_new') }}"
-                    class="action-card"
-                >
-
-                    <div class="action-image">
-
-                        <img
-                            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80"
-                            alt="Ajouter un produit"
-                        >
-
-                        <div class="action-icon">
-                            <i class="bi bi-plus-lg"></i>
-                        </div>
-
-                    </div>
-
-                    <div class="action-body">
-
-                        <h3>
-                            Ajouter un produit
-                        </h3>
-
-                        <p>
-                            Enregistrer un nouveau produit
-                            dans votre stock.
-                        </p>
-
-                    </div>
-
-                    <span class="action-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </span>
-
-                </a>
-
-
-                {# VOIR PRODUITS #}
-
-                <a
-                    href="{{ path('app_produit_index') }}"
-                    class="action-card"
-                >
-
-                    <div class="action-image">
-
-                        <img
-                            src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=80"
-                            alt="Gestion des produits"
-                        >
-
-                        <div class="action-icon">
-                            <i class="bi bi-grid"></i>
-                        </div>
-
-                    </div>
-
-                    <div class="action-body">
-
-                        <h3>
-                            Voir les produits
-                        </h3>
-
-                        <p>
-                            Consulter, modifier ou supprimer
-                            vos produits.
-                        </p>
-
-                    </div>
-
-                    <span class="action-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </span>
-
-                </a>
-
-
-                {# GESTION STOCK #}
-
-                <a
-                    href="#"
-                    class="action-card"
-                >
-
-                    <div class="action-image">
-
-                        <img
-                            src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=700&q=80"
-                            alt="Gestion du stock"
-                        >
-
-                        <div class="action-icon">
-                            <i class="bi bi-clipboard-data"></i>
-                        </div>
-
-                    </div>
-
-                    <div class="action-body">
-
-                        <h3>
-                            Gestion du stock
-                        </h3>
-
-                        <p>
-                            Consultez les quantités disponibles
-                            et les mouvements.
-                        </p>
-
-                    </div>
-
-                    <span class="action-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </span>
-
-                </a>
-
-
-                {# UTILISATEURS #}
-
-                <a
-                    href="#"
-                    class="action-card"
-                >
-
-                    <div class="action-image">
-
-                        <img
-                            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=700&q=80"
-                            alt="Gestion des utilisateurs"
-                        >
-
-                        <div class="action-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-
-                    </div>
-
-                    <div class="action-body">
-
-                        <h3>
-                            Utilisateurs
-                        </h3>
-
-                        <p>
-                            Gérez les utilisateurs et leurs
-                            différents accès.
-                        </p>
-
-                    </div>
-
-                    <span class="action-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </span>
-
-                </a>
-
-            </div>
-
-        </section>
-
-
-        {# =====================================================
-           GRAPHIQUE + ACTIVITES
-        ====================================================== #}
-
-        <section class="dashboard-grid">
-
-
-            {# =================================================
-               PERFORMANCE
-            ================================================== #}
-
-            <div class="dashboard-card">
-
-                <div class="dashboard-card-header">
-
-                    <h3 class="dashboard-card-title">
-                        <i class="bi bi-bar-chart-line"></i>
-                        Performances hebdomadaires
-                    </h3>
-
-                    <a
-                        href="#"
-                        class="dashboard-card-link"
-                    >
-                        Voir détails
-                    </a>
-
-                </div>
-
-
-                <div class="chart-container">
-
-                    <div class="chart-legend">
-
-                        <span class="legend-item">
-                            <span class="legend-dot legend-sales"></span>
-                            Ventes
-                        </span>
-
-                        <span class="legend-item">
-                            <span class="legend-dot legend-orders"></span>
-                            Commandes
-                        </span>
-
-                        <span class="legend-item">
-                            <span class="legend-dot legend-stock"></span>
-                            Inventaire
-                        </span>
-
-                    </div>
-
-
-                    <svg
-                        class="performance-chart"
-                        viewBox="0 0 800 250"
-                        preserveAspectRatio="none"
-                    >
-
-                        {# GRILLE #}
-
-                        <line
-                            x1="0"
-                            y1="30"
-                            x2="800"
-                            y2="30"
-                            class="chart-grid-line"
-                        />
-
-                        <line
-                            x1="0"
-                            y1="80"
-                            x2="800"
-                            y2="80"
-                            class="chart-grid-line"
-                        />
-
-                        <line
-                            x1="0"
-                            y1="130"
-                            x2="800"
-                            y2="130"
-                            class="chart-grid-line"
-                        />
-
-                        <line
-                            x1="0"
-                            y1="180"
-                            x2="800"
-                            y2="180"
-                            class="chart-grid-line"
-                        />
-
-                        <line
-                            x1="0"
-                            y1="230"
-                            x2="800"
-                            y2="230"
-                            class="chart-grid-line"
-                        />
-
-
-                        {# ZONE #}
-
-                        <path
-                            class="chart-area"
-                            d="
-                                M 0 185
-                                L 110 150
-                                L 220 170
-                                L 330 105
-                                L 440 80
-                                L 550 135
-                                L 660 95
-                                L 800 65
-                                L 800 230
-                                L 0 230
-                                Z
-                            "
-                        />
-
-
-                        {# VENTES #}
-
-                        <path
-                            class="chart-line-sales"
-                            d="
-                                M 0 180
-                                C 55 165, 75 160, 110 145
-                                S 180 170, 220 155
-                                S 290 120, 330 110
-                                S 400 75, 440 65
-                                S 510 125, 550 135
-                                S 620 110, 660 90
-                                S 740 115, 800 70
-                            "
-                        />
-
-
-                        {# COMMANDES #}
-
-                        <path
-                            class="chart-line-orders"
-                            d="
-                                M 0 205
-                                C 55 195, 75 190, 110 185
-                                S 175 135, 220 145
-                                S 285 170, 330 155
-                                S 395 110, 440 100
-                                S 510 150, 550 155
-                                S 620 125, 660 115
-                                S 735 80, 800 50
-                            "
-                        />
-
-
-                        {# INVENTAIRE #}
-
-                        <path
-                            class="chart-line-stock"
-                            d="
-                                M 0 210
-                                C 55 200, 75 205, 110 195
-                                S 175 175, 220 180
-                                S 285 135, 330 140
-                                S 395 165, 440 155
-                                S 510 120, 550 105
-                                S 620 145, 660 135
-                                S 735 150, 800 120
-                            "
-                        />
-
-
-                        {# POINTS #}
-
-                        <circle
-                            cx="110"
-                            cy="145"
-                            r="4"
-                            class="chart-point"
-                            stroke="#22c55e"
-                        />
-
-                        <circle
-                            cx="220"
-                            cy="155"
-                            r="4"
-                            class="chart-point"
-                            stroke="#22c55e"
-                        />
-
-                        <circle
-                            cx="330"
-                            cy="110"
-                            r="4"
-                            class="chart-point"
-                            stroke="#22c55e"
-                        />
-
-                        <circle
-                            cx="440"
-                            cy="65"
-                            r="4"
-                            class="chart-point"
-                            stroke="#22c55e"
-                        />
-
-                        <circle
-                            cx="550"
-                            cy="135"
-                            r="4"
-                            class="chart-point"
-                            stroke="#22c55e"
-                        />
-
-                        <circle
-                            cx="660"
-                            cy="90"
-                            r="4"
-                            class="chart-point"
-                            stroke="#22c55e"
-                        />
-
-                        <circle
-                            cx="800"
-                            cy="70"
-                            r="4"
-                            class="chart-point"
-                            stroke="#22c55e"
-                        />
-
-                    </svg>
-
-
-                    <div
-                        style="
-                            display:flex;
-                            justify-content:space-between;
-                            color:#9aa7b7;
-                            font-size:10px;
-                            padding:0 3px;
-                        "
-                    >
-
-                        <span>Lun</span>
-                        <span>Mar</span>
-                        <span>Mer</span>
-                        <span>Jeu</span>
-                        <span>Ven</span>
-                        <span>Sam</span>
-                        <span>Dim</span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            {# =================================================
-               ACTIVITE RECENTE
-            ================================================== #}
-
-            <div class="dashboard-card">
-
-                <div class="dashboard-card-header">
-
-                    <h3 class="dashboard-card-title">
-                        <i class="bi bi-clock-history"></i>
-                        Activité récente
-                    </h3>
-
-                    <a
-                        href="#"
-                        class="dashboard-card-link"
-                    >
-                        Tout voir
-                    </a>
-
-                </div>
-
-
-                <div class="activity-list">
-
-
-                    <div class="activity-item">
-
-                        <div class="activity-icon">
-
-                            <i class="bi bi-plus-lg"></i>
-
-                        </div>
-
-                        <div class="activity-text">
-
-                            <strong>
-                                Nouveau produit ajouté
-                            </strong>
-
-                            <span>
-                                Produit ajouté au catalogue
-                            </span>
-
-                        </div>
-
-                        <span class="activity-time">
-                            10 min
-                        </span>
-
-                    </div>
-
-
-                    <div class="activity-item">
-
-                        <div class="activity-icon green">
-
-                            <i class="bi bi-arrow-down-circle"></i>
-
-                        </div>
-
-                        <div class="activity-text">
-
-                            <strong>
-                                Entrée de stock
-                            </strong>
-
-                            <span>
-                                Quantité mise à jour
-                            </span>
-
-                        </div>
-
-                        <span class="activity-time">
-                            35 min
-                        </span>
-
-                    </div>
-
-
-                    <div class="activity-item">
-
-                        <div class="activity-icon orange">
-
-                            <i class="bi bi-pencil"></i>
-
-                        </div>
-
-                        <div class="activity-text">
-
-                            <strong>
-                                Produit modifié
-                            </strong>
-
-                            <span>
-                                Informations mises à jour
-                            </span>
-
-                        </div>
-
-                        <span class="activity-time">
-                            1 h
-                        </span>
-
-                    </div>
-
-
-                    <div class="activity-item">
-
-                        <div class="activity-icon purple">
-
-                            <i class="bi bi-person"></i>
-
-                        </div>
-
-                        <div class="activity-text">
-
-                            <strong>
-                                Connexion utilisateur
-                            </strong>
-
-                            <span>
-                                Nouvelle session ouverte
-                            </span>
-
-                        </div>
-
-                        <span class="activity-time">
-                            2 h
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                {# ALERTE #}
-
-                <div class="stock-alert">
-
-                    <div class="stock-alert-header">
-
-                        <div class="stock-alert-icon">
-                            <i class="bi bi-bell"></i>
-                        </div>
-
-                        <h4>
-                            Alertes de stock
-                        </h4>
-
-                    </div>
-
-
-                    <p>
-                        Certains produits nécessitent votre
-                        attention afin d'éviter une rupture
-                        de stock.
-                    </p>
-
-
-                    <div class="alert-products">
-
-                        <div class="alert-product">
-
-                            <span class="alert-product-name">
-                                Samsung Galaxy A35
-                            </span>
-
-                            <span class="alert-product-stock">
-                                3 unités
-                            </span>
-
-                        </div>
-
-
-                        <div class="alert-product">
-
-                            <span class="alert-product-name">
-                                Clavier mécanique
-                            </span>
-
-                            <span class="alert-product-stock">
-                                5 unités
-                            </span>
-
-                        </div>
-
-
-                        <div class="alert-product">
-
-                            <span class="alert-product-name">
-                                Souris sans fil
-                            </span>
-
-                            <span class="alert-product-stock">
-                                2 unités
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
+        </div>
 
 
     </div>
 
+</header>
+
+
+<!-- ==========================================================
+     HERO
+     ========================================================== -->
+
+<section
+    id="accueil"
+    class="bm-hero"
+>
+
+    <div class="bm-hero-inner">
+
+
+        <!-- TEXTE -->
+
+        <div>
+
+            <span class="bm-badge">
+
+                <i class="bi bi-geo-alt-fill"></i>
+
+                Antanimena · Madagascar
+
+            </span>
+
+
+            <h1>
+
+                Découvrez
+
+                <span class="bm-script">
+                    Bueble Mania
+                </span>
+
+            </h1>
+
+
+            <p class="bm-hero-description">
+
+                Des glaces gourmandes, une expérience fraîche
+                et un univers pensé pour vous faire plaisir.
+                Découvrez nos produits et préparez votre prochaine commande.
+
+            </p>
+
+
+            <div class="bm-hero-actions">
+
+
+                <a
+                    href="{{ path('app_login') }}"
+                    class="bm-primary-btn"
+                >
+
+                    <i class="bi bi-bag-heart-fill"></i>
+
+                    Commander maintenant
+
+                </a>
+
+
+                <a
+                    href="#glaces"
+                    class="bm-secondary-btn"
+                >
+
+                    <i class="bi bi-arrow-down-circle"></i>
+
+                    Découvrir nos glaces
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- VISUEL -->
+
+        <div class="bm-visual">
+
+
+            <div class="bm-ice-card">
+
+
+                <div class="bm-floating-tag one">
+
+                    <i class="bi bi-stars"></i>
+
+                    Gourmand & frais
+
+                </div>
+
+
+                <div class="bm-ice-circle">
+
+                    <i class="bi bi-cup-straw"></i>
+
+                </div>
+
+
+                <div class="bm-ice-card-title">
+
+                    Une envie de fraîcheur ?
+
+                </div>
+
+
+                <div class="bm-ice-card-subtitle">
+
+                    Explorez notre univers et trouvez
+                    votre prochaine glace préférée.
+
+                </div>
+
+
+                <div class="bm-floating-tag two">
+
+                    🍦 Bueble Mania
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================================
+     BENEFITS
+     ========================================================== -->
+
+<section class="bm-benefits">
+
+    <div class="bm-benefits-inner">
+
+
+        <div class="bm-benefit">
+
+            <div class="bm-benefit-icon">
+
+                <i class="bi bi-heart-fill"></i>
+
+            </div>
+
+            <h3>
+                Pensé pour le plaisir
+            </h3>
+
+            <p>
+                Une expérience agréable pour découvrir
+                les produits Bueble Mania.
+            </p>
+
+        </div>
+
+
+        <div class="bm-benefit">
+
+            <div class="bm-benefit-icon">
+
+                <i class="bi bi-lightning-charge-fill"></i>
+
+            </div>
+
+            <h3>
+                Commande simplifiée
+            </h3>
+
+            <p>
+                Consultez les produits, ajoutez-les au panier
+                et suivez vos commandes.
+            </p>
+
+        </div>
+
+
+        <div class="bm-benefit">
+
+            <div class="bm-benefit-icon">
+
+                <i class="bi bi-geo-alt-fill"></i>
+
+            </div>
+
+            <h3>
+                Facile à retrouver
+            </h3>
+
+            <p>
+                Retrouvez facilement Bueble Mania
+                depuis votre téléphone.
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================================
+     PRODUITS
+     ========================================================== -->
+
+<section
+    id="glaces"
+    class="bm-section"
+>
+
+    <div class="bm-section-inner">
+
+
+        <span class="bm-kicker">
+            Notre univers
+        </span>
+
+
+        <h2 class="bm-section-title">
+
+            Des glaces qui donnent envie.
+
+        </h2>
+
+
+        <p class="bm-section-description">
+
+            Découvrez les produits actuellement disponibles
+            dans notre catalogue Bueble Mania.
+
+        </p>
+
+
+        <div class="bm-product-preview">
+
+
+            {% if produits is defined and produits is not empty %}
+
+
+                {% for produit in produits %}
+
+
+                    <div class="bm-product-card">
+
+
+
+<div class="bm-product-visual">
+
+    {% if produit.image %}
+
+        <img
+            src="{{ asset('images/produits/' ~ produit.image) }}"
+            alt="{{ produit.nom }}"
+            class="bm-product-image"
+        >
+
+    {% else %}
+
+        <div class="bm-product-placeholder">
+
+            <i class="bi bi-cup-straw"></i>
+
+        </div>
+
+    {% endif %}
+
 </div>
 
-{% endblock %}
+
+
+
+                        <h3>
+
+                            {{ produit.nom }}
+
+                        </h3>
+
+
+                        <p class="bm-product-description">
+
+                            {% if produit.description %}
+
+                                {{ produit.description|slice(0, 70) }}
+
+                                {% if produit.description|length > 70 %}
+                                    ...
+                                {% endif %}
+
+                            {% else %}
+
+                                Une délicieuse gourmandise
+                                signée Bueble Mania.
+
+                            {% endif %}
+
+                        </p>
+
+
+                        <div class="bm-product-price">
+
+                            {{ produit.prixVente|number_format(0, ',', ' ') }}
+
+                            Ar
+
+                        </div>
+
+
+                        <div class="bm-product-bottom">
+
+
+                            {% if produit.quantiteStock > 0 %}
+
+                                <span class="bm-stock-badge available">
+
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+
+                                    Disponible
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="bm-stock-badge empty">
+
+                                    <i class="bi bi-x-circle-fill me-1"></i>
+
+                                    Épuisé
+
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <a
+                            href="{{ path('app_login') }}"
+                            class="bm-product-link"
+                        >
+
+                            {% if produit.quantiteStock > 0 %}
+
+                                Commander
+
+                            {% else %}
+
+                                Voir le produit
+
+                            {% endif %}
+
+
+                            <i class="bi bi-arrow-right"></i>
+
+                        </a>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <div class="bm-empty-products">
+
+
+                    <i class="bi bi-box-seam"></i>
+
+
+                    <h3>
+
+                        Nos glaces arrivent bientôt
+
+                    </h3>
+
+
+                    <p>
+
+                        Aucun produit actif n'est actuellement
+                        disponible dans le catalogue.
+
+                    </p>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+        <!-- CATALOGUE COMPLET -->
+
+        <div class="bm-catalog-button">
+
+            <a
+                href="{{ path('app_login') }}"
+                class="bm-primary-btn"
+            >
+
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+
+                Voir tout le catalogue
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================================
+     LOCALISATION
+     ========================================================== -->
+
+<section
+    id="localisation"
+    class="bm-section pt-0"
+>
+
+    <div class="bm-section-inner">
+
+
+        <div class="bm-location">
+
+
+            <div>
+
+
+                <div class="bm-location-icon">
+
+                    <i class="bi bi-geo-alt-fill"></i>
+
+                </div>
+
+
+                <h2>
+
+                    Retrouvez Bueble Mania
+
+                </h2>
+
+
+                <p>
+
+                    Notre société se trouve à
+                    <strong>Antanimena, Madagascar</strong>.
+
+                    La carte interactive et le guidage GPS
+                    seront intégrés avec l'emplacement officiel
+                    de Bueble Mania.
+
+                </p>
+
+
+                <a
+                    href="https://www.google.com/maps/search/?api=1&query=Bueble+Mania+Antanimena+Madagascar"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="bm-map-button"
+                >
+
+                    <i class="bi bi-map-fill"></i>
+
+                    Rechercher sur Google Maps
+
+                </a>
+
+
+            </div>
+
+
+            <div class="bm-location-map">
+
+
+                <div class="bm-location-map-content">
+
+
+                    <i class="bi bi-pin-map-fill"></i>
+
+
+                    <strong>
+
+                        Antanimena
+
+                    </strong>
+
+
+                    <div
+                        style="
+                            margin-top: 5px;
+                            color: #aaa5bb;
+                            font-size: 10px;
+                        "
+                    >
+
+                        Madagascar
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================================
+     FINAL CTA
+     ========================================================== -->
+
+<section
+    id="contact"
+    class="bm-final-cta"
+>
+
+
+    <h2>
+
+        Une petite envie de glace ? 🍦
+
+    </h2>
+
+
+    <p>
+
+        Créez votre compte pour découvrir le catalogue,
+        ajouter vos produits au panier et suivre vos commandes.
+
+    </p>
+
+
+    <div
+        class="bm-hero-actions"
+        style="justify-content: center;"
+    >
+
+
+        <a
+            href="{{ path('app_register') }}"
+            class="bm-primary-btn"
+        >
+
+            <i class="bi bi-person-plus-fill"></i>
+
+            Créer mon compte
+
+        </a>
+
+
+        <a
+            href="{{ path('app_login') }}"
+            class="bm-secondary-btn"
+            style="
+                color: #27243a !important;
+                background: #f2eff8;
+                border-color: #ebe5f3;
+            "
+        >
+
+            <i class="bi bi-box-arrow-in-right"></i>
+
+            Se connecter
+
+        </a>
+
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================================
+     FOOTER
+     ========================================================== -->
+
+<footer class="bm-footer">
+
+    <div class="bm-footer-inner">
+
+
+        <div class="bm-footer-brand">
+
+            Bueble Mania
+
+        </div>
+
+
+        <small>
+
+            © {{ "now"|date("Y") }}
+            Bueble Mania · Antanimena, Madagascar
+
+        </small>
+
+
+        <small>
+
+            Fraîcheur · Gourmandise · Plaisir
+
+        </small>
+
+
+    </div>
+
+</footer>
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+</body>
+
+</html>
+

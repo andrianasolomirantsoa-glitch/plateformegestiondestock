@@ -1,0 +1,1123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau fournisseur{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4 px-3 px-lg-4">
+
+    {# =========================================================
+       EN-TÊTE
+       ========================================================= #}
+    <div class="page-header mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+
+                <div class="page-badge">
+                    <i class="bi bi-truck me-2"></i>
+                    Gestion des fournisseurs
+                </div>
+
+                <h1 class="page-title mt-2 mb-1">
+                    Nouveau fournisseur
+                </h1>
+
+                <p class="page-subtitle mb-0">
+                    Ajoutez un nouveau fournisseur à votre gestion de stock.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ path('app_fournisseur_index') }}"
+                class="btn btn-light back-btn"
+            >
+                <i class="bi bi-arrow-left me-2"></i>
+                Retour aux fournisseurs
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       FLASH SUCCESS
+       ========================================================= #}
+    {% for message in app.flashes('success') %}
+
+        <div class="alert alert-success custom-alert mb-4">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    {# =========================================================
+       FLASH ERROR
+       ========================================================= #}
+    {% for message in app.flashes('error') %}
+
+        <div class="alert alert-danger custom-alert mb-4">
+
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    <div class="row g-4">
+
+        {# =====================================================
+           FORMULAIRE
+           ===================================================== #}
+        <div class="col-lg-8">
+
+            <div class="form-card">
+
+                <div class="card-header-custom">
+
+                    <div class="header-icon">
+                        <i class="bi bi-building-add"></i>
+                    </div>
+
+                    <div>
+
+                        <h2 class="card-title-custom mb-1">
+                            Informations du fournisseur
+                        </h2>
+
+                        <p class="card-subtitle-custom mb-0">
+                            Renseignez les informations principales du fournisseur.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body-custom">
+
+                    <form
+                        method="post"
+                        action="{{ path('app_fournisseur_new') }}"
+                        novalidate
+                    >
+
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token('creer_fournisseur') }}"
+                        >
+
+
+                        {# =================================================
+                           INFORMATIONS PRINCIPALES
+                           ================================================= #}
+                        <div class="section-title">
+
+                            <span class="section-number">
+                                01
+                            </span>
+
+                            Informations principales
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+
+                            {# NOM #}
+                            <div class="col-md-12">
+
+                                <label
+                                    for="nom"
+                                    class="form-label-custom"
+                                >
+
+                                    Nom du fournisseur
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <div class="input-icon-wrapper">
+
+                                    <i class="bi bi-building input-icon"></i>
+
+                                    <input
+                                        type="text"
+                                        id="nom"
+                                        name="nom"
+                                        class="form-control form-control-custom"
+                                        placeholder="Ex. Samsung Madagascar"
+                                        maxlength="150"
+                                        required
+                                        value="{{ app.request.request.get('nom')|default('') }}"
+                                        autocomplete="organization"
+                                    >
+
+                                </div>
+
+
+                                <div class="form-help">
+                                    Le nom permet d'identifier rapidement le fournisseur.
+                                </div>
+
+                            </div>
+
+
+                            {# EMAIL #}
+                            <div class="col-md-6">
+
+                                <label
+                                    for="email"
+                                    class="form-label-custom"
+                                >
+                                    Adresse e-mail
+                                </label>
+
+
+                                <div class="input-icon-wrapper">
+
+                                    <i class="bi bi-envelope input-icon"></i>
+
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        class="form-control form-control-custom"
+                                        placeholder="contact@fournisseur.com"
+                                        maxlength="180"
+                                        value="{{ app.request.request.get('email')|default('') }}"
+                                        autocomplete="email"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            {# TELEPHONE #}
+                            <div class="col-md-6">
+
+                                <label
+                                    for="telephone"
+                                    class="form-label-custom"
+                                >
+                                    Téléphone
+                                </label>
+
+
+                                <div class="input-icon-wrapper">
+
+                                    <i class="bi bi-telephone input-icon"></i>
+
+                                    <input
+                                        type="text"
+                                        id="telephone"
+                                        name="telephone"
+                                        class="form-control form-control-custom"
+                                        placeholder="Ex. 032 12 345 67"
+                                        maxlength="30"
+                                        value="{{ app.request.request.get('telephone')|default('') }}"
+                                        autocomplete="tel"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {# =================================================
+                           LOCALISATION
+                           ================================================= #}
+                        <div class="section-title section-spacing">
+
+                            <span class="section-number">
+                                02
+                            </span>
+
+                            Localisation
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+
+                            {# ADRESSE #}
+                            <div class="col-md-12">
+
+                                <label
+                                    for="adresse"
+                                    class="form-label-custom"
+                                >
+                                    Adresse
+                                </label>
+
+
+                                <div class="input-icon-wrapper">
+
+                                    <i class="bi bi-geo-alt input-icon"></i>
+
+                                    <input
+                                        type="text"
+                                        id="adresse"
+                                        name="adresse"
+                                        class="form-control form-control-custom"
+                                        placeholder="Ex. Lot II A 45 Analakely"
+                                        maxlength="255"
+                                        value="{{ app.request.request.get('adresse')|default('') }}"
+                                        autocomplete="street-address"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            {# VILLE #}
+                            <div class="col-md-6">
+
+                                <label
+                                    for="ville"
+                                    class="form-label-custom"
+                                >
+                                    Ville
+                                </label>
+
+
+                                <div class="input-icon-wrapper">
+
+                                    <i class="bi bi-pin-map input-icon"></i>
+
+                                    <input
+                                        type="text"
+                                        id="ville"
+                                        name="ville"
+                                        class="form-control form-control-custom"
+                                        placeholder="Ex. Antananarivo"
+                                        maxlength="100"
+                                        value="{{ app.request.request.get('ville')|default('') }}"
+                                        autocomplete="address-level2"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            {# PAYS #}
+                            <div class="col-md-6">
+
+                                <label
+                                    for="pays"
+                                    class="form-label-custom"
+                                >
+                                    Pays
+                                </label>
+
+
+                                <div class="input-icon-wrapper">
+
+                                    <i class="bi bi-globe2 input-icon"></i>
+
+                                    <input
+                                        type="text"
+                                        id="pays"
+                                        name="pays"
+                                        class="form-control form-control-custom"
+                                        placeholder="Ex. Madagascar"
+                                        maxlength="100"
+                                        value="{{ app.request.request.get('pays')|default('Madagascar') }}"
+                                        autocomplete="country-name"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {# =================================================
+                           ACTIONS
+                           ================================================= #}
+                        <div class="form-actions">
+
+                            <a
+                                href="{{ path('app_fournisseur_index') }}"
+                                class="btn btn-light cancel-btn"
+                            >
+                                Annuler
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary save-btn"
+                            >
+
+                                <i class="bi bi-check2-circle me-2"></i>
+
+                                Enregistrer le fournisseur
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# =====================================================
+           PANNEAU DROIT
+           ===================================================== #}
+        <div class="col-lg-4">
+
+
+            {# APERÇU #}
+            <div class="preview-card mb-4">
+
+                <div class="preview-header">
+
+                    <div class="preview-icon">
+                        <i class="bi bi-eye"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="preview-title">
+                            Aperçu
+                        </div>
+
+                        <div class="preview-subtitle">
+                            Informations saisies
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="preview-content">
+
+                    <div class="preview-avatar" id="previewAvatar">
+                        F
+                    </div>
+
+
+                    <div class="preview-name" id="previewName">
+                        Nouveau fournisseur
+                    </div>
+
+
+                    <div class="preview-company">
+                        <i class="bi bi-building me-1"></i>
+                        Fournisseur
+                    </div>
+
+
+                    <div class="preview-divider"></div>
+
+
+                    <div class="preview-item">
+
+                        <i class="bi bi-envelope"></i>
+
+                        <span id="previewEmail">
+                            Aucun e-mail renseigné
+                        </span>
+
+                    </div>
+
+
+                    <div class="preview-item">
+
+                        <i class="bi bi-telephone"></i>
+
+                        <span id="previewTelephone">
+                            Aucun téléphone renseigné
+                        </span>
+
+                    </div>
+
+
+                    <div class="preview-item">
+
+                        <i class="bi bi-geo-alt"></i>
+
+                        <span id="previewVille">
+                            Ville non renseignée
+                        </span>
+
+                    </div>
+
+
+                    <div class="preview-status">
+
+                        <span class="status-dot"></span>
+
+                        Actif à la création
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {# CONSEIL #}
+            <div class="help-card">
+
+                <div class="help-icon">
+                    <i class="bi bi-lightbulb"></i>
+                </div>
+
+
+                <div>
+
+                    <div class="help-title">
+                        Conseil
+                    </div>
+
+
+                    <div class="help-text">
+                        Renseignez au minimum le nom du fournisseur.
+                        Les autres informations peuvent être ajoutées ou
+                        modifiées plus tard.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {# INFORMATION #}
+            <div class="info-card mt-4">
+
+                <div class="info-title">
+
+                    <i class="bi bi-shield-check me-2"></i>
+
+                    État initial
+
+                </div>
+
+
+                <p class="info-text mb-0">
+
+                    Le fournisseur sera créé avec le statut
+                    <strong>Actif</strong>.
+                    Vous pourrez le désactiver depuis la liste des fournisseurs.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{# =============================================================
+   STYLE
+   ============================================================= #}
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .page-header {
+        padding: 4px 2px;
+    }
+
+    .page-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .page-title {
+        color: #172033;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .page-subtitle {
+        color: #8993a5;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+       BUTTON RETOUR
+       ========================================================= */
+
+    .back-btn {
+        padding: 11px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .back-btn:hover {
+        background: #f8fafc;
+        color: #172033;
+        border-color: #cbd5e1;
+    }
+
+
+    /* =========================================================
+       ALERT
+       ========================================================= */
+
+    .custom-alert {
+        border: 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       FORM CARD
+       ========================================================= */
+
+    .form-card {
+        overflow: hidden;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 8px 30px rgba(15,23,42,.05);
+    }
+
+    .card-header-custom {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #f1f4f8;
+    }
+
+    .header-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .card-title-custom {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .card-subtitle-custom {
+        color: #98a1af;
+        font-size: 12px;
+    }
+
+    .card-body-custom {
+        padding: 25px 24px;
+    }
+
+
+    /* =========================================================
+       SECTIONS
+       ========================================================= */
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 18px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .section-spacing {
+        margin-top: 30px;
+    }
+
+    .section-number {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #4f46e5;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .form-label-custom {
+        display: block;
+        margin-bottom: 7px;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .required-star {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 13px;
+        z-index: 2;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 14px;
+        pointer-events: none;
+    }
+
+    .form-control-custom {
+        height: 45px;
+        padding-left: 39px;
+        border: 1px solid #dfe5ec;
+        border-radius: 10px;
+        color: #172033;
+        font-size: 13px;
+        box-shadow: none;
+        transition: .2s;
+    }
+
+    .form-control-custom::placeholder {
+        color: #b1b8c4;
+    }
+
+    .form-control-custom:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+    }
+
+    .form-help {
+        margin-top: 6px;
+        color: #a0a8b5;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 32px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f4f7;
+    }
+
+    .cancel-btn {
+        min-width: 100px;
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .cancel-btn:hover {
+        background: #f8fafc;
+        color: #334155;
+    }
+
+    .save-btn {
+        padding: 11px 18px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 800;
+        box-shadow: 0 7px 18px rgba(13,110,253,.16);
+    }
+
+
+    /* =========================================================
+       PREVIEW
+       ========================================================= */
+
+    .preview-card {
+        overflow: hidden;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 8px 30px rgba(15,23,42,.05);
+    }
+
+    .preview-header {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 18px 20px;
+        border-bottom: 1px solid #f1f4f8;
+    }
+
+    .preview-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 16px;
+    }
+
+    .preview-title {
+        color: #172033;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .preview-subtitle {
+        margin-top: 2px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+    .preview-content {
+        padding: 25px 20px;
+        text-align: center;
+    }
+
+    .preview-avatar {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 23px;
+        font-weight: 800;
+    }
+
+    .preview-name {
+        max-width: 100%;
+        color: #172033;
+        font-size: 16px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .preview-company {
+        margin-top: 5px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+    .preview-divider {
+        height: 1px;
+        margin: 20px 0;
+        background: #f1f4f7;
+    }
+
+    .preview-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 12px;
+        color: #64748b;
+        font-size: 11px;
+        text-align: left;
+    }
+
+    .preview-item:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .preview-item i {
+        width: 18px;
+        color: #94a3b8;
+        flex-shrink: 0;
+    }
+
+    .preview-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .preview-status {
+        margin-top: 20px;
+        padding: 8px 10px;
+        border-radius: 9px;
+        background: #ecfdf5;
+        color: #047857;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-right: 4px;
+        border-radius: 50%;
+        background: #10b981;
+    }
+
+
+    /* =========================================================
+       HELP
+       ========================================================= */
+
+    .help-card {
+        display: flex;
+        gap: 13px;
+        padding: 18px;
+        border: 1px solid #e8edf4;
+        border-radius: 16px;
+        background: #f8fafc;
+    }
+
+    .help-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #fef3c7;
+        color: #d97706;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+    .help-title {
+        color: #334155;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .help-text {
+        margin-top: 5px;
+        color: #7b8495;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       INFO
+       ========================================================= */
+
+    .info-card {
+        padding: 18px;
+        border: 1px solid #dbeafe;
+        border-radius: 16px;
+        background: #eff6ff;
+    }
+
+    .info-title {
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .info-text {
+        margin-top: 8px;
+        color: #64748b;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .info-text strong {
+        color: #047857;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 767px) {
+
+        .page-title {
+            font-size: 25px;
+        }
+
+        .back-btn {
+            width: 100%;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .cancel-btn,
+        .save-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+{# =============================================================
+   JAVASCRIPT — APERÇU EN DIRECT
+   ============================================================= #}
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const nom = document.getElementById('nom');
+        const email = document.getElementById('email');
+        const telephone = document.getElementById('telephone');
+        const ville = document.getElementById('ville');
+
+        const previewAvatar = document.getElementById('previewAvatar');
+        const previewName = document.getElementById('previewName');
+        const previewEmail = document.getElementById('previewEmail');
+        const previewTelephone = document.getElementById('previewTelephone');
+        const previewVille = document.getElementById('previewVille');
+
+
+        function updatePreview() {
+
+            const nomValue = nom.value.trim();
+            const emailValue = email.value.trim();
+            const telephoneValue = telephone.value.trim();
+            const villeValue = ville.value.trim();
+
+
+            /* Nom */
+
+            if (nomValue !== '') {
+
+                previewName.textContent = nomValue;
+
+                previewAvatar.textContent =
+                    nomValue.substring(0, 1).toUpperCase();
+
+            } else {
+
+                previewName.textContent = 'Nouveau fournisseur';
+
+                previewAvatar.textContent = 'F';
+
+            }
+
+
+            /* Email */
+
+            if (emailValue !== '') {
+
+                previewEmail.textContent = emailValue;
+
+            } else {
+
+                previewEmail.textContent = 'Aucun e-mail renseigné';
+
+            }
+
+
+            /* Téléphone */
+
+            if (telephoneValue !== '') {
+
+                previewTelephone.textContent = telephoneValue;
+
+            } else {
+
+                previewTelephone.textContent = 'Aucun téléphone renseigné';
+
+            }
+
+
+            /* Ville */
+
+            if (villeValue !== '') {
+
+                previewVille.textContent = villeValue;
+
+            } else {
+
+                previewVille.textContent = 'Ville non renseignée';
+
+            }
+
+        }
+
+
+        nom.addEventListener('input', updatePreview);
+        email.addEventListener('input', updatePreview);
+        telephone.addEventListener('input', updatePreview);
+        ville.addEventListener('input', updatePreview);
+
+
+        updatePreview();
+
+    });
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,316 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Gestion des paiements
+{% endblock %}
+
+{% block header_title %}
+    <div class="dashboard-heading">
+
+        <div>
+            <h1 class="page-title">
+                Gestion des paiements
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Consultez et validez les paiements des clients.
+            </p>
+        </div>
+
+        <div class="dashboard-date">
+            <i class="bi bi-calendar3"></i>
+            {{ "now"|date("d/m/Y") }}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>
+                Liste des paiements
+            </h2>
+
+            <p class="text-muted mb-0">
+                {{ paiements|length }}
+                paiement{% if paiements|length > 1 %}s{% endif %}
+            </p>
+        </div>
+
+        <a
+            href="{{ path('app_dashboard') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Retour au tableau de bord
+        </a>
+
+    </div>
+
+    {% if paiements is empty %}
+
+        <div class="card shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <i
+                    class="bi bi-credit-card text-muted"
+                    style="font-size: 70px;"
+                ></i>
+
+                <h3 class="mt-3">
+                    Aucun paiement
+                </h3>
+
+                <p class="text-muted mb-0">
+                    Aucun paiement n'a encore été déclaré.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Commande</th>
+                                <th>Client</th>
+                                <th>Mode</th>
+                                <th>Montant</th>
+                                <th>Référence</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for paiement in paiements %}
+
+                                <tr>
+
+                                    <td>
+                                        {% if paiement.commande %}
+                                            <strong>
+                                                {{ paiement.commande.numero }}
+                                            </strong>
+                                        {% else %}
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+
+                                        {% if paiement.commande and paiement.commande.user %}
+
+                                            <strong>
+                                                {{ paiement.commande.user.prenom }}
+                                                {{ paiement.commande.user.nom }}
+                                            </strong>
+
+                                            <small class="text-muted d-block">
+                                                {{ paiement.commande.user.email }}
+                                            </small>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if paiement.mode == 'ESPECES' %}
+
+                                            <span class="badge bg-secondary">
+                                                Espèces
+                                            </span>
+
+                                        {% elseif paiement.mode == 'MOBILE_MONEY' %}
+
+                                            <span class="badge bg-primary">
+                                                Mobile Money
+                                            </span>
+
+                                        {% elseif paiement.mode == 'VIREMENT' %}
+
+                                            <span class="badge bg-info text-dark">
+                                                Virement
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-secondary">
+                                                {{ paiement.mode }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            {{ paiement.montant|number_format(2, ',', ' ') }}
+                                            Ar
+                                        </strong>
+                                    </td>
+
+                                    <td>
+
+                                        {% if paiement.reference %}
+                                            {{ paiement.reference }}
+                                        {% else %}
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        {{ paiement.createdAt|date('d/m/Y H:i') }}
+                                    </td>
+
+                                    <td>
+
+                                        {% if paiement.statut == 'EN_ATTENTE' %}
+
+                                            <span class="badge bg-warning text-dark">
+                                                En attente
+                                            </span>
+
+                                        {% elseif paiement.statut == 'PAYE' %}
+
+                                            <span class="badge bg-success">
+                                                Payé
+                                            </span>
+
+                                        {% elseif paiement.statut == 'REFUSE' %}
+
+                                            <span class="badge bg-danger">
+                                                Refusé
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-secondary">
+                                                {{ paiement.statut }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        {% if paiement.statut == 'EN_ATTENTE' %}
+
+                                            <form
+                                                action="{{ path(
+                                                    'app_admin_paiement_status',
+                                                    {
+                                                        'id': paiement.id,
+                                                        'statut': 'PAYE'
+                                                    }
+                                                ) }}"
+                                                method="post"
+                                                class="d-inline"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="_token"
+                                                    value="{{ csrf_token('paiement_statut_' ~ paiement.id) }}"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-success btn-sm"
+                                                >
+                                                    <i class="bi bi-check-circle"></i>
+                                                    Valider
+                                                </button>
+
+                                            </form>
+
+                                            <form
+                                                action="{{ path(
+                                                    'app_admin_paiement_status',
+                                                    {
+                                                        'id': paiement.id,
+                                                        'statut': 'REFUSE'
+                                                    }
+                                                ) }}"
+                                                method="post"
+                                                class="d-inline"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="_token"
+                                                    value="{{ csrf_token('paiement_statut_' ~ paiement.id) }}"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                >
+                                                    <i class="bi bi-x-circle"></i>
+                                                    Refuser
+                                                </button>
+
+                                            </form>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                Déjà traité
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+

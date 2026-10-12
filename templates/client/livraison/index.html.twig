@@ -1,0 +1,1215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Livraison - {{ commande.numero }}
+{% endblock %}
+
+{% block body %}
+
+<style>
+
+    /* =========================================================
+       PAGE LIVRAISON CLIENT
+       ========================================================= */
+
+    .client-delivery-page {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       RETOUR
+       ========================================================= */
+
+    .delivery-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        margin-bottom: 18px;
+
+        color: #6f7a8d;
+        text-decoration: none;
+
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+    .delivery-back:hover {
+        color: #2563eb;
+    }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .delivery-header {
+        padding: 25px 28px;
+        margin-bottom: 20px;
+
+        border-radius: 17px;
+
+        background: linear-gradient(
+            135deg,
+            #172033,
+            #263653
+        );
+
+        color: white;
+
+        box-shadow: 0 8px 25px rgba(23,32,51,.13);
+    }
+
+    .delivery-header small {
+        display: block;
+
+        margin-bottom: 5px;
+
+        color: #aab5c7;
+
+        font-size: 9px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .12em;
+    }
+
+    .delivery-header h1 {
+        margin: 0;
+
+        font-size: 25px;
+        font-weight: 850;
+    }
+
+    .delivery-header p {
+        margin: 8px 0 0;
+
+        color: #c5cedb;
+
+        font-size: 11px;
+        line-height: 1.55;
+    }
+
+    /* =========================================================
+       GRID
+       ========================================================= */
+
+    .delivery-grid {
+        display: grid;
+
+        grid-template-columns: minmax(0, 1.3fr) minmax(300px, .8fr);
+
+        gap: 20px;
+
+        align-items: start;
+    }
+
+    /* =========================================================
+       CARDS
+       ========================================================= */
+
+    .delivery-card {
+        overflow: hidden;
+
+        background: white;
+
+        border: 1px solid #e8ebf1;
+        border-radius: 16px;
+
+        box-shadow: 0 3px 14px rgba(15,23,42,.045);
+    }
+
+    .delivery-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 18px 20px;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .delivery-card-header h2 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 14px;
+        font-weight: 850;
+    }
+
+    .delivery-card-body {
+        padding: 20px;
+    }
+
+    /* =========================================================
+       ETAPES
+       ========================================================= */
+
+    .delivery-steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 10px;
+
+        margin-bottom: 22px;
+    }
+
+    .delivery-step {
+        padding: 12px;
+
+        border: 1px solid #e7ebf1;
+        border-radius: 11px;
+
+        background: #fafbfd;
+
+        text-align: center;
+    }
+
+    .delivery-step-number {
+        width: 28px;
+        height: 28px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin: 0 auto 7px;
+
+        border-radius: 50%;
+
+        background: #eff6ff;
+        color: #2563eb;
+
+        font-size: 10px;
+        font-weight: 850;
+    }
+
+    .delivery-step strong {
+        display: block;
+
+        color: #344054;
+
+        font-size: 9px;
+        font-weight: 850;
+    }
+
+    .delivery-step span {
+        display: block;
+
+        margin-top: 3px;
+
+        color: #8b95a7;
+
+        font-size: 8px;
+    }
+
+    /* =========================================================
+       MODES DE LIVRAISON
+       ========================================================= */
+
+    .mode-grid {
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 10px;
+    }
+
+    .delivery-mode {
+        position: relative;
+    }
+
+    .delivery-mode input {
+        position: absolute;
+
+        opacity: 0;
+
+        pointer-events: none;
+    }
+
+    .delivery-mode label {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        min-height: 125px;
+
+        padding: 13px;
+
+        border: 1px solid #dfe4ec;
+        border-radius: 12px;
+
+        background: #fafbfd;
+
+        color: #667085;
+
+        text-align: center;
+
+        cursor: pointer;
+
+        transition: .2s ease;
+    }
+
+    .delivery-mode label:hover {
+        background: #f7faff;
+        border-color: #c3d3f7;
+    }
+
+    .delivery-mode input:checked + label {
+        background: #eff6ff;
+        border-color: #2563eb;
+
+        color: #1d4ed8;
+
+        box-shadow: 0 0 0 2px rgba(37,99,235,.08);
+    }
+
+    .mode-icon {
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 9px;
+
+        border-radius: 12px;
+
+        background: white;
+
+        font-size: 18px;
+    }
+
+    .mode-title {
+        display: block;
+
+        font-size: 10px;
+        font-weight: 850;
+    }
+
+    .mode-description {
+        margin-top: 4px;
+
+        color: #8993a5;
+
+        font-size: 8px;
+        line-height: 1.4;
+    }
+
+    /* =========================================================
+       FORMULAIRE
+       ========================================================= */
+
+    .form-section {
+        margin-top: 23px;
+    }
+
+    .form-label-client {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #344054;
+
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .delivery-input,
+    .delivery-textarea {
+        width: 100%;
+
+        border: 1px solid #dfe4ec;
+        border-radius: 9px;
+
+        background: #fafbfd;
+
+        color: #172033;
+
+        font-size: 11px;
+
+        outline: none;
+
+        transition: .2s ease;
+    }
+
+    .delivery-input {
+        min-height: 43px;
+
+        padding: 0 12px;
+    }
+
+    .delivery-textarea {
+        min-height: 95px;
+
+        padding: 12px;
+
+        resize: vertical;
+    }
+
+    .delivery-input:focus,
+    .delivery-textarea:focus {
+        background: white;
+
+        border-color: #9dbbff;
+
+        box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+    }
+
+    .form-help {
+        margin-top: 5px;
+
+        color: #8a94a6;
+
+        font-size: 8px;
+        line-height: 1.5;
+    }
+
+    .delivery-form-grid {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 13px;
+    }
+
+    .delivery-form-full {
+        grid-column: 1 / -1;
+    }
+
+    /* =========================================================
+       VALIDATION
+       ========================================================= */
+
+    .required-mark {
+        color: #dc2626;
+    }
+
+    /* =========================================================
+       BOUTON
+       ========================================================= */
+
+    .delivery-submit {
+        width: 100%;
+
+        min-height: 46px;
+
+        margin-top: 21px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 8px;
+
+        border: 0;
+        border-radius: 10px;
+
+        background: #172033;
+        color: white;
+
+        font-size: 11px;
+        font-weight: 850;
+
+        cursor: pointer;
+
+        transition: .2s ease;
+    }
+
+    .delivery-submit:hover {
+        background: #263653;
+
+        transform: translateY(-1px);
+    }
+
+    /* =========================================================
+       RESUME COMMANDE
+       ========================================================= */
+
+    .summary-item {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 15px;
+
+        padding-bottom: 11px;
+        margin-bottom: 12px;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .summary-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+
+        border-bottom: none;
+    }
+
+    .summary-label {
+        color: #8a94a6;
+
+        font-size: 9px;
+    }
+
+    .summary-value {
+        color: #344054;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        text-align: right;
+    }
+
+    .summary-total {
+        display: flex;
+
+        align-items: flex-end;
+        justify-content: space-between;
+
+        margin-top: 17px;
+        padding-top: 16px;
+
+        border-top: 1px solid #edf0f5;
+    }
+
+    .summary-total span:first-child {
+        color: #344054;
+
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .summary-total span:last-child {
+        color: #172033;
+
+        font-size: 21px;
+        font-weight: 900;
+    }
+
+    /* =========================================================
+       PAIEMENT CONFIRME
+       ========================================================= */
+
+    .payment-confirmed {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 10px;
+
+        padding: 12px;
+
+        margin-top: 17px;
+
+        border-radius: 10px;
+
+        background: #ecfdf3;
+
+        color: #15803d;
+
+        font-size: 9px;
+
+        line-height: 1.5;
+    }
+
+    .payment-confirmed i {
+        font-size: 14px;
+    }
+
+    /* =========================================================
+       INFO LIVRAISON
+       ========================================================= */
+
+    .delivery-info {
+        margin-top: 18px;
+    }
+
+    .delivery-info-item {
+        display: flex;
+
+        gap: 11px;
+
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .delivery-info-item:last-child {
+        padding-bottom: 0;
+        margin-bottom: 0;
+
+        border-bottom: none;
+    }
+
+    .delivery-info-icon {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 9px;
+
+        background: #eff6ff;
+        color: #2563eb;
+
+        font-size: 13px;
+    }
+
+    .delivery-info-item strong {
+        display: block;
+
+        color: #344054;
+
+        font-size: 10px;
+        font-weight: 850;
+    }
+
+    .delivery-info-item span {
+        display: block;
+
+        margin-top: 3px;
+
+        color: #8b95a7;
+
+        font-size: 8px;
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 850px) {
+
+        .delivery-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+    @media (max-width: 650px) {
+
+        .delivery-header {
+            padding: 22px;
+        }
+
+        .delivery-header h1 {
+            font-size: 21px;
+        }
+
+        .delivery-steps,
+        .mode-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .delivery-mode label {
+            min-height: 85px;
+
+            flex-direction: row;
+
+            justify-content: flex-start;
+
+            text-align: left;
+
+            gap: 11px;
+        }
+
+        .mode-icon {
+            margin-bottom: 0;
+        }
+
+        .delivery-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .delivery-form-full {
+            grid-column: auto;
+        }
+
+    }
+
+</style>
+
+
+<div class="client-delivery-page">
+
+    {# =========================================================
+       RETOUR
+       ========================================================= #}
+
+    <a
+        href="{{ path('app_client_commande_confirmation', {
+            id: commande.id
+        }) }}"
+        class="delivery-back"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Retour à la commande
+    </a>
+
+
+    {# =========================================================
+       HEADER
+       ========================================================= #}
+
+    <section class="delivery-header">
+
+        <small>
+            Espace client · Livraison
+        </small>
+
+        <h1>
+            Organiser la livraison
+        </h1>
+
+        <p>
+            Commande {{ commande.numero }} ·
+            Choisissez votre mode de réception et renseignez
+            les informations nécessaires.
+        </p>
+
+    </section>
+
+
+    <div class="delivery-grid">
+
+        {# =====================================================
+           FORMULAIRE
+           ===================================================== #}
+
+        <section class="delivery-card">
+
+            <div class="delivery-card-header">
+
+                <h2>
+                    <i class="bi bi-truck me-1"></i>
+                    Informations de livraison
+                </h2>
+
+                <span
+                    style="
+                        color:#15803d;
+                        font-size:9px;
+                        font-weight:800;
+                    "
+                >
+                    PAIEMENT VALIDÉ
+                </span>
+
+            </div>
+
+
+            <div class="delivery-card-body">
+
+                {# ETAPES #}
+
+                <div class="delivery-steps">
+
+                    <div class="delivery-step">
+
+                        <div class="delivery-step-number">
+                            1
+                        </div>
+
+                        <strong>
+                            Mode
+                        </strong>
+
+                        <span>
+                            Choisir la livraison
+                        </span>
+
+                    </div>
+
+
+                    <div class="delivery-step">
+
+                        <div class="delivery-step-number">
+                            2
+                        </div>
+
+                        <strong>
+                            Adresse
+                        </strong>
+
+                        <span>
+                            Renseigner les informations
+                        </span>
+
+                    </div>
+
+
+                    <div class="delivery-step">
+
+                        <div class="delivery-step-number">
+                            3
+                        </div>
+
+                        <strong>
+                            Confirmation
+                        </strong>
+
+                        <span>
+                            Enregistrer la livraison
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="post"
+                    action="{{ path('app_client_livraison_new', {
+                        id: commande.id
+                    }) }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value="{{ csrf_token('livraison_' ~ commande.id) }}"
+                    >
+
+
+                    {# =================================================
+                       MODE DE LIVRAISON
+                       ================================================= #}
+
+                    <div>
+
+                        <label class="form-label-client">
+                            Mode de livraison
+                            <span class="required-mark">*</span>
+                        </label>
+
+
+                        <div class="mode-grid">
+
+                            {# DOMICILE #}
+
+                            <div class="delivery-mode">
+
+                                <input
+                                    type="radio"
+                                    id="mode_domicile"
+                                    name="mode_livraison"
+                                    value="DOMICILE"
+                                    checked
+                                >
+
+                                <label for="mode_domicile">
+
+                                    <div class="mode-icon">
+                                        <i class="bi bi-house-door"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <span class="mode-title">
+                                            À domicile
+                                        </span>
+
+                                        <span class="mode-description">
+                                            Livraison directement à votre adresse
+                                        </span>
+
+                                    </div>
+
+                                </label>
+
+                            </div>
+
+
+                            {# POINT RELAIS #}
+
+                            <div class="delivery-mode">
+
+                                <input
+                                    type="radio"
+                                    id="mode_relais"
+                                    name="mode_livraison"
+                                    value="POINT_RELAIS"
+                                >
+
+                                <label for="mode_relais">
+
+                                    <div class="mode-icon">
+                                        <i class="bi bi-shop"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <span class="mode-title">
+                                            Point relais
+                                        </span>
+
+                                        <span class="mode-description">
+                                            Récupérer dans un point relais
+                                        </span>
+
+                                    </div>
+
+                                </label>
+
+                            </div>
+
+
+                            {# RETRAIT #}
+
+                            <div class="delivery-mode">
+
+                                <input
+                                    type="radio"
+                                    id="mode_retrait"
+                                    name="mode_livraison"
+                                    value="RETRAIT"
+                                >
+
+                                <label for="mode_retrait">
+
+                                    <div class="mode-icon">
+                                        <i class="bi bi-box-seam"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <span class="mode-title">
+                                            Retrait
+                                        </span>
+
+                                        <span class="mode-description">
+                                            Retirer directement la commande
+                                        </span>
+
+                                    </div>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {# =================================================
+                       ADRESSE
+                       ================================================= #}
+
+                    <div class="form-section">
+
+                        <div class="delivery-form-grid">
+
+                            <div class="delivery-form-full">
+
+                                <label
+                                    for="adresse_livraison"
+                                    class="form-label-client"
+                                >
+                                    Adresse de livraison
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <textarea
+                                    id="adresse_livraison"
+                                    name="adresse_livraison"
+                                    class="delivery-textarea"
+                                    required
+                                    placeholder="Ex. Lot II A 25, Ambatomaro..."
+                                ></textarea>
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    for="ville"
+                                    class="form-label-client"
+                                >
+                                    Ville
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="ville"
+                                    name="ville"
+                                    class="delivery-input"
+                                    required
+                                    maxlength="100"
+                                    placeholder="Antananarivo"
+                                >
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    for="pays"
+                                    class="form-label-client"
+                                >
+                                    Pays
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="pays"
+                                    name="pays"
+                                    class="delivery-input"
+                                    value="Madagascar"
+                                    required
+                                    maxlength="100"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-help">
+
+                        Vérifiez attentivement l'adresse et la ville avant
+                        d'enregistrer la livraison.
+
+                    </div>
+
+
+                    {# SUBMIT #}
+
+                    <button
+                        type="submit"
+                        class="delivery-submit"
+                    >
+
+                        <i class="bi bi-check2-circle"></i>
+
+                        Enregistrer ma livraison
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        {# =====================================================
+           COLONNE DROITE
+           ===================================================== #}
+
+        <aside>
+
+            {# RESUME COMMANDE #}
+
+            <section class="delivery-card">
+
+                <div class="delivery-card-header">
+
+                    <h2>
+                        <i class="bi bi-receipt me-1"></i>
+                        Résumé de la commande
+                    </h2>
+
+                </div>
+
+
+                <div class="delivery-card-body">
+
+                    <div class="summary-item">
+
+                        <span class="summary-label">
+                            Numéro
+                        </span>
+
+                        <span class="summary-value">
+                            {{ commande.numero }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span class="summary-label">
+                            Date
+                        </span>
+
+                        <span class="summary-value">
+                            {{ commande.createdAt|date('d/m/Y à H:i') }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span class="summary-label">
+                            Statut
+                        </span>
+
+                        <span class="summary-value">
+                            Confirmée
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span class="summary-label">
+                            Paiement
+                        </span>
+
+                        <span class="summary-value">
+                            PAYÉ
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <span>
+                            {{ commande.total|number_format(0, ',', ' ') }} Ar
+                        </span>
+
+                    </div>
+
+
+                    <div class="payment-confirmed">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        <span>
+                            Votre paiement est confirmé.
+                            Vous pouvez maintenant enregistrer
+                            les informations de livraison.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {# INFORMATIONS #}
+
+            <section
+                class="delivery-card"
+                style="margin-top:18px;"
+            >
+
+                <div class="delivery-card-header">
+
+                    <h2>
+                        Informations
+                    </h2>
+
+                </div>
+
+
+                <div class="delivery-card-body">
+
+                    <div class="delivery-info">
+
+                        <div class="delivery-info-item">
+
+                            <div class="delivery-info-icon">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Adresse
+                                </strong>
+
+                                <span>
+                                    Indiquez une adresse précise
+                                    pour faciliter la réception.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="delivery-info-item">
+
+                            <div class="delivery-info-icon">
+                                <i class="bi bi-telephone"></i>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Coordonnées
+                                </strong>
+
+                                <span>
+                                    Utilisez une adresse où vous
+                                    pourrez recevoir votre commande.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="delivery-info-item">
+
+                            <div class="delivery-info-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Sécurité
+                                </strong>
+
+                                <span>
+                                    Les informations sont liées
+                                    à votre commande.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock %}

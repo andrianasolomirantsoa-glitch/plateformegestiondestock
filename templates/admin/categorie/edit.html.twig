@@ -1,0 +1,709 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la catégorie{% endblock %}
+
+{% block body %}
+
+<style>
+
+    /* =========================================================
+       PAGE MODIFICATION CATEGORIE
+       ========================================================= */
+
+    .category-form-page {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================================
+       EN-TETE
+       ========================================================= */
+
+    .category-form-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        margin-bottom: 25px;
+    }
+
+    .category-form-title {
+        min-width: 0;
+    }
+
+    .category-form-kicker {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 6px;
+
+        margin-bottom: 6px;
+
+        color: #2563eb;
+
+        font-size: 11px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .category-form-header h1 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .category-form-header p {
+        margin: 7px 0 0;
+
+        color: #7d8799;
+
+        font-size: 12px;
+    }
+
+    .category-back-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        padding: 10px 13px;
+
+        border: 1px solid #dde3ed;
+        border-radius: 9px;
+
+        background: white;
+        color: #566174;
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        white-space: nowrap;
+    }
+
+    .category-back-button:hover {
+        background: #f8fafc;
+        color: #172033;
+    }
+
+
+    /* =========================================================
+       GRILLE
+       ========================================================= */
+
+    .category-form-grid {
+        display: grid;
+
+        grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr);
+
+        gap: 20px;
+    }
+
+
+    /* =========================================================
+       CARTE
+       ========================================================= */
+
+    .category-form-card {
+        overflow: hidden;
+
+        background: white;
+
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+    }
+
+    .category-form-card-header {
+        padding: 19px 20px;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .category-form-card-header h2 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .category-form-card-header p {
+        margin: 5px 0 0;
+
+        color: #8a94a6;
+
+        font-size: 10px;
+    }
+
+    .category-form-body {
+        padding: 22px;
+    }
+
+
+    /* =========================================================
+       IDENTIFIANT
+       ========================================================= */
+
+    .category-id-box {
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+
+        margin-bottom: 20px;
+
+        padding: 10px 12px;
+
+        border-radius: 9px;
+
+        background: #f8fafc;
+    }
+
+    .category-id-box i {
+        color: #2563eb;
+    }
+
+    .category-id-box span {
+        color: #7d8799;
+
+        font-size: 10px;
+    }
+
+    .category-id-box strong {
+        color: #172033;
+
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       CHAMPS
+       ========================================================= */
+
+    .category-field {
+        margin-bottom: 19px;
+    }
+
+    .category-field:last-child {
+        margin-bottom: 0;
+    }
+
+    .category-field label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #344054;
+
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .category-required {
+        color: #dc3545;
+    }
+
+    .category-field input,
+    .category-field textarea {
+        width: 100%;
+
+        padding: 11px 12px;
+
+        border: 1px solid #dce2eb;
+        border-radius: 9px;
+
+        background: #fff;
+        color: #172033;
+
+        outline: none;
+
+        font-size: 11px;
+
+        transition: .2s ease;
+    }
+
+    .category-field textarea {
+        min-height: 150px;
+
+        resize: vertical;
+
+        line-height: 1.6;
+    }
+
+    .category-field input:focus,
+    .category-field textarea:focus {
+        border-color: #93b4ff;
+
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+    }
+
+    .category-field small {
+        display: block;
+
+        margin-top: 6px;
+
+        color: #8a94a6;
+
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .category-form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: 10px;
+
+        padding-top: 20px;
+
+        border-top: 1px solid #edf0f5;
+    }
+
+    .category-btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        padding: 10px 14px;
+
+        border-radius: 9px;
+
+        background: #f3f5f8;
+        color: #566174;
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .category-btn-cancel:hover {
+        background: #e8ebf0;
+        color: #172033;
+    }
+
+    .category-btn-save {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        padding: 10px 15px;
+
+        border: 0;
+        border-radius: 9px;
+
+        background: #172033;
+        color: white;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        cursor: pointer;
+
+        transition: .2s ease;
+    }
+
+    .category-btn-save:hover {
+        background: #263653;
+    }
+
+
+    /* =========================================================
+       PANNEAU DROIT
+       ========================================================= */
+
+    .category-info-card {
+        height: fit-content;
+
+        padding: 21px;
+
+        background: white;
+
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+    }
+
+    .category-info-icon {
+        width: 48px;
+        height: 48px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 15px;
+
+        border-radius: 13px;
+
+        background: #eff4ff;
+        color: #2563eb;
+
+        font-size: 21px;
+    }
+
+    .category-info-card h3 {
+        margin: 0 0 8px;
+
+        color: #172033;
+
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .category-info-card > p {
+        margin: 0 0 17px;
+
+        color: #7d8799;
+
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .category-info-item {
+        display: flex;
+        align-items: flex-start;
+
+        gap: 10px;
+
+        margin-bottom: 13px;
+    }
+
+    .category-info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .category-info-item i {
+        margin-top: 2px;
+
+        color: #2563eb;
+
+        font-size: 12px;
+    }
+
+    .category-info-item span {
+        color: #657084;
+
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 850px) {
+
+        .category-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .category-form-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .category-back-button {
+            width: 100%;
+        }
+
+        .category-form-body {
+            padding: 18px;
+        }
+
+        .category-form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .category-btn-cancel,
+        .category-btn-save {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+<div class="category-form-page">
+
+
+{# =========================================================
+   EN-TETE
+   ========================================================= #}
+
+<div class="category-form-header">
+
+    <div class="category-form-title">
+
+        <span class="category-form-kicker">
+            <i class="bi bi-pencil-square"></i>
+            Administration
+        </span>
+
+        <h1>
+            Modifier la catégorie
+        </h1>
+
+        <p>
+            Modifiez les informations de cette catégorie.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ path('app_categorie_index') }}"
+        class="category-back-button"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Retour aux catégories
+    </a>
+
+</div>
+
+
+<div class="category-form-grid">
+
+
+    {# =====================================================
+       FORMULAIRE
+       ===================================================== #}
+
+    <div class="category-form-card">
+
+        <div class="category-form-card-header">
+
+            <h2>
+                Informations de la catégorie
+            </h2>
+
+            <p>
+                Modifiez les informations puis enregistrez les changements.
+            </p>
+
+        </div>
+
+
+        <div class="category-form-body">
+
+
+            {# IDENTIFIANT #}
+
+            <div class="category-id-box">
+
+                <i class="bi bi-hash"></i>
+
+                <span>
+                    Identifiant :
+                </span>
+
+                <strong>
+                    #{{ categorie.id }}
+                </strong>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="{{ path('app_categorie_edit', {
+                    id: categorie.id
+                }) }}"
+            >
+
+
+                {# TOKEN CSRF #}
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('modifier_categorie_' ~ categorie.id) }}"
+                >
+
+
+                {# NOM #}
+
+                <div class="category-field">
+
+                    <label for="nom">
+
+                        Nom de la catégorie
+
+                        <span class="category-required">
+                            *
+                        </span>
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nom"
+                        name="nom"
+                        value="{{ categorie.nom|default('') }}"
+                        maxlength="100"
+                        required
+                        autofocus
+                        placeholder="Exemple : Smartphones"
+                    >
+
+                    <small>
+                        Le nom doit rester unique dans le catalogue.
+                    </small>
+
+                </div>
+
+
+                {# DESCRIPTION #}
+
+                <div class="category-field">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        maxlength="500"
+                        placeholder="Description de la catégorie..."
+                    >{{ categorie.description|default('') }}</textarea>
+
+                    <small>
+                        La description est facultative.
+                    </small>
+
+                </div>
+
+
+                {# ACTIONS #}
+
+                <div class="category-form-actions">
+
+                    <a
+                        href="{{ path('app_categorie_index') }}"
+                        class="category-btn-cancel"
+                    >
+                        <i class="bi bi-x-lg"></i>
+                        Annuler
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="category-btn-save"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Enregistrer les modifications
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    {# =====================================================
+       INFORMATIONS
+       ===================================================== #}
+
+    <div class="category-info-card">
+
+        <div class="category-info-icon">
+            <i class="bi bi-info-circle"></i>
+        </div>
+
+
+        <h3>
+            Modifier une catégorie
+        </h3>
+
+
+        <p>
+            Les modifications sont enregistrées directement
+            dans le catalogue.
+        </p>
+
+
+        <div class="category-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Le nom doit être renseigné.
+            </span>
+
+        </div>
+
+
+        <div class="category-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Deux catégories ne peuvent pas avoir le même nom.
+            </span>
+
+        </div>
+
+
+        <div class="category-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                La description peut être modifiée à tout moment.
+            </span>
+
+        </div>
+
+
+        <div class="category-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                La modification ne supprime aucun produit associé.
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

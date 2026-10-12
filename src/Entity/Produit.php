@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProduitRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
@@ -14,47 +16,80 @@ class Produit
     #[ORM\Column]
     private ?int $id = null;
 
+
     #[ORM\Column(length: 100, unique: true)]
     private ?string $reference = null;
+
 
     #[ORM\Column(length: 150)]
     private ?string $nom = null;
 
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
+
 
     #[ORM\Column(name: 'prix_achat', type: 'decimal', precision: 12, scale: 2)]
     private ?string $prixAchat = null;
 
+
     #[ORM\Column(name: 'prix_vente', type: 'decimal', precision: 12, scale: 2)]
     private ?string $prixVente = null;
+
+
+    /**
+     * Photo principale du produit.
+     */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
 
     #[ORM\Column(name: 'quantite_stock')]
     private int $quantiteStock = 0;
 
+
     #[ORM\Column(name: 'seuil_alerte')]
     private int $seuilAlerte = 0;
+
 
     #[ORM\Column(length: 30)]
     private string $unite = 'piece';
 
+
     #[ORM\Column]
     private bool $actif = true;
+
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
     #[ORM\JoinColumn(name: 'categorie_id', nullable: false)]
     private ?Categorie $categorie = null;
 
+
     #[ORM\Column(name: 'created_at')]
     private ?\DateTimeImmutable $createdAt = null;
+
 
     #[ORM\Column(name: 'updated_at', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
 
+    /**
+     * Photos secondaires du produit.
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'produit',
+        targetEntity: ProduitImage::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $images;
+
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+
+        $this->images = new ArrayCollection();
     }
 
 
@@ -69,6 +104,7 @@ class Produit
         return $this->reference;
     }
 
+
     public function setReference(string $reference): static
     {
         $this->reference = $reference;
@@ -81,6 +117,7 @@ class Produit
     {
         return $this->nom;
     }
+
 
     public function setNom(string $nom): static
     {
@@ -95,6 +132,7 @@ class Produit
         return $this->description;
     }
 
+
     public function setDescription(?string $description): static
     {
         $this->description = $description;
@@ -107,6 +145,7 @@ class Produit
     {
         return $this->prixAchat;
     }
+
 
     public function setPrixAchat(string $prixAchat): static
     {
@@ -121,9 +160,27 @@ class Produit
         return $this->prixVente;
     }
 
+
     public function setPrixVente(string $prixVente): static
     {
         $this->prixVente = $prixVente;
+
+        return $this;
+    }
+
+
+    /**
+     * Photo principale.
+     */
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }
@@ -133,6 +190,7 @@ class Produit
     {
         return $this->quantiteStock;
     }
+
 
     public function setQuantiteStock(int $quantiteStock): static
     {
@@ -147,6 +205,7 @@ class Produit
         return $this->seuilAlerte;
     }
 
+
     public function setSeuilAlerte(int $seuilAlerte): static
     {
         $this->seuilAlerte = $seuilAlerte;
@@ -159,6 +218,7 @@ class Produit
     {
         return $this->unite;
     }
+
 
     public function setUnite(string $unite): static
     {
@@ -173,6 +233,7 @@ class Produit
         return $this->actif;
     }
 
+
     public function setActif(bool $actif): static
     {
         $this->actif = $actif;
@@ -185,6 +246,7 @@ class Produit
     {
         return $this->categorie;
     }
+
 
     public function setCategorie(?Categorie $categorie): static
     {
@@ -199,6 +261,7 @@ class Produit
         return $this->createdAt;
     }
 
+
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -212,9 +275,46 @@ class Produit
         return $this->updatedAt;
     }
 
+
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, ProduitImage>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+
+    public function addImage(ProduitImage $image): static
+    {
+        if (!$this->images->contains($image)) {
+
+            $this->images->add($image);
+
+            $image->setProduit($this);
+        }
+
+        return $this;
+    }
+
+
+    public function removeImage(ProduitImage $image): static
+    {
+        if ($this->images->removeElement($image)) {
+
+            if ($image->getProduit() === $this) {
+
+                $image->setProduit(null);
+            }
+        }
 
         return $this;
     }

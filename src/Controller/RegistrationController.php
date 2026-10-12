@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Client;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +21,27 @@ class RegistrationController extends AbstractController
     ): Response {
         if ($request->isMethod('POST')) {
 
-            $nom = trim($request->request->get('nom', ''));
-            $prenom = trim($request->request->get('prenom', ''));
-            $email = trim($request->request->get('email', ''));
-            $password = $request->request->get('password', '');
-            $passwordConfirmation = $request->request->get('password_confirmation', '');
+            $nom = trim(
+                $request->request->get('nom', '')
+            );
+
+            $prenom = trim(
+                $request->request->get('prenom', '')
+            );
+
+            $email = trim(
+                $request->request->get('email', '')
+            );
+
+            $password = $request->request->get(
+                'password',
+                ''
+            );
+
+            $passwordConfirmation = $request->request->get(
+                'password_confirmation',
+                ''
+            );
 
             // Vérification des champs
             if (
@@ -33,9 +50,14 @@ class RegistrationController extends AbstractController
                 empty($email) ||
                 empty($password)
             ) {
-                $this->addFlash('error', 'Tous les champs sont obligatoires.');
+                $this->addFlash(
+                    'error',
+                    'Tous les champs sont obligatoires.'
+                );
 
-                return $this->redirectToRoute('app_register');
+                return $this->redirectToRoute(
+                    'app_register'
+                );
             }
 
             // Vérification du mot de passe
@@ -45,42 +67,59 @@ class RegistrationController extends AbstractController
                     'Les mots de passe ne correspondent pas.'
                 );
 
-                return $this->redirectToRoute('app_register');
+                return $this->redirectToRoute(
+                    'app_register'
+                );
             }
 
             // Vérification de l'email
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (!filter_var(
+                $email,
+                FILTER_VALIDATE_EMAIL
+            )) {
                 $this->addFlash(
                     'error',
                     'Veuillez saisir une adresse email valide.'
                 );
 
-                return $this->redirectToRoute('app_register');
+                return $this->redirectToRoute(
+                    'app_register'
+                );
             }
 
             // Vérifier si l'utilisateur existe déjà
             $existingUser = $entityManager
                 ->getRepository(User::class)
-                ->findOneBy(['email' => $email]);
+                ->findOneBy([
+                    'email' => $email,
+                ]);
 
-            if ($existingUser) {
+            if ($existingUser !== null) {
                 $this->addFlash(
                     'error',
                     'Cette adresse email est déjà utilisée.'
                 );
 
-                return $this->redirectToRoute('app_register');
+                return $this->redirectToRoute(
+                    'app_register'
+                );
             }
 
-            // Création de l'utilisateur
+            // ==========================================
+            // CRÉATION DU COMPTE USER
+            // ==========================================
+
             $user = new User();
 
             $user->setNom($nom);
             $user->setPrenom($prenom);
             $user->setEmail($email);
-
-            // Compte actif
             $user->setActif(true);
+
+            // Rôle client
+            $user->setRoles([
+                'ROLE_CLIENT',
+            ]);
 
             // Hash du mot de passe
             $hashedPassword = $passwordHasher->hashPassword(
@@ -88,13 +127,32 @@ class RegistrationController extends AbstractController
                 $password
             );
 
-            $user->setPassword($hashedPassword);
+            $user->setPassword(
+                $hashedPassword
+            );
 
-            // Rôle par défaut
-            $user->setRoles(['ROLE_USER']);
-
-            // Enregistrement
             $entityManager->persist($user);
+
+            // ==========================================
+            // CRÉATION AUTOMATIQUE DU PROFIL CLIENT
+            // ==========================================
+
+            $client = new Client();
+
+            $client->setNom($nom);
+            $client->setPrenom($prenom);
+            $client->setEmail($email);
+            $client->setActif(true);
+
+            // Liaison User <-> Client
+            $client->setUser($user);
+
+            $entityManager->persist($client);
+
+            // ==========================================
+            // ENREGISTREMENT DES DEUX
+            // ==========================================
+
             $entityManager->flush();
 
             $this->addFlash(
@@ -102,9 +160,14 @@ class RegistrationController extends AbstractController
                 'Votre compte a été créé avec succès.'
             );
 
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute(
+                'app_login'
+            );
         }
 
-        return $this->render('registration/register.html.twig');
+        return $this->render(
+            'registration/register.html.twig'
+        );
     }
 }
+

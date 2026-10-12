@@ -1,0 +1,309 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ commande.numero }} - Gestion des commandes
+{% endblock %}
+
+{% block header_title %}
+    <div class="dashboard-heading">
+
+        <div>
+            <h1 class="page-title">
+                Détail de la commande
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Consultez les informations et le contenu de la commande.
+            </p>
+        </div>
+
+        <div class="dashboard-date">
+            <i class="bi bi-calendar3"></i>
+            {{ "now"|date("d/m/Y") }}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+
+        <a
+            href="{{ path('app_admin_commande_index') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Retour aux commandes
+        </a>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+
+                        <div>
+
+                            <h2 class="mb-1">
+                                {{ commande.numero }}
+                            </h2>
+
+                            <p class="text-muted mb-0">
+                                {{ commande.createdAt|date('d/m/Y H:i') }}
+                            </p>
+
+                        </div>
+
+                        <div>
+
+                            {% if commande.statut == 'EN_ATTENTE' %}
+
+                                <span class="badge bg-warning text-dark fs-6">
+                                    En attente
+                                </span>
+
+                            {% elseif commande.statut == 'CONFIRMEE' %}
+
+                                <span class="badge bg-success fs-6">
+                                    Confirmée
+                                </span>
+
+                            {% elseif commande.statut == 'ANNULEE' %}
+
+                                <span class="badge bg-danger fs-6">
+                                    Annulée
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary fs-6">
+                                    {{ commande.statut }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <h4 class="mb-3">
+                        Produits commandés
+                    </h4>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered align-middle">
+
+                            <thead class="table-light">
+
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Référence</th>
+                                    <th class="text-center">Quantité</th>
+                                    <th class="text-end">Prix unitaire</th>
+                                    <th class="text-end">Sous-total</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for ligne in lignes %}
+
+                                    <tr>
+
+                                        <td>
+                                            {{ ligne.produit.nom }}
+                                        </td>
+
+                                        <td>
+                                            {{ ligne.produit.reference }}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {{ ligne.quantite }}
+                                        </td>
+
+                                        <td class="text-end">
+                                            {{ ligne.prixUnitaire|number_format(2, ',', ' ') }}
+                                            Ar
+                                        </td>
+
+                                        <td class="text-end">
+                                            <strong>
+                                                {{ ligne.sousTotal|number_format(2, ',', ' ') }}
+                                                Ar
+                                            </strong>
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+
+                        <div style="min-width: 280px;">
+
+                            <div class="d-flex justify-content-between">
+
+                                <span class="fs-5">
+                                    Total
+                                </span>
+
+                                <strong class="fs-4 text-primary">
+                                    {{ commande.total|number_format(2, ',', ' ') }}
+                                    Ar
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-body">
+
+                    <h4 class="mb-3">
+                        Client
+                    </h4>
+
+                    {% if commande.user %}
+
+                        <p class="mb-1">
+                            <strong>Nom :</strong>
+                            {{ commande.user.nom }}
+                        </p>
+
+                        <p class="mb-1">
+                            <strong>Prénom :</strong>
+                            {{ commande.user.prenom }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Email :</strong>
+                            {{ commande.user.email }}
+                        </p>
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+                            Client inconnu.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% if commande.statut == 'EN_ATTENTE' %}
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <h4 class="mb-3">
+                            Gestion du statut
+                        </h4>
+
+                        <form
+                            action="{{ path(
+                                'app_admin_commande_status',
+                                {
+                                    'id': commande.id,
+                                    'statut': 'CONFIRMEE'
+                                }
+                            ) }}"
+                            method="post"
+                            class="mb-3"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="_token"
+                                value="{{ csrf_token('commande_statut_' ~ commande.id) }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="btn btn-success w-100"
+                            >
+                                <i class="bi bi-check-circle"></i>
+                                Confirmer la commande
+                            </button>
+
+                        </form>
+
+                        <form
+                            action="{{ path(
+                                'app_admin_commande_status',
+                                {
+                                    'id': commande.id,
+                                    'statut': 'ANNULEE'
+                                }
+                            ) }}"
+                            method="post"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="_token"
+                                value="{{ csrf_token('commande_statut_' ~ commande.id) }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger w-100"
+                            >
+                                <i class="bi bi-x-circle"></i>
+                                Annuler la commande
+                            </button>
+
+                        </form>
+
+                        <small class="text-muted d-block mt-3">
+                            En cas d'annulation, les quantités seront
+                            automatiquement remises en stock.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+

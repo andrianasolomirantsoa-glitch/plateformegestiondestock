@@ -1,0 +1,2021 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une sortie de stock{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4 px-3 px-lg-4">
+
+    {# =========================================================
+       HEADER
+       ========================================================= #}
+    <div class="page-header mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+
+                <div class="page-badge">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Gestion du stock
+                </div>
+
+                <h1 class="page-title mt-2 mb-1">
+                    Modifier une sortie de stock
+                </h1>
+
+                <p class="page-subtitle mb-0">
+                    Modifiez les informations de cette sortie et vérifiez le nouveau stock.
+                </p>
+
+            </div>
+
+
+            <a href="{{ path('app_sortie_stock_index') }}"
+               class="btn btn-light back-btn">
+
+                <i class="bi bi-arrow-left me-2"></i>
+                Retour aux sorties
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       FLASH SUCCESS
+       ========================================================= #}
+    {% for message in app.flashes('success') %}
+
+        <div class="alert alert-success custom-alert mb-4">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    {# =========================================================
+       FLASH ERROR
+       ========================================================= #}
+    {% for message in app.flashes('error') %}
+
+        <div class="alert alert-danger custom-alert mb-4">
+
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    <div class="row g-4 align-items-start">
+
+
+        {# =====================================================
+           FORMULAIRE
+           ===================================================== #}
+        <div class="col-xl-8">
+
+            <div class="main-card">
+
+                {# CARD HEADER #}
+                <div class="card-top">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="card-icon">
+                            <i class="bi bi-pencil-square"></i>
+                        </div>
+
+                        <div>
+
+                            <h2 class="card-title mb-1">
+                                Informations de la sortie
+                            </h2>
+
+                            <p class="card-subtitle mb-0">
+                                Sortie #{{ sortie.id }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="entry-status">
+
+                        <i class="bi bi-pencil me-1"></i>
+
+                        Modification
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-content">
+
+                    <form
+                        method="post"
+                        action="{{ path('app_sortie_stock_edit', {
+                            id: sortie.id
+                        }) }}"
+                    >
+
+
+                        {# =================================================
+                           PRODUIT
+                           ================================================= #}
+                        <div class="form-section">
+
+                            <div class="section-title">
+
+                                <i class="bi bi-box-seam"></i>
+
+                                Produit
+
+                            </div>
+
+
+                            <label
+                                for="produit"
+                                class="form-label"
+                            >
+
+                                Produit
+                                <span class="required">*</span>
+
+                            </label>
+
+
+                            <select
+                                id="produit"
+                                name="produit"
+                                class="form-select custom-select"
+                                required
+                            >
+
+                                <option value="">
+                                    -- Sélectionner un produit --
+                                </option>
+
+
+                                {% for produit in produits %}
+
+                                    <option
+                                        value="{{ produit.id }}"
+                                        data-stock="{{ produit.quantiteStock }}"
+                                        {% if sortie.produit and sortie.produit.id == produit.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        {{ produit.reference }}
+                                        —
+                                        {{ produit.nom }}
+
+                                        — Stock :
+                                        {{ produit.quantiteStock }}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+
+                            <div class="field-help">
+
+                                <i class="bi bi-info-circle me-1"></i>
+
+                                Le stock actuel est celui enregistré en base.
+                                L'ancienne sortie est déjà comprise dans ce stock.
+
+                            </div>
+
+                        </div>
+
+
+                        {# =================================================
+                           CLIENT
+                           ================================================= #}
+                        <div class="form-section">
+
+                            <div class="section-title">
+
+                                <i class="bi bi-person"></i>
+
+                                Client
+
+                            </div>
+
+
+                            <label
+                                for="client"
+                                class="form-label"
+                            >
+                                Client
+                            </label>
+
+
+                            <select
+                                id="client"
+                                name="client"
+                                class="form-select custom-select"
+                            >
+
+                                <option value="">
+                                    -- Aucun client --
+                                </option>
+
+
+                                {% for client in clients %}
+
+                                    <option
+                                        value="{{ client.id }}"
+                                        {% if sortie.client and sortie.client.id == client.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        {% if client.prenom %}
+                                            {{ client.prenom }}
+                                        {% endif %}
+
+                                        {% if client.nom %}
+                                            {{ client.nom }}
+                                        {% endif %}
+
+                                        {% if client.email is defined and client.email %}
+                                            — {{ client.email }}
+                                        {% endif %}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+
+                            <div class="field-help">
+
+                                <i class="bi bi-info-circle me-1"></i>
+
+                                Le client peut être modifié ou supprimé.
+
+                            </div>
+
+                        </div>
+
+
+                        {# =================================================
+                           QUANTITE + PRIX
+                           ================================================= #}
+                        <div class="form-section">
+
+                            <div class="section-title">
+
+                                <i class="bi bi-123"></i>
+
+                                Quantité et prix
+
+                            </div>
+
+
+                            <div class="row g-3">
+
+
+                                {# QUANTITE #}
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="quantite"
+                                        class="form-label"
+                                    >
+
+                                        Nouvelle quantité
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <div class="input-group">
+
+                                        <input
+                                            type="number"
+                                            id="quantite"
+                                            name="quantite"
+                                            class="form-control custom-input"
+                                            min="1"
+                                            step="1"
+                                            value="{{ sortie.quantite }}"
+                                            required
+                                        >
+
+
+                                        <span class="input-group-text custom-addon">
+                                            pièces
+                                        </span>
+
+                                    </div>
+
+
+                                    <div
+                                        id="quantiteHelp"
+                                        class="quantity-help"
+                                    >
+                                        Modification de la quantité actuelle.
+                                    </div>
+
+                                </div>
+
+
+                                {# PRIX #}
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="prixUnitaire"
+                                        class="form-label"
+                                    >
+                                        Prix unitaire
+                                    </label>
+
+
+                                    <div class="input-group">
+
+                                        <input
+                                            type="number"
+                                            id="prixUnitaire"
+                                            name="prixUnitaire"
+                                            class="form-control custom-input"
+                                            min="0"
+                                            step="0.01"
+                                            value="{{ sortie.prixUnitaire ?? '' }}"
+                                            placeholder="Ex : 20000"
+                                        >
+
+
+                                        <span class="input-group-text custom-addon">
+                                            MGA
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {# =================================================
+                           DATE + DOCUMENT
+                           ================================================= #}
+                        <div class="form-section">
+
+                            <div class="section-title">
+
+                                <i class="bi bi-calendar3"></i>
+
+                                Informations du mouvement
+
+                            </div>
+
+
+                            <div class="row g-3">
+
+
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="dateSortie"
+                                        class="form-label"
+                                    >
+                                        Date de sortie
+                                    </label>
+
+
+                                    <input
+                                        type="datetime-local"
+                                        id="dateSortie"
+                                        name="dateSortie"
+                                        class="form-control custom-input"
+                                        value="{% if sortie.dateSortie %}{{ sortie.dateSortie|date('Y-m-d\\TH:i') }}{% endif %}"
+                                    >
+
+                                </div>
+
+
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="referenceDocument"
+                                        class="form-label"
+                                    >
+                                        Référence du document
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        id="referenceDocument"
+                                        name="referenceDocument"
+                                        class="form-control custom-input"
+                                        maxlength="100"
+                                        value="{{ sortie.referenceDocument ?? '' }}"
+                                        placeholder="Ex : BL-SORT-2026-001"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {# =================================================
+                           COMMENTAIRE
+                           ================================================= #}
+                        <div class="form-section mb-0">
+
+                            <div class="section-title">
+
+                                <i class="bi bi-chat-left-text"></i>
+
+                                Commentaire
+
+                            </div>
+
+
+                            <label
+                                for="commentaire"
+                                class="form-label"
+                            >
+                                Commentaire
+                            </label>
+
+
+                            <textarea
+                                id="commentaire"
+                                name="commentaire"
+                                class="form-control custom-textarea"
+                                rows="4"
+                                placeholder="Modifier la remarque..."
+                            >{{ sortie.commentaire ?? '' }}</textarea>
+
+                        </div>
+
+
+                        {# =================================================
+                           CSRF
+                           ================================================= #}
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token(
+                                'modifier_sortie_stock_' ~ sortie.id
+                            ) }}"
+                        >
+
+
+                        {# =================================================
+                           ACTIONS
+                           ================================================= #}
+                        <div class="form-actions">
+
+                            <a
+                                href="{{ path('app_sortie_stock_index') }}"
+                                class="btn btn-light action-cancel"
+                            >
+
+                                <i class="bi bi-x-lg me-2"></i>
+
+                                Annuler
+
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                id="submitButton"
+                                class="btn btn-primary action-save"
+                            >
+
+                                <i class="bi bi-check2-circle me-2"></i>
+
+                                Enregistrer les modifications
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# =====================================================
+           COLONNE DROITE
+           ===================================================== #}
+        <div class="col-xl-4">
+
+
+            {# =================================================
+               PREVISUALISATION STOCK
+               ================================================= #}
+            <div class="stock-card">
+
+                <div class="stock-card-header">
+
+                    <div class="stock-card-icon">
+
+                        <i class="bi bi-box-seam"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3 class="stock-card-title mb-1">
+                            Aperçu du stock
+                        </h3>
+
+                        <p class="stock-card-subtitle mb-0">
+                            Calcul en temps réel
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {# STOCK ACTUEL #}
+                <div class="stock-item">
+
+                    <div class="stock-item-label">
+
+                        <i class="bi bi-box me-2"></i>
+
+                        Stock actuel
+
+                    </div>
+
+
+                    <div class="stock-item-value">
+
+                        <span id="stockActuel">
+                            0
+                        </span>
+
+                        <small>
+                            pièces
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                {# ANCIENNE SORTIE #}
+                <div class="stock-item">
+
+                    <div class="stock-item-label">
+
+                        <i class="bi bi-arrow-up-left me-2"></i>
+
+                        Ancienne sortie
+
+                    </div>
+
+
+                    <div class="stock-item-value">
+
+                        <span id="ancienneQuantite">
+                            {{ sortie.quantite }}
+                        </span>
+
+                        <small>
+                            pièces
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                {# STOCK AVANT SORTIE #}
+                <div class="stock-item">
+
+                    <div class="stock-item-label">
+
+                        <i class="bi bi-box-arrow-left me-2"></i>
+
+                        Stock avant sortie
+
+                    </div>
+
+
+                    <div class="stock-item-value">
+
+                        <span id="stockAvantSortie">
+                            0
+                        </span>
+
+                        <small>
+                            pièces
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                {# NOUVELLE SORTIE #}
+                <div class="stock-item stock-new">
+
+                    <div class="stock-item-label">
+
+                        <i class="bi bi-arrow-up-circle me-2"></i>
+
+                        Nouvelle sortie
+
+                    </div>
+
+
+                    <div class="stock-item-value">
+
+                        <span id="nouvelleQuantite">
+                            {{ sortie.quantite }}
+                        </span>
+
+                        <small>
+                            pièces
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stock-separator"></div>
+
+
+                {# NOUVEAU STOCK #}
+                <div class="stock-result">
+
+                    <div>
+
+                        <div class="stock-result-label">
+                            Nouveau stock estimé
+                        </div>
+
+                        <div
+                            class="stock-result-text"
+                            id="stockResultText"
+                        >
+                            Après modification
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="stock-result-number"
+                        id="nouveauStock"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                {# MESSAGE #}
+                <div
+                    id="stockInfoMessage"
+                    class="stock-message"
+                >
+
+                    <i class="bi bi-info-circle-fill"></i>
+
+                    <span>
+                        Le calcul sera mis à jour automatiquement.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            {# =================================================
+               EXPLICATION
+               ================================================= #}
+            <div class="help-card mt-4">
+
+                <div class="help-title">
+
+                    <div class="help-icon">
+                        <i class="bi bi-lightbulb-fill"></i>
+                    </div>
+
+                    <span>
+                        Règle de modification
+                    </span>
+
+                </div>
+
+
+                <p class="help-text">
+
+                    L'ancienne sortie est déjà déduite du stock actuel.
+                    Lorsqu'elle est modifiée, le système réintègre
+                    l'ancienne quantité avant de retirer la nouvelle.
+
+                </p>
+
+
+                <div class="formula">
+
+                    <div class="formula-line">
+
+                        <span>
+                            Stock actuel
+                        </span>
+
+                        <strong id="formulaStock">
+                            10
+                        </strong>
+
+                    </div>
+
+
+                    <div class="formula-operation">
+                        + Ancienne sortie
+                    </div>
+
+
+                    <div class="formula-operation">
+                        − Nouvelle sortie
+                    </div>
+
+
+                    <div class="formula-line formula-total">
+
+                        <span>
+                            Nouveau stock
+                        </span>
+
+                        <strong id="formulaResult">
+                            9
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="example-text"
+                    id="exampleText"
+                >
+
+                    <i class="bi bi-check-circle me-1"></i>
+
+                    Exemple : 10 + 4 − 5 = 9 pièces
+
+                </div>
+
+            </div>
+
+
+            {# =================================================
+               ALERTE
+               ================================================= #}
+            <div
+                id="stockAlert"
+                class="stock-alert mt-4"
+                style="display:none;"
+            >
+
+                <div class="stock-alert-icon">
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Stock insuffisant
+                    </strong>
+
+                    <p id="stockAlertText">
+                        La nouvelle quantité dépasse le stock disponible.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{# =============================================================
+   STYLE
+   ============================================================= #}
+<style>
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .page-header {
+        padding: 4px 2px;
+    }
+
+    .page-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #fff1f2;
+        color: #be123c;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .page-title {
+        color: #172033;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .page-subtitle {
+        color: #8993a5;
+        font-size: 14px;
+    }
+
+    .back-btn {
+        padding: 11px 16px;
+        border-radius: 11px;
+        border: 1px solid #e5e7eb;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       ALERTS
+       ========================================================= */
+
+    .custom-alert {
+        border: 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       CARDS
+       ========================================================= */
+
+    .main-card,
+    .stock-card,
+    .help-card,
+    .stock-alert {
+        background: #ffffff;
+        border: 1px solid #edf0f5;
+        border-radius: 20px;
+        box-shadow: 0 10px 35px rgba(15,23,42,.06);
+    }
+
+    .card-top {
+        padding: 24px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff1f2;
+        color: #e11d48;
+        font-size: 21px;
+    }
+
+    .card-title {
+        color: #172033;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .card-subtitle {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .entry-status {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #c2410c;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .card-content {
+        padding: 26px;
+    }
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .form-section {
+        margin-bottom: 28px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        color: #111827;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .section-title i {
+        color: #e11d48;
+    }
+
+    .form-label {
+        color: #374151;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .required {
+        color: #ef4444;
+    }
+
+    .custom-input,
+    .custom-select,
+    .custom-textarea {
+        min-height: 46px;
+        border: 1px solid #dfe4ea;
+        border-radius: 12px;
+        color: #172033;
+        font-size: 14px;
+    }
+
+    .custom-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .custom-input:focus,
+    .custom-select:focus,
+    .custom-textarea:focus {
+        border-color: #e11d48;
+        box-shadow: 0 0 0 .2rem rgba(225,29,72,.08);
+    }
+
+    .custom-addon {
+        border: 1px solid #dfe4ea;
+        border-left: 0;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 0 12px 12px 0;
+    }
+
+    .field-help {
+        margin-top: 8px;
+        color: #94a3b8;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .quantity-help {
+        margin-top: 8px;
+        color: #94a3b8;
+        font-size: 11px;
+    }
+
+    .quantity-help.success {
+        color: #059669;
+        font-weight: 600;
+    }
+
+    .quantity-help.danger {
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 22px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .action-cancel {
+        padding: 11px 18px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .action-save {
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: 0;
+        background: #e11d48;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(225,29,72,.20);
+    }
+
+    .action-save:hover {
+        background: #be123c;
+    }
+
+    .action-save:disabled {
+        background: #fda4af;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+
+    /* =========================================================
+       STOCK
+       ========================================================= */
+
+    .stock-card {
+        position: sticky;
+        top: 20px;
+        padding: 24px;
+    }
+
+    .stock-card-header {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 20px;
+    }
+
+    .stock-card-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff1f2;
+        color: #e11d48;
+        font-size: 20px;
+    }
+
+    .stock-card-title {
+        color: #111827;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .stock-card-subtitle {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    .stock-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 13px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .stock-item-label {
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stock-item-label i {
+        color: #94a3b8;
+    }
+
+    .stock-item-value {
+        color: #111827;
+        font-size: 20px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .stock-item-value small {
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .stock-new {
+        margin-top: 4px;
+        padding: 13px 10px;
+        border-radius: 10px;
+        border-bottom: 0;
+        background: #fff7f8;
+    }
+
+    .stock-new .stock-item-value {
+        color: #e11d48;
+    }
+
+    .stock-separator {
+        height: 1px;
+        margin: 5px 0;
+        background: #e5e7eb;
+    }
+
+    .stock-result {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 17px;
+        padding: 17px;
+        border: 1px solid #fecdd3;
+        border-radius: 15px;
+        background: #fff1f2;
+    }
+
+    .stock-result-label {
+        color: #be123c;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .stock-result-text {
+        margin-top: 3px;
+        color: #9ca3af;
+        font-size: 11px;
+    }
+
+    .stock-result-number {
+        color: #be123c;
+        font-size: 32px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .stock-message {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-top: 15px;
+        padding: 13px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 11px;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 12px;
+        line-height: 1.65;
+    }
+
+    .stock-message i {
+        margin-top: 3px;
+        color: #6366f1;
+        flex-shrink: 0;
+    }
+
+    .stock-message.good {
+        border-color: #bbf7d0;
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .stock-message.good i {
+        color: #059669;
+    }
+
+    .stock-message.warning {
+        border-color: #fecaca;
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    .stock-message.warning i {
+        color: #dc2626;
+    }
+
+
+    /* =========================================================
+       HELP
+       ========================================================= */
+
+    .help-card {
+        padding: 22px;
+    }
+
+    .help-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: #111827;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .help-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff7ed;
+        color: #f59e0b;
+    }
+
+    .help-text {
+        margin-bottom: 16px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.65;
+    }
+
+    .formula {
+        padding: 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+    }
+
+    .formula-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 0;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .formula-line strong {
+        color: #111827;
+    }
+
+    .formula-operation {
+        padding: 2px 0;
+        color: #94a3b8;
+        font-size: 11px;
+    }
+
+    .formula-total {
+        margin-top: 8px;
+        padding-top: 10px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .formula-total strong {
+        color: #be123c;
+    }
+
+    .example-text {
+        margin-top: 14px;
+        color: #64748b;
+        font-size: 11px;
+    }
+
+    .example-text i {
+        color: #059669;
+    }
+
+
+    /* =========================================================
+       ALERT STOCK
+       ========================================================= */
+
+    .stock-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 15px;
+        border-color: #fecaca;
+        background: #fef2f2;
+    }
+
+    .stock-alert-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .stock-alert strong {
+        color: #991b1b;
+        font-size: 13px;
+    }
+
+    .stock-alert p {
+        margin: 3px 0 0;
+        color: #b91c1c;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1199px) {
+
+        .stock-card {
+            position: static;
+        }
+
+    }
+
+    @media (max-width: 767px) {
+
+        .page-title {
+            font-size: 25px;
+        }
+
+        .card-top {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .form-actions {
+            align-items: stretch;
+            flex-direction: column-reverse;
+        }
+
+        .action-cancel,
+        .action-save {
+            width: 100%;
+        }
+
+        .stock-result {
+            align-items: flex-start;
+        }
+
+    }
+
+</style>
+
+
+{# =============================================================
+   JAVASCRIPT
+   ============================================================= #}
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const produitSelect =
+        document.getElementById('produit');
+
+    const quantiteInput =
+        document.getElementById('quantite');
+
+    const stockActuelElement =
+        document.getElementById('stockActuel');
+
+    const ancienneQuantiteElement =
+        document.getElementById('ancienneQuantite');
+
+    const stockAvantSortieElement =
+        document.getElementById('stockAvantSortie');
+
+    const nouvelleQuantiteElement =
+        document.getElementById('nouvelleQuantite');
+
+    const nouveauStockElement =
+        document.getElementById('nouveauStock');
+
+    const formulaStock =
+        document.getElementById('formulaStock');
+
+    const formulaResult =
+        document.getElementById('formulaResult');
+
+    const exampleText =
+        document.getElementById('exampleText');
+
+    const stockInfoMessage =
+        document.getElementById('stockInfoMessage');
+
+    const stockAlert =
+        document.getElementById('stockAlert');
+
+    const stockAlertText =
+        document.getElementById('stockAlertText');
+
+    const quantityHelp =
+        document.getElementById('quantiteHelp');
+
+    const submitButton =
+        document.getElementById('submitButton');
+
+
+    /*
+     * Anciennes informations
+     */
+    const ancienneQuantite =
+        {{ sortie.quantite }};
+
+    const ancienProduitId =
+        {{ sortie.produit ? sortie.produit.id : 0 }};
+
+
+    /*
+     * Stock du produit sélectionné
+     */
+    function getStockProduit() {
+
+        if (
+            !produitSelect ||
+            !produitSelect.value
+        ) {
+            return 0;
+        }
+
+        const option =
+            produitSelect.options[
+                produitSelect.selectedIndex
+            ];
+
+        if (!option) {
+            return 0;
+        }
+
+        return parseInt(
+            option.dataset.stock || '0',
+            10
+        );
+    }
+
+
+    /*
+     * Mise à jour de l'aperçu
+     */
+    function mettreAJourStock() {
+
+        const produitId =
+            parseInt(
+                produitSelect.value || '0',
+                10
+            );
+
+
+        let nouvelleQuantite =
+            parseInt(
+                quantiteInput.value || '0',
+                10
+            );
+
+
+        if (
+            isNaN(nouvelleQuantite) ||
+            nouvelleQuantite < 0
+        ) {
+            nouvelleQuantite = 0;
+        }
+
+
+        const stockActuel =
+            getStockProduit();
+
+
+        /*
+         * Affichage général
+         */
+        stockActuelElement.textContent =
+            stockActuel;
+
+        ancienneQuantiteElement.textContent =
+            ancienneQuantite;
+
+        nouvelleQuantiteElement.textContent =
+            nouvelleQuantite;
+
+        formulaStock.textContent =
+            stockActuel;
+
+
+        /*
+         * Aucun produit
+         */
+        if (produitId === 0) {
+
+            stockAvantSortieElement.textContent =
+                0;
+
+            nouveauStockElement.textContent =
+                0;
+
+            formulaResult.textContent =
+                0;
+
+            quantityHelp.textContent =
+                'Sélectionnez un produit.';
+
+            quantityHelp.className =
+                'quantity-help';
+
+            stockInfoMessage.className =
+                'stock-message';
+
+            stockInfoMessage.innerHTML = `
+                <i class="bi bi-info-circle-fill"></i>
+                <span>
+                    Sélectionnez un produit pour afficher
+                    le calcul du stock.
+                </span>
+            `;
+
+            stockAlert.style.display =
+                'none';
+
+            submitButton.disabled =
+                false;
+
+            return;
+        }
+
+
+        /*
+         * =====================================================
+         * MÊME PRODUIT
+         * =====================================================
+         *
+         * Le stock actuel contient déjà l'ancienne sortie.
+         *
+         * Exemple :
+         *
+         * Stock actuel = 10
+         * Ancienne sortie = 4
+         * Nouvelle sortie = 5
+         *
+         * Stock avant sortie = 10 + 4 = 14
+         *
+         * Nouveau stock = 14 - 5 = 9
+         */
+        if (produitId === ancienProduitId) {
+
+            const stockAvantSortie =
+                stockActuel + ancienneQuantite;
+
+
+            const nouveauStock =
+                stockAvantSortie - nouvelleQuantite;
+
+
+            stockAvantSortieElement.textContent =
+                stockAvantSortie;
+
+            nouveauStockElement.textContent =
+                nouveauStock;
+
+            formulaResult.textContent =
+                nouveauStock;
+
+
+            if (nouvelleQuantite === 0) {
+
+                quantityHelp.textContent =
+                    'Saisissez une quantité supérieure à zéro.';
+
+                quantityHelp.className =
+                    'quantity-help';
+
+                stockInfoMessage.className =
+                    'stock-message';
+
+                stockInfoMessage.innerHTML = `
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>
+                        L'ancienne sortie de
+                        <strong>${ancienneQuantite} pièce(s)</strong>
+                        est déjà incluse dans le stock actuel.
+                    </span>
+                `;
+
+                stockAlert.style.display =
+                    'none';
+
+                submitButton.disabled =
+                    true;
+
+            }
+
+            else {
+
+                quantityHelp.textContent =
+                    `Stock disponible pour cette modification : ${stockAvantSortie} pièce(s).`;
+
+                if (nouvelleQuantite > stockAvantSortie) {
+
+                    quantityHelp.textContent =
+                        `Stock insuffisant : ${stockAvantSortie} pièce(s) disponibles.`;
+
+                    quantityHelp.className =
+                        'quantity-help danger';
+
+
+                    stockInfoMessage.className =
+                        'stock-message warning';
+
+                    stockInfoMessage.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>
+                            La nouvelle sortie de
+                            <strong>${nouvelleQuantite} pièce(s)</strong>
+                            dépasse le stock disponible de
+                            <strong>${stockAvantSortie} pièce(s)</strong>.
+                        </span>
+                    `;
+
+
+                    stockAlert.style.display =
+                        'flex';
+
+                    stockAlertText.textContent =
+                        `Nouvelle sortie : ${nouvelleQuantite} pièce(s). Stock disponible : ${stockAvantSortie} pièce(s).`;
+
+
+                    submitButton.disabled =
+                        true;
+
+                }
+
+                else {
+
+                    quantityHelp.className =
+                        'quantity-help success';
+
+
+                    stockInfoMessage.className =
+                        'stock-message good';
+
+                    stockInfoMessage.innerHTML = `
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>
+                            Calcul :
+                            <strong>
+                                ${stockActuel}
+                                + ${ancienneQuantite}
+                                − ${nouvelleQuantite}
+                                = ${nouveauStock} pièce(s)
+                            </strong>
+                            <br>
+                            La modification est possible.
+                        </span>
+                    `;
+
+
+                    stockAlert.style.display =
+                        'none';
+
+                    submitButton.disabled =
+                        false;
+
+                }
+
+            }
+
+
+            exampleText.innerHTML = `
+                <i class="bi bi-check-circle me-1"></i>
+                ${stockActuel}
+                + ${ancienneQuantite}
+                − ${nouvelleQuantite}
+                = ${nouveauStock} pièce(s)
+            `;
+
+        }
+
+
+        /*
+         * =====================================================
+         * CHANGEMENT DE PRODUIT
+         * =====================================================
+         */
+        else {
+
+            /*
+             * Pour le nouveau produit,
+             * son stock actuel n'inclut pas l'ancienne sortie.
+             */
+            const stockAvantSortie =
+                stockActuel;
+
+
+            const nouveauStock =
+                stockActuel - nouvelleQuantite;
+
+
+            stockAvantSortieElement.textContent =
+                stockAvantSortie;
+
+            nouveauStockElement.textContent =
+                nouveauStock;
+
+            formulaResult.textContent =
+                nouveauStock;
+
+
+            if (nouvelleQuantite === 0) {
+
+                quantityHelp.textContent =
+                    'Saisissez une quantité supérieure à zéro.';
+
+                quantityHelp.className =
+                    'quantity-help';
+
+                stockInfoMessage.className =
+                    'stock-message';
+
+                stockInfoMessage.innerHTML = `
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>
+                        Le produit a été changé.
+                        L'ancienne sortie de
+                        <strong>${ancienneQuantite} pièce(s)</strong>
+                        sera rendue à l'ancien produit.
+                    </span>
+                `;
+
+                stockAlert.style.display =
+                    'none';
+
+                submitButton.disabled =
+                    true;
+
+            }
+
+            else if (
+                nouvelleQuantite > stockActuel
+            ) {
+
+                quantityHelp.textContent =
+                    `Stock insuffisant : ${stockActuel} pièce(s) disponibles.`;
+
+                quantityHelp.className =
+                    'quantity-help danger';
+
+
+                stockInfoMessage.className =
+                    'stock-message warning';
+
+                stockInfoMessage.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>
+                        Le nouveau produit possède seulement
+                        <strong>${stockActuel} pièce(s)</strong>.
+                        La nouvelle sortie demande
+                        <strong>${nouvelleQuantite} pièce(s)</strong>.
+                    </span>
+                `;
+
+
+                stockAlert.style.display =
+                    'flex';
+
+                stockAlertText.textContent =
+                    `Stock du nouveau produit : ${stockActuel} pièce(s). Quantité demandée : ${nouvelleQuantite} pièce(s).`;
+
+
+                submitButton.disabled =
+                    true;
+
+            }
+
+            else {
+
+                quantityHelp.textContent =
+                    `Stock disponible du nouveau produit : ${stockActuel} pièce(s).`;
+
+                quantityHelp.className =
+                    'quantity-help success';
+
+
+                stockInfoMessage.className =
+                    'stock-message good';
+
+                stockInfoMessage.innerHTML = `
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>
+                        L'ancienne sortie de
+                        <strong>${ancienneQuantite} pièce(s)</strong>
+                        sera rendue à l'ancien produit.
+                        <br>
+                        Nouveau produit :
+                        <strong>
+                            ${stockActuel}
+                            − ${nouvelleQuantite}
+                            = ${nouveauStock} pièce(s)
+                        </strong>
+                    </span>
+                `;
+
+
+                stockAlert.style.display =
+                    'none';
+
+                submitButton.disabled =
+                    false;
+
+            }
+
+
+            exampleText.innerHTML = `
+                <i class="bi bi-check-circle me-1"></i>
+                Nouveau produit :
+                ${stockActuel}
+                − ${nouvelleQuantite}
+                = ${nouveauStock} pièce(s)
+            `;
+
+        }
+
+    }
+
+
+    /*
+     * Changement produit
+     */
+    if (produitSelect) {
+
+        produitSelect.addEventListener(
+            'change',
+            mettreAJourStock
+        );
+
+    }
+
+
+    /*
+     * Changement quantité
+     */
+    if (quantiteInput) {
+
+        quantiteInput.addEventListener(
+            'input',
+            mettreAJourStock
+        );
+
+        quantiteInput.addEventListener(
+            'change',
+            mettreAJourStock
+        );
+
+    }
+
+
+    /*
+     * Sécurité avant envoi
+     */
+    const form =
+        document.querySelector('form');
+
+    if (form) {
+
+        form.addEventListener(
+            'submit',
+            function (event) {
+
+                const produitId =
+                    parseInt(
+                        produitSelect.value || '0',
+                        10
+                    );
+
+                const quantite =
+                    parseInt(
+                        quantiteInput.value || '0',
+                        10
+                    );
+
+                if (
+                    produitId === 0 ||
+                    isNaN(quantite) ||
+                    quantite <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    mettreAJourStock();
+
+                    return;
+                }
+
+
+                /*
+                 * Même produit :
+                 * stock disponible = stock actuel + ancienne sortie
+                 */
+                if (produitId === ancienProduitId) {
+
+                    const stockDisponible =
+                        getStockProduit()
+                        + ancienneQuantite;
+
+
+                    if (quantite > stockDisponible) {
+
+                        event.preventDefault();
+
+                        mettreAJourStock();
+
+                    }
+
+                }
+
+
+                /*
+                 * Produit changé :
+                 * stock disponible = stock actuel du nouveau produit
+                 */
+                else {
+
+                    const stockDisponible =
+                        getStockProduit();
+
+
+                    if (quantite > stockDisponible) {
+
+                        event.preventDefault();
+
+                        mettreAJourStock();
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Calcul initial
+     */
+    mettreAJourStock();
+
+});
+
+</script>
+
+{% endblock %}
+

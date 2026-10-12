@@ -1,0 +1,390 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Gestion des livraisons
+{% endblock %}
+
+{% block header_title %}
+    <div class="dashboard-heading">
+
+        <div>
+            <h1 class="page-title">
+                Gestion des livraisons
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Suivez l'état des livraisons des commandes.
+            </p>
+        </div>
+
+        <div class="dashboard-date">
+            <i class="bi bi-calendar3"></i>
+            {{ "now"|date("d/m/Y") }}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2>
+                Liste des livraisons
+            </h2>
+
+            <p class="text-muted mb-0">
+                {{ livraisons|length }}
+                livraison{% if livraisons|length > 1 %}s{% endif %}
+            </p>
+
+        </div>
+
+        <a
+            href="{{ path('app_dashboard') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Retour au tableau de bord
+        </a>
+
+    </div>
+
+    {% if livraisons is empty %}
+
+        <div class="card shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <i
+                    class="bi bi-truck text-muted"
+                    style="font-size: 70px;"
+                ></i>
+
+                <h3 class="mt-3">
+                    Aucune livraison
+                </h3>
+
+                <p class="text-muted mb-0">
+                    Aucune livraison n'a encore été enregistrée.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Commande</th>
+                                <th>Client</th>
+                                <th>Mode</th>
+                                <th>Adresse</th>
+                                <th>Ville</th>
+                                <th>Statut</th>
+                                <th>Date livraison</th>
+                                <th class="text-center">
+                                    Action
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for livraison in livraisons %}
+
+                                <tr>
+
+                                    <td>
+
+                                        {% if livraison.commande %}
+
+                                            <strong>
+                                                {{ livraison.commande.numero }}
+                                            </strong>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if livraison.commande and livraison.commande.user %}
+
+                                            <strong>
+                                                {{ livraison.commande.user.prenom }}
+                                                {{ livraison.commande.user.nom }}
+                                            </strong>
+
+                                            <small class="text-muted d-block">
+                                                {{ livraison.commande.user.email }}
+                                            </small>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if livraison.modeLivraison == 'DOMICILE' %}
+
+                                            <span class="badge bg-primary">
+                                                Domicile
+                                            </span>
+
+                                        {% elseif livraison.modeLivraison == 'POINT_RELAIS' %}
+
+                                            <span class="badge bg-info text-dark">
+                                                Point relais
+                                            </span>
+
+                                        {% elseif livraison.modeLivraison == 'RETRAIT' %}
+
+                                            <span class="badge bg-secondary">
+                                                Retrait
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-secondary">
+                                                {{ livraison.modeLivraison }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        {{ livraison.adresseLivraison }}
+                                    </td>
+
+                                    <td>
+                                        {{ livraison.ville }}
+                                    </td>
+
+                                    <td>
+
+                                        {% if livraison.statut == 'EN_ATTENTE' %}
+
+                                            <span class="badge bg-warning text-dark">
+                                                En attente
+                                            </span>
+
+                                        {% elseif livraison.statut == 'EN_COURS' %}
+
+                                            <span class="badge bg-primary">
+                                                En cours
+                                            </span>
+
+                                        {% elseif livraison.statut == 'LIVREE' %}
+
+                                            <span class="badge bg-success">
+                                                Livrée
+                                            </span>
+
+                                        {% elseif livraison.statut == 'ANNULEE' %}
+
+                                            <span class="badge bg-danger">
+                                                Annulée
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-secondary">
+                                                {{ livraison.statut }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if livraison.dateLivraison %}
+
+                                            {{ livraison.dateLivraison|date('d/m/Y H:i') }}
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        {% if livraison.statut == 'EN_ATTENTE' %}
+
+                                            <form
+                                                action="{{ path(
+                                                    'app_admin_livraison_status',
+                                                    {
+                                                        'id': livraison.id,
+                                                        'statut': 'EN_COURS'
+                                                    }
+                                                ) }}"
+                                                method="post"
+                                                class="d-inline"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="_token"
+                                                    value="{{ csrf_token('livraison_statut_' ~ livraison.id) }}"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-primary btn-sm"
+                                                >
+                                                    <i class="bi bi-truck"></i>
+                                                    Expédier
+                                                </button>
+
+                                            </form>
+
+                                            <form
+                                                action="{{ path(
+                                                    'app_admin_livraison_status',
+                                                    {
+                                                        'id': livraison.id,
+                                                        'statut': 'ANNULEE'
+                                                    }
+                                                ) }}"
+                                                method="post"
+                                                class="d-inline"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="_token"
+                                                    value="{{ csrf_token('livraison_statut_' ~ livraison.id) }}"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                >
+                                                    <i class="bi bi-x-circle"></i>
+                                                    Annuler
+                                                </button>
+
+                                            </form>
+
+                                        {% elseif livraison.statut == 'EN_COURS' %}
+
+                                            <form
+                                                action="{{ path(
+                                                    'app_admin_livraison_status',
+                                                    {
+                                                        'id': livraison.id,
+                                                        'statut': 'LIVREE'
+                                                    }
+                                                ) }}"
+                                                method="post"
+                                                class="d-inline"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="_token"
+                                                    value="{{ csrf_token('livraison_statut_' ~ livraison.id) }}"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-success btn-sm"
+                                                >
+                                                    <i class="bi bi-check-circle"></i>
+                                                    Marquer livrée
+                                                </button>
+
+                                            </form>
+
+                                            <form
+                                                action="{{ path(
+                                                    'app_admin_livraison_status',
+                                                    {
+                                                        'id': livraison.id,
+                                                        'statut': 'ANNULEE'
+                                                    }
+                                                ) }}"
+                                                method="post"
+                                                class="d-inline"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="_token"
+                                                    value="{{ csrf_token('livraison_statut_' ~ livraison.id) }}"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                >
+                                                    <i class="bi bi-x-circle"></i>
+                                                    Annuler
+                                                </button>
+
+                                            </form>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                Aucun changement
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

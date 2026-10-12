@@ -1,0 +1,1270 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fournisseurs{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4 px-3 px-lg-4">
+
+    {# =========================================================
+       HEADER
+       ========================================================= #}
+    <div class="page-header mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+
+                <div class="page-badge">
+                    <i class="bi bi-truck me-2"></i>
+                    Gestion des fournisseurs
+                </div>
+
+                <h1 class="page-title mt-2 mb-1">
+                    Fournisseurs
+                </h1>
+
+                <p class="page-subtitle mb-0">
+                    Gérez les fournisseurs utilisés pour vos opérations de stock.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ path('app_fournisseur_new') }}"
+                class="btn btn-primary new-btn"
+            >
+
+                <i class="bi bi-plus-lg me-2"></i>
+
+                Nouveau fournisseur
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       FLASH SUCCESS
+       ========================================================= #}
+    {% for message in app.flashes('success') %}
+
+        <div class="alert alert-success custom-alert mb-4">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    {# =========================================================
+       FLASH ERROR
+       ========================================================= #}
+    {% for message in app.flashes('error') %}
+
+        <div class="alert alert-danger custom-alert mb-4">
+
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    {# =========================================================
+       STATISTIQUES
+       ========================================================= #}
+    <div class="row g-3 mb-4">
+
+        {# TOTAL #}
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Total fournisseurs
+                        </div>
+
+                        <div class="stat-value">
+                            {{ nombreFournisseurs }}
+                        </div>
+
+                        <div class="stat-info">
+                            fournisseurs enregistrés
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon icon-blue">
+
+                        <i class="bi bi-truck"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# ACTIFS #}
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Fournisseurs actifs
+                        </div>
+
+                        <div class="stat-value">
+                            {{ fournisseursActifs }}
+                        </div>
+
+                        <div class="stat-info">
+                            fournisseurs disponibles
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon icon-green">
+
+                        <i class="bi bi-check-circle"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {# INACTIFS #}
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Fournisseurs inactifs
+                        </div>
+
+                        <div class="stat-value">
+                            {{ fournisseursInactifs }}
+                        </div>
+
+                        <div class="stat-info">
+                            fournisseurs désactivés
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon icon-red">
+
+                        <i class="bi bi-slash-circle"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       TABLE CARD
+       ========================================================= #}
+    <div class="table-card">
+
+        {# TABLE HEADER #}
+        <div class="table-header">
+
+            <div>
+
+                <div class="table-title">
+                    Liste des fournisseurs
+                </div>
+
+                <div class="table-subtitle">
+                    Consultez, modifiez ou activez/désactivez vos fournisseurs.
+                </div>
+
+            </div>
+
+
+            {# RECHERCHE #}
+            <form
+                method="get"
+                action="{{ path('app_fournisseur_index') }}"
+                class="search-form"
+            >
+
+                <div class="search-box">
+
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ recherche }}"
+                        class="search-input"
+                        placeholder="Rechercher un fournisseur..."
+                        autocomplete="off"
+                    >
+
+
+                    {% if recherche %}
+
+                        <a
+                            href="{{ path('app_fournisseur_index') }}"
+                            class="search-clear"
+                            title="Effacer"
+                        >
+
+                            <i class="bi bi-x-circle"></i>
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-dark search-btn"
+                >
+
+                    Rechercher
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        {# =====================================================
+           TABLE
+           ===================================================== #}
+        <div class="table-responsive">
+
+            <table class="table custom-table align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Fournisseur
+                        </th>
+
+                        <th>
+                            Contact
+                        </th>
+
+                        <th>
+                            Localisation
+                        </th>
+
+                        <th>
+                            Créé le
+                        </th>
+
+                        <th class="text-center">
+                            Statut
+                        </th>
+
+                        <th class="text-end">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% if fournisseurs is not empty %}
+
+                    {% for fournisseur in fournisseurs %}
+
+                        <tr>
+
+                            {# =================================================
+                               FOURNISSEUR
+                               ================================================= #}
+                            <td>
+
+                                <div class="supplier-cell">
+
+                                    <div class="supplier-avatar">
+
+                                        {{ fournisseur.nom
+                                            ? fournisseur.nom|slice(0, 1)|upper
+                                            : 'F'
+                                        }}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div class="supplier-name">
+                                            {{ fournisseur.nom }}
+                                        </div>
+
+                                        <div class="supplier-id">
+                                            Fournisseur #{{ fournisseur.id }}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            {# =================================================
+                               CONTACT
+                               ================================================= #}
+                            <td>
+
+                                <div class="contact-cell">
+
+                                    {% if fournisseur.email %}
+
+                                        <div class="contact-line">
+
+                                            <i class="bi bi-envelope"></i>
+
+                                            <span>
+                                                {{ fournisseur.email }}
+                                            </span>
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    {% if fournisseur.telephone %}
+
+                                        <div class="contact-line">
+
+                                            <i class="bi bi-telephone"></i>
+
+                                            <span>
+                                                {{ fournisseur.telephone }}
+                                            </span>
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    {% if not fournisseur.email and not fournisseur.telephone %}
+
+                                        <span class="text-muted small">
+                                            Aucun contact
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+
+                            {# =================================================
+                               LOCALISATION
+                               ================================================= #}
+                            <td>
+
+                                <div class="location-cell">
+
+                                    {% if fournisseur.ville %}
+
+                                        <div class="location-main">
+
+                                            <i class="bi bi-geo-alt me-1"></i>
+
+                                            {{ fournisseur.ville }}
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <div class="location-main text-muted">
+
+                                            <i class="bi bi-geo-alt me-1"></i>
+
+                                            Ville non renseignée
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    {% if fournisseur.pays %}
+
+                                        <div class="location-country">
+
+                                            {{ fournisseur.pays }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+
+                            {# =================================================
+                               DATE
+                               ================================================= #}
+                            <td>
+
+                                {% if fournisseur.createdAt %}
+
+                                    <div class="date-cell">
+
+                                        <div class="date-main">
+
+                                            {{ fournisseur.createdAt|date('d/m/Y') }}
+
+                                        </div>
+
+                                        <div class="date-time">
+
+                                            {{ fournisseur.createdAt|date('H:i') }}
+
+                                        </div>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               STATUT
+                               ================================================= #}
+                            <td class="text-center">
+
+                                {% if fournisseur.actif %}
+
+                                    <span class="status-badge status-active">
+
+                                        <i class="bi bi-check-circle-fill me-1"></i>
+
+                                        Actif
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-inactive">
+
+                                        <i class="bi bi-x-circle-fill me-1"></i>
+
+                                        Inactif
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {# =================================================
+                               ACTIONS
+                               ================================================= #}
+                            <td>
+
+                                <div class="actions-wrapper">
+
+
+                                    {# MODIFIER #}
+                                    <a
+                                        href="{{ path('app_fournisseur_edit', {
+                                            id: fournisseur.id
+                                        }) }}"
+                                        class="action-btn action-edit"
+                                        title="Modifier"
+                                    >
+
+                                        <i class="bi bi-pencil-square"></i>
+
+                                    </a>
+
+
+                                    {# TOGGLE #}
+                                    <form
+                                        method="post"
+                                        action="{{ path('app_fournisseur_toggle', {
+                                            id: fournisseur.id
+                                        }) }}"
+                                        class="d-inline"
+                                        onsubmit="return confirm(
+                                            '{{ fournisseur.actif
+                                                ? 'Voulez-vous désactiver ce fournisseur ?'
+                                                : 'Voulez-vous activer ce fournisseur ?'
+                                            }}'
+                                        );"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token(
+                                                'toggle_fournisseur_' ~ fournisseur.id
+                                            ) }}"
+                                        >
+
+
+                                        {% if fournisseur.actif %}
+
+                                            <button
+                                                type="submit"
+                                                class="action-btn action-disable"
+                                                title="Désactiver"
+                                            >
+
+                                                <i class="bi bi-toggle-on"></i>
+
+                                            </button>
+
+                                        {% else %}
+
+                                            <button
+                                                type="submit"
+                                                class="action-btn action-enable"
+                                                title="Activer"
+                                            >
+
+                                                <i class="bi bi-toggle-off"></i>
+
+                                            </button>
+
+                                        {% endif %}
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            <div class="empty-state">
+
+                                <div class="empty-icon">
+
+                                    <i class="bi bi-truck"></i>
+
+                                </div>
+
+
+                                <h3>
+                                    Aucun fournisseur trouvé
+                                </h3>
+
+
+                                {% if recherche %}
+
+                                    <p>
+
+                                        Aucun fournisseur ne correspond à
+                                        <strong>« {{ recherche }} »</strong>.
+
+                                    </p>
+
+
+                                    <a
+                                        href="{{ path('app_fournisseur_index') }}"
+                                        class="btn btn-light border"
+                                    >
+
+                                        <i class="bi bi-arrow-counterclockwise me-2"></i>
+
+                                        Effacer la recherche
+
+                                    </a>
+
+                                {% else %}
+
+                                    <p>
+                                        Aucun fournisseur n'a encore été enregistré.
+                                    </p>
+
+
+                                    <a
+                                        href="{{ path('app_fournisseur_new') }}"
+                                        class="btn btn-primary"
+                                    >
+
+                                        <i class="bi bi-plus-lg me-2"></i>
+
+                                        Ajouter un fournisseur
+
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {# =====================================================
+           FOOTER
+           ===================================================== #}
+        {% if fournisseurs is not empty %}
+
+            <div class="table-footer">
+
+                <div class="result-info">
+
+                    <i class="bi bi-info-circle me-1"></i>
+
+                    {{ nombreFournisseurs }}
+
+                    {% if nombreFournisseurs > 1 %}
+                        fournisseurs affichés
+                    {% else %}
+                        fournisseur affiché
+                    {% endif %}
+
+                </div>
+
+
+                <a
+                    href="{{ path('app_fournisseur_new') }}"
+                    class="btn btn-primary footer-new-btn"
+                >
+
+                    <i class="bi bi-plus-lg me-2"></i>
+
+                    Nouveau fournisseur
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+{# =============================================================
+   STYLE
+   ============================================================= #}
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .page-header {
+        padding: 4px 2px;
+    }
+
+    .page-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .page-title {
+        color: #172033;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .page-subtitle {
+        color: #8993a5;
+        font-size: 14px;
+    }
+
+    .new-btn {
+        padding: 12px 18px;
+        border-radius: 11px;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(13,110,253,.16);
+    }
+
+
+    /* =========================================================
+       ALERT
+       ========================================================= */
+
+    .custom-alert {
+        border: 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       STATISTIQUES
+       ========================================================= */
+
+    .stat-card {
+        min-height: 145px;
+        padding: 20px;
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 7px 25px rgba(15,23,42,.05);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .stat-label {
+        color: #7b8495;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .stat-value {
+        margin-top: 8px;
+        color: #172033;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .stat-info {
+        margin-top: 7px;
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 20px;
+    }
+
+    .icon-blue {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .icon-green {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .icon-red {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+
+    /* =========================================================
+       TABLE CARD
+       ========================================================= */
+
+    .table-card {
+        overflow: hidden;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 8px 30px rgba(15,23,42,.05);
+    }
+
+    .table-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #f1f4f8;
+    }
+
+    .table-title {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .table-subtitle {
+        margin-top: 4px;
+        color: #98a1af;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       SEARCH
+       ========================================================= */
+
+    .search-form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 290px;
+        height: 42px;
+    }
+
+    .search-box > i {
+        position: absolute;
+        left: 13px;
+        z-index: 2;
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 100%;
+        padding: 0 40px;
+        border: 1px solid #e0e5eb;
+        border-radius: 10px;
+        outline: none;
+        color: #172033;
+        font-size: 13px;
+        transition: .2s;
+    }
+
+    .search-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 12px;
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .search-clear:hover {
+        color: #ef4444;
+    }
+
+    .search-btn {
+        height: 42px;
+        padding: 0 15px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .custom-table {
+        min-width: 950px;
+    }
+
+    .custom-table thead th {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e9edf2;
+        background: #f8fafc;
+        color: #768195;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        white-space: nowrap;
+    }
+
+    .custom-table tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f3f6;
+    }
+
+    .custom-table tbody tr {
+        transition: .18s;
+    }
+
+    .custom-table tbody tr:hover {
+        background: #fbfcfe;
+    }
+
+
+    /* =========================================================
+       FOURNISSEUR
+       ========================================================= */
+
+    .supplier-cell {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 190px;
+    }
+
+    .supplier-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .supplier-name {
+        color: #172033;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .supplier-id {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       CONTACT
+       ========================================================= */
+
+    .contact-cell {
+        min-width: 190px;
+    }
+
+    .contact-line {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 5px;
+        color: #64748b;
+        font-size: 11px;
+    }
+
+    .contact-line:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-line i {
+        width: 15px;
+        color: #94a3b8;
+    }
+
+
+    /* =========================================================
+       LOCALISATION
+       ========================================================= */
+
+    .location-cell {
+        min-width: 130px;
+    }
+
+    .location-main {
+        color: #475569;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .location-country {
+        margin-top: 4px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       DATE
+       ========================================================= */
+
+    .date-main {
+        color: #172033;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .date-time {
+        margin-top: 3px;
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .status-inactive {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .actions-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        background: #ffffff;
+        text-decoration: none;
+        transition: .2s;
+        cursor: pointer;
+    }
+
+    .action-edit {
+        color: #475569;
+    }
+
+    .action-edit:hover {
+        border-color: #c7d2fe;
+        background: #eef2ff;
+        color: #4f46e5;
+        transform: translateY(-1px);
+    }
+
+    .action-disable {
+        color: #dc2626;
+    }
+
+    .action-disable:hover {
+        border-color: #fecaca;
+        background: #fef2f2;
+        color: #b91c1c;
+        transform: translateY(-1px);
+    }
+
+    .action-enable {
+        color: #059669;
+    }
+
+    .action-enable:hover {
+        border-color: #bbf7d0;
+        background: #ecfdf5;
+        color: #047857;
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    .empty-state {
+        padding: 70px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 29px;
+    }
+
+    .empty-state h3 {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        max-width: 500px;
+        margin: 8px auto 20px;
+        color: #98a1af;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .table-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 16px 24px;
+        border-top: 1px solid #f1f4f7;
+    }
+
+    .result-info {
+        color: #8d97a7;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .footer-new-btn {
+        padding: 9px 13px;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 950px) {
+
+        .table-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .search-form {
+            width: 100%;
+        }
+
+        .search-box {
+            width: 100%;
+            flex: 1;
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .page-title {
+            font-size: 25px;
+        }
+
+        .new-btn {
+            width: 100%;
+        }
+
+        .table-footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .footer-new-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+

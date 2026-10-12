@@ -1,0 +1,252 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Modifier un administrateur
+{% endblock %}
+
+{% block header_title %}
+    <div class="dashboard-heading">
+
+        <div>
+
+            <h1 class="page-title">
+                Modifier un administrateur
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Modifiez les informations du compte administrateur.
+            </p>
+
+        </div>
+
+        <div class="dashboard-date">
+            <i class="bi bi-calendar3"></i>
+            {{ "now"|date("d/m/Y") }}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    .admin-edit-card {
+        max-width: 760px;
+        margin: 0 auto;
+        border: 0;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+    }
+
+    .admin-edit-header {
+        padding: 35px;
+        background: linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+        color: white;
+    }
+
+    .admin-edit-icon {
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.14);
+        font-size: 28px;
+    }
+
+    .admin-edit-body {
+        padding: 30px;
+        background: #ffffff;
+    }
+
+    .admin-edit-body .form-label {
+        font-size: 13px;
+        font-weight: 650;
+        color: #334155;
+    }
+
+    .admin-edit-body .form-control {
+        min-height: 47px;
+        border-radius: 12px;
+    }
+
+    .admin-edit-body .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.12);
+    }
+</style>
+
+<div class="container py-4">
+
+    <div class="mb-4">
+
+        <a
+            href="{{ path('app_admin_user_index') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Retour aux administrateurs
+        </a>
+
+    </div>
+
+    <div class="admin-edit-card">
+
+        <div class="admin-edit-header">
+
+            <div class="admin-edit-icon">
+                <i class="bi bi-person-gear"></i>
+            </div>
+
+            <h2 class="mt-3 mb-2">
+                Modifier le compte
+            </h2>
+
+            <p class="mb-0 text-white-50">
+                {{ admin.prenom }} {{ admin.nom }}
+            </p>
+
+        </div>
+
+        <div class="admin-edit-body">
+
+            <form method="post">
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('modifier_admin_' ~ admin.id) }}"
+                >
+
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="nom"
+                            class="form-label"
+                        >
+                            Nom
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nom"
+                            name="nom"
+                            class="form-control"
+                            value="{{ admin.nom }}"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="prenom"
+                            class="form-label"
+                        >
+                            Prénom
+                        </label>
+
+                        <input
+                            type="text"
+                            id="prenom"
+                            name="prenom"
+                            class="form-control"
+                            value="{{ admin.prenom }}"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <label
+                            for="email"
+                            class="form-label"
+                        >
+                            Adresse e-mail
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-control"
+                            value="{{ admin.email }}"
+                            maxlength="180"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Rôle
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="Administrateur"
+                            readonly
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Statut
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{% if admin.actif %}Actif{% else %}Inactif{% endif %}"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a
+                        href="{{ path('app_admin_user_index') }}"
+                        class="btn btn-outline-secondary"
+                    >
+                        Annuler
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary px-4"
+                    >
+                        <i class="bi bi-check-circle"></i>
+                        Enregistrer
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+

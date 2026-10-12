@@ -1,0 +1,1042 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle entrée de stock{% endblock %}
+
+{% block body %}
+
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .entry-form-page {
+        max-width: 1150px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================================
+       EN-TETE
+       ========================================================= */
+
+    .entry-form-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        margin-bottom: 25px;
+    }
+
+    .entry-form-kicker {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 6px;
+
+        margin-bottom: 6px;
+
+        color: #2563eb;
+
+        font-size: 11px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .entry-form-header h1 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .entry-form-header p {
+        margin: 7px 0 0;
+
+        color: #7d8799;
+
+        font-size: 12px;
+    }
+
+    .entry-back-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        padding: 10px 13px;
+
+        border: 1px solid #dde3ed;
+        border-radius: 9px;
+
+        background: white;
+        color: #566174;
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        white-space: nowrap;
+    }
+
+    .entry-back-button:hover {
+        background: #f8fafc;
+        color: #172033;
+    }
+
+
+    /* =========================================================
+       GRILLE
+       ========================================================= */
+
+    .entry-form-grid {
+        display: grid;
+
+        grid-template-columns: minmax(0, 1.55fr) minmax(280px, .8fr);
+
+        gap: 20px;
+    }
+
+
+    /* =========================================================
+       CARTE FORMULAIRE
+       ========================================================= */
+
+    .entry-form-card {
+        overflow: hidden;
+
+        background: white;
+
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+    }
+
+    .entry-form-card-header {
+        padding: 19px 20px;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .entry-form-card-header h2 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .entry-form-card-header p {
+        margin: 5px 0 0;
+
+        color: #8a94a6;
+
+        font-size: 10px;
+    }
+
+    .entry-form-body {
+        padding: 22px;
+    }
+
+
+    /* =========================================================
+       GRILLE CHAMPS
+       ========================================================= */
+
+    .entry-fields-grid {
+        display: grid;
+
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        gap: 18px;
+    }
+
+    .entry-field-full {
+        grid-column: 1 / -1;
+    }
+
+
+    /* =========================================================
+       CHAMPS
+       ========================================================= */
+
+    .entry-field {
+        margin-bottom: 1px;
+    }
+
+    .entry-field label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #344054;
+
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .entry-required {
+        color: #dc3545;
+    }
+
+    .entry-field input,
+    .entry-field select,
+    .entry-field textarea {
+        width: 100%;
+
+        padding: 11px 12px;
+
+        border: 1px solid #dce2eb;
+        border-radius: 9px;
+
+        background: white;
+
+        color: #172033;
+
+        outline: none;
+
+        font-size: 11px;
+
+        transition: .2s ease;
+    }
+
+    .entry-field select {
+        cursor: pointer;
+    }
+
+    .entry-field textarea {
+        min-height: 120px;
+
+        resize: vertical;
+
+        line-height: 1.6;
+    }
+
+    .entry-field input:focus,
+    .entry-field select:focus,
+    .entry-field textarea:focus {
+        border-color: #93b4ff;
+
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+    }
+
+    .entry-field small {
+        display: block;
+
+        margin-top: 6px;
+
+        color: #8a94a6;
+
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       STOCK ACTUEL
+       ========================================================= */
+
+    .entry-current-stock {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        margin-top: 8px;
+
+        padding: 9px 11px;
+
+        border-radius: 9px;
+
+        background: #f8fafc;
+
+        color: #657084;
+
+        font-size: 9px;
+    }
+
+    .entry-current-stock i {
+        color: #2563eb;
+        font-size: 13px;
+    }
+
+    .entry-current-stock strong {
+        color: #172033;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .entry-form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: 10px;
+
+        margin-top: 22px;
+        padding-top: 20px;
+
+        border-top: 1px solid #edf0f5;
+    }
+
+    .entry-btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        padding: 10px 14px;
+
+        border-radius: 9px;
+
+        background: #f3f5f8;
+        color: #566174;
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .entry-btn-cancel:hover {
+        background: #e8ebf0;
+        color: #172033;
+    }
+
+    .entry-btn-save {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        padding: 10px 15px;
+
+        border: 0;
+        border-radius: 9px;
+
+        background: #172033;
+        color: white;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        cursor: pointer;
+
+        transition: .2s ease;
+    }
+
+    .entry-btn-save:hover {
+        background: #263653;
+    }
+
+
+    /* =========================================================
+       PANNEAU DROIT
+       ========================================================= */
+
+    .entry-info-card {
+        height: fit-content;
+
+        padding: 21px;
+
+        background: white;
+
+        border: 1px solid #edf0f5;
+        border-radius: 16px;
+
+        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+    }
+
+    .entry-info-icon {
+        width: 48px;
+        height: 48px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 15px;
+
+        border-radius: 13px;
+
+        background: #eff4ff;
+        color: #2563eb;
+
+        font-size: 21px;
+    }
+
+    .entry-info-card h3 {
+        margin: 0 0 8px;
+
+        color: #172033;
+
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .entry-info-card > p {
+        margin: 0 0 17px;
+
+        color: #7d8799;
+
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .entry-info-item {
+        display: flex;
+        align-items: flex-start;
+
+        gap: 10px;
+
+        margin-bottom: 13px;
+    }
+
+    .entry-info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .entry-info-item i {
+        margin-top: 2px;
+
+        color: #2563eb;
+
+        font-size: 12px;
+    }
+
+    .entry-info-item span {
+        color: #657084;
+
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .entry-stock-example {
+        margin-top: 18px;
+
+        padding: 12px;
+
+        border-radius: 10px;
+
+        background: #ecfdf3;
+        color: #166534;
+
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 850px) {
+
+        .entry-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+    @media (max-width: 650px) {
+
+        .entry-form-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .entry-back-button {
+            width: 100%;
+        }
+
+        .entry-fields-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .entry-field-full {
+            grid-column: auto;
+        }
+
+        .entry-form-body {
+            padding: 18px;
+        }
+
+        .entry-form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .entry-btn-cancel,
+        .entry-btn-save {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+<div class="entry-form-page">
+
+
+{# =========================================================
+   EN-TETE
+   ========================================================= #}
+
+<div class="entry-form-header">
+
+    <div>
+
+        <span class="entry-form-kicker">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Gestion du stock
+
+        </span>
+
+        <h1>
+            Nouvelle entrée de stock
+        </h1>
+
+        <p>
+            Enregistrez un nouvel arrivage de produits.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ path('app_entree_stock_index') }}"
+        class="entry-back-button"
+    >
+
+        <i class="bi bi-arrow-left"></i>
+
+        Retour aux entrées
+
+    </a>
+
+</div>
+
+
+<div class="entry-form-grid">
+
+
+    {# =====================================================
+       FORMULAIRE
+       ===================================================== #}
+
+    <div class="entry-form-card">
+
+
+        <div class="entry-form-card-header">
+
+            <h2>
+                Informations de l'entrée
+            </h2>
+
+            <p>
+                Les champs marqués d'une étoile sont obligatoires.
+            </p>
+
+        </div>
+
+
+        <div class="entry-form-body">
+
+            <form
+                method="POST"
+                action="{{ path('app_entree_stock_new') }}"
+            >
+
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('creer_entree_stock') }}"
+                >
+
+
+                <div class="entry-fields-grid">
+
+
+                    {# =================================================
+                       PRODUIT
+                       ================================================= #}
+
+                    <div class="entry-field entry-field-full">
+
+                        <label for="produit_id">
+
+                            Produit
+
+                            <span class="entry-required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <select
+                            id="produit_id"
+                            name="produit_id"
+                            required
+                        >
+
+                            <option value="">
+                                -- Sélectionner un produit --
+                            </option>
+
+                            {% for produit in produits %}
+
+                                <option
+                                    value="{{ produit.id }}"
+                                    data-stock="{{ produit.quantiteStock }}"
+                                    data-unite="{{ produit.unite }}"
+                                    {% if entree.produit and entree.produit.id == produit.id %}
+                                        selected
+                                    {% endif %}
+                                >
+
+                                    {{ produit.nom }}
+                                    — {{ produit.reference }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div
+                            class="entry-current-stock"
+                            id="current-stock-box"
+                        >
+
+                            <i class="bi bi-box-seam"></i>
+
+                            <span>
+                                Stock actuel :
+                            </span>
+
+                            <strong id="current-stock">
+                                Sélectionnez un produit
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    {# =================================================
+                       FOURNISSEUR
+                       ================================================= #}
+
+                    <div class="entry-field">
+
+                        <label for="fournisseur_id">
+                            Fournisseur
+                        </label>
+
+                        <select
+                            id="fournisseur_id"
+                            name="fournisseur_id"
+                        >
+
+                            <option value="">
+                                -- Aucun fournisseur --
+                            </option>
+
+                            {% for fournisseur in fournisseurs %}
+
+                                <option
+                                    value="{{ fournisseur.id }}"
+                                    {% if entree.fournisseur and entree.fournisseur.id == fournisseur.id %}
+                                        selected
+                                    {% endif %}
+                                >
+
+                                    {{ fournisseur.nom }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <small>
+                            Le fournisseur est facultatif.
+                        </small>
+
+                    </div>
+
+
+                    {# =================================================
+                       QUANTITE
+                       ================================================= #}
+
+                    <div class="entry-field">
+
+                        <label for="quantite">
+
+                            Quantité
+
+                            <span class="entry-required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="quantite"
+                            name="quantite"
+                            value="{{ entree.quantite > 0 ? entree.quantite : '' }}"
+                            min="1"
+                            step="1"
+                            required
+                            placeholder="Exemple : 10"
+                        >
+
+                        <small>
+                            Cette quantité sera ajoutée automatiquement
+                            au stock actuel.
+                        </small>
+
+                    </div>
+
+
+                    {# =================================================
+                       PRIX UNITAIRE
+                       ================================================= #}
+
+                    <div class="entry-field">
+
+                        <label for="prix_unitaire">
+
+                            Prix unitaire
+
+                            <span class="entry-required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="prix_unitaire"
+                            name="prix_unitaire"
+                            value="{{ entree.prixUnitaire|default('') }}"
+                            min="0"
+                            step="0.01"
+                            required
+                            placeholder="Exemple : 150000"
+                        >
+
+                        <small>
+                            Prix d'achat d'une unité en Ariary.
+                        </small>
+
+                    </div>
+
+
+                    {# =================================================
+                       DATE
+                       ================================================= #}
+
+                    <div class="entry-field">
+
+                        <label for="date_entree">
+                            Date d'entrée
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            id="date_entree"
+                            name="date_entree"
+                            value="{{ entree.dateEntree ? entree.dateEntree|date('Y-m-d\\TH:i') : '' }}"
+                        >
+
+                        <small>
+                            La date actuelle est utilisée si ce champ
+                            reste vide.
+                        </small>
+
+                    </div>
+
+
+                    {# =================================================
+                       REFERENCE DOCUMENT
+                       ================================================= #}
+
+                    <div class="entry-field">
+
+                        <label for="reference_document">
+                            Référence du document
+                        </label>
+
+                        <input
+                            type="text"
+                            id="reference_document"
+                            name="reference_document"
+                            maxlength="100"
+                            value="{{ entree.referenceDocument|default('') }}"
+                            placeholder="Exemple : BL-2026-001"
+                        >
+
+                        <small>
+                            Bon de livraison, facture ou autre référence.
+                        </small>
+
+                    </div>
+
+
+                    {# =================================================
+                       COMMENTAIRE
+                       ================================================= #}
+
+                    <div class="entry-field entry-field-full">
+
+                        <label for="commentaire">
+                            Commentaire
+                        </label>
+
+                        <textarea
+                            id="commentaire"
+                            name="commentaire"
+                            maxlength="1000"
+                            placeholder="Informations supplémentaires concernant cette entrée..."
+                        >{{ entree.commentaire|default('') }}</textarea>
+
+                    </div>
+
+
+                </div>
+
+
+                {# =================================================
+                   ACTIONS
+                   ================================================= #}
+
+                <div class="entry-form-actions">
+
+                    <a
+                        href="{{ path('app_entree_stock_index') }}"
+                        class="entry-btn-cancel"
+                    >
+
+                        <i class="bi bi-x-lg"></i>
+
+                        Annuler
+
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="entry-btn-save"
+                    >
+
+                        <i class="bi bi-check-lg"></i>
+
+                        Enregistrer l'entrée
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    {# =====================================================
+       INFORMATIONS
+       ===================================================== #}
+
+    <div class="entry-info-card">
+
+
+        <div class="entry-info-icon">
+
+            <i class="bi bi-box-seam"></i>
+
+        </div>
+
+
+        <h3>
+            Fonctionnement
+        </h3>
+
+
+        <p>
+            Une entrée de stock correspond à l'arrivée de nouveaux
+            produits dans votre stock.
+        </p>
+
+
+        <div class="entry-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Sélectionnez le produit concerné.
+            </span>
+
+        </div>
+
+
+        <div class="entry-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Indiquez la quantité reçue.
+            </span>
+
+        </div>
+
+
+        <div class="entry-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Le fournisseur peut être renseigné
+                si nécessaire.
+            </span>
+
+        </div>
+
+
+        <div class="entry-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Le prix unitaire correspond au prix d'achat
+                du produit.
+            </span>
+
+        </div>
+
+
+        <div class="entry-info-item">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span>
+                Le stock est augmenté automatiquement après
+                l'enregistrement.
+            </span>
+
+        </div>
+
+
+        <div class="entry-stock-example">
+
+            <i class="bi bi-arrow-up-circle"></i>
+
+            Exemple :
+
+            <strong>
+                stock actuel 20
+            </strong>
+
+            +
+            <strong>
+                entrée 10
+            </strong>
+
+            =
+            <strong>
+                nouveau stock 30
+            </strong>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% block javascripts %}
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const produitSelect =
+            document.getElementById('produit_id');
+
+        const currentStock =
+            document.getElementById('current-stock');
+
+
+        function updateStock() {
+
+            const selectedOption =
+                produitSelect.options[
+                    produitSelect.selectedIndex
+                ];
+
+
+            if (
+                !selectedOption
+                || !selectedOption.value
+            ) {
+
+                currentStock.textContent =
+                    'Sélectionnez un produit';
+
+                return;
+            }
+
+
+            const stock =
+                selectedOption.dataset.stock || '0';
+
+            const unite =
+                selectedOption.dataset.unite || 'piece';
+
+
+            currentStock.textContent =
+                stock + ' ' + unite;
+
+        }
+
+
+        produitSelect.addEventListener(
+            'change',
+            updateStock
+        );
+
+
+        updateStock();
+
+    });
+
+</script>
+
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,1621 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Commande {{ commande.numero }}
+{% endblock %}
+
+{% block body %}
+
+<style>
+
+    /* =========================================================
+       PAGE DETAIL COMMANDE
+       ========================================================= */
+
+    .client-order-detail {
+        max-width: 1350px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       RETOUR
+       ========================================================= */
+
+    .order-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        margin-bottom: 18px;
+
+        color: #6f7a8d;
+        text-decoration: none;
+
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+    .order-back:hover {
+        color: #2563eb;
+    }
+
+    /* =========================================================
+       HEADER COMMANDE
+       ========================================================= */
+
+    .order-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        padding: 24px 27px;
+        margin-bottom: 20px;
+
+        border-radius: 17px;
+
+        background: linear-gradient(
+            135deg,
+            #172033,
+            #263653
+        );
+
+        color: white;
+
+        box-shadow: 0 8px 25px rgba(23,32,51,.13);
+    }
+
+    .order-hero-label {
+        display: block;
+
+        margin-bottom: 5px;
+
+        color: #aab5c7;
+
+        font-size: 9px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .12em;
+    }
+
+    .order-hero h1 {
+        margin: 0;
+
+        font-size: 25px;
+        font-weight: 850;
+    }
+
+    .order-hero-date {
+        margin-top: 7px;
+
+        color: #c3ccda;
+
+        font-size: 10px;
+    }
+
+    .order-hero-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        padding: 8px 11px;
+
+        border-radius: 999px;
+
+        background: rgba(255,255,255,.10);
+
+        font-size: 10px;
+        font-weight: 850;
+    }
+
+    /* =========================================================
+       LAYOUT
+       ========================================================= */
+
+    .order-detail-grid {
+        display: grid;
+
+        grid-template-columns: minmax(0, 1.65fr) minmax(290px, .8fr);
+
+        gap: 20px;
+
+        align-items: start;
+    }
+
+    /* =========================================================
+       CARDS
+       ========================================================= */
+
+    .order-card {
+        margin-bottom: 18px;
+
+        background: white;
+
+        border: 1px solid #e8ebf1;
+        border-radius: 16px;
+
+        box-shadow: 0 3px 14px rgba(15,23,42,.045);
+
+        overflow: hidden;
+    }
+
+    .order-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .order-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 17px 20px;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .order-card-header h2 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 14px;
+        font-weight: 850;
+    }
+
+    .order-card-body {
+        padding: 20px;
+    }
+
+    /* =========================================================
+       PRODUITS
+       ========================================================= */
+
+    .product-row {
+        display: grid;
+
+        grid-template-columns: 55px minmax(0, 1fr) auto;
+
+        gap: 13px;
+
+        align-items: center;
+
+        padding: 15px 0;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .product-row:first-child {
+        padding-top: 0;
+    }
+
+    .product-row:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .product-icon {
+        width: 55px;
+        height: 55px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 13px;
+
+        background:
+            radial-gradient(
+                circle at top right,
+                #eaf2ff,
+                transparent 50%
+            ),
+            #f7f9fc;
+
+        color: #2563eb;
+
+        font-size: 21px;
+    }
+
+    .product-reference {
+        display: block;
+
+        color: #929bad;
+
+        font-size: 8px;
+        font-weight: 750;
+
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .product-name {
+        margin: 4px 0;
+
+        color: #172033;
+
+        font-size: 12px;
+        font-weight: 850;
+    }
+
+    .product-meta {
+        color: #8a94a6;
+
+        font-size: 9px;
+    }
+
+    .product-price {
+        text-align: right;
+    }
+
+    .product-unit-price {
+        color: #7c8799;
+
+        font-size: 9px;
+    }
+
+    .product-subtotal {
+        margin-top: 4px;
+
+        color: #172033;
+
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+    /* =========================================================
+       TOTAL
+       ========================================================= */
+
+    .total-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-top: 20px;
+        padding-top: 17px;
+
+        border-top: 1px solid #edf0f5;
+    }
+
+    .total-label {
+        color: #5c677b;
+
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .total-value {
+        color: #172033;
+
+        font-size: 22px;
+        font-weight: 900;
+    }
+
+    /* =========================================================
+       STATUT
+       ========================================================= */
+
+    .status-box {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 13px;
+
+        padding: 14px;
+
+        border-radius: 11px;
+
+        background: #f8fafc;
+
+        margin-bottom: 11px;
+    }
+
+    .status-box:last-child {
+        margin-bottom: 0;
+    }
+
+    .status-icon {
+        width: 37px;
+        height: 37px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 10px;
+
+        background: #eff4ff;
+        color: #2563eb;
+
+        font-size: 15px;
+    }
+
+    .status-title {
+        color: #172033;
+
+        font-size: 11px;
+        font-weight: 850;
+    }
+
+    .status-text {
+        margin-top: 4px;
+
+        color: #8791a3;
+
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+    .detail-badge {
+        display: inline-flex;
+
+        margin-top: 7px;
+
+        padding: 5px 8px;
+
+        border-radius: 999px;
+
+        font-size: 8px;
+        font-weight: 850;
+    }
+
+    .badge-success {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .badge-warning {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .badge-danger {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    .badge-info {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .badge-neutral {
+        background: #f3f4f6;
+        color: #667085;
+    }
+
+    /* =========================================================
+       TIMELINE
+       ========================================================= */
+
+    .timeline {
+        position: relative;
+
+        padding-left: 10px;
+    }
+
+    .timeline-line {
+        position: absolute;
+
+        left: 13px;
+        top: 14px;
+        bottom: 14px;
+
+        width: 2px;
+
+        background: #e7ebf2;
+    }
+
+    .timeline-item {
+        position: relative;
+
+        display: flex;
+
+        gap: 13px;
+
+        padding-bottom: 18px;
+    }
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .timeline-dot {
+        position: relative;
+
+        width: 28px;
+        height: 28px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 50%;
+
+        background: white;
+
+        border: 2px solid #dfe5ee;
+
+        color: #a0a9b8;
+
+        z-index: 2;
+
+        font-size: 10px;
+    }
+
+    .timeline-item.active .timeline-dot {
+        border-color: #2563eb;
+
+        background: #eff6ff;
+
+        color: #2563eb;
+    }
+
+    .timeline-item.done .timeline-dot {
+        border-color: #16a34a;
+
+        background: #ecfdf3;
+
+        color: #16a34a;
+    }
+
+    .timeline-content strong {
+        display: block;
+
+        color: #344054;
+
+        font-size: 10px;
+        font-weight: 850;
+    }
+
+    .timeline-content span {
+        display: block;
+
+        margin-top: 3px;
+
+        color: #929bad;
+
+        font-size: 8px;
+    }
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .action-button {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+
+        min-height: 43px;
+
+        margin-top: 9px;
+
+        border-radius: 10px;
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 850;
+    }
+
+    .action-primary {
+        background: #172033;
+        color: white;
+    }
+
+    .action-primary:hover {
+        background: #263653;
+        color: white;
+    }
+
+    .action-success {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .action-success:hover {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .action-secondary {
+        background: #eff4ff;
+        color: #2563eb;
+    }
+
+    .action-secondary:hover {
+        background: #e1ebff;
+        color: #1d4ed8;
+    }
+
+    /* =========================================================
+       INFOS COMMANDE
+       ========================================================= */
+
+    .info-list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 12px;
+    }
+
+    .info-item {
+        display: flex;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+        padding-bottom: 11px;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .info-item:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #8b95a7;
+
+        font-size: 9px;
+    }
+
+    .info-value {
+        color: #344054;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        text-align: right;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1000px) {
+
+        .order-detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+    @media (max-width: 700px) {
+
+        .order-hero {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+        .order-hero-status {
+            width: 100%;
+
+            justify-content: center;
+        }
+
+        .product-row {
+            grid-template-columns: 50px minmax(0,1fr);
+        }
+
+        .product-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .product-price {
+            grid-column: 1 / -1;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            text-align: left;
+        }
+
+    }
+
+</style>
+
+
+<div class="client-order-detail">
+
+    {# =========================================================
+       RETOUR
+       ========================================================= #}
+
+    <a
+        href="{{ path('app_client_commandes') }}"
+        class="order-back"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Retour à mes commandes
+    </a>
+
+
+    {# =========================================================
+       HERO
+       ========================================================= #}
+
+    <section class="order-hero">
+
+        <div>
+
+            <span class="order-hero-label">
+                Détail de la commande
+            </span>
+
+            <h1>
+                {{ commande.numero }}
+            </h1>
+
+            <div class="order-hero-date">
+
+                <i class="bi bi-calendar3 me-1"></i>
+
+                Commandée le
+                {{ commande.createdAt|date('d/m/Y à H:i') }}
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            {% if commande.statut == 'EN_ATTENTE' %}
+
+                <span class="order-hero-status">
+                    <i class="bi bi-hourglass-split"></i>
+                    Commande en attente
+                </span>
+
+            {% elseif commande.statut == 'CONFIRMEE' %}
+
+                <span class="order-hero-status">
+                    <i class="bi bi-check-circle"></i>
+                    Commande confirmée
+                </span>
+
+            {% elseif commande.statut == 'ANNULEE' %}
+
+                <span class="order-hero-status">
+                    <i class="bi bi-x-circle"></i>
+                    Commande annulée
+                </span>
+
+            {% else %}
+
+                <span class="order-hero-status">
+                    {{ commande.statut }}
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <div class="order-detail-grid">
+
+        {# =====================================================
+           COLONNE PRINCIPALE
+           ===================================================== #}
+
+        <div>
+
+            {# =================================================
+               PRODUITS
+               ================================================= #}
+
+            <section class="order-card">
+
+                <div class="order-card-header">
+
+                    <h2>
+                        <i class="bi bi-box-seam me-1"></i>
+                        Produits commandés
+                    </h2>
+
+                    <span style="color:#8a94a6;font-size:9px;">
+                        {{ lignes|length }} ligne(s)
+                    </span>
+
+                </div>
+
+
+                <div class="order-card-body">
+
+                    {% for ligne in lignes %}
+
+                        <div class="product-row">
+
+                            <div class="product-icon">
+
+                                <i class="bi bi-box-seam"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="product-reference">
+
+                                    Réf.
+                                    {{ ligne.produit.reference }}
+
+                                </span>
+
+                                <div class="product-name">
+
+                                    {{ ligne.produit.nom }}
+
+                                </div>
+
+                                <div class="product-meta">
+
+                                    Quantité :
+                                    <strong>{{ ligne.quantite }}</strong>
+
+                                    · Prix unitaire :
+                                    {{ ligne.prixUnitaire|number_format(0, ',', ' ') }} Ar
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="product-price">
+
+                                <div class="product-unit-price">
+
+                                    {{ ligne.quantite }}
+                                    ×
+                                    {{ ligne.prixUnitaire|number_format(0, ',', ' ') }} Ar
+
+                                </div>
+
+                                <div class="product-subtotal">
+
+                                    {{ ligne.sousTotal|number_format(0, ',', ' ') }} Ar
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                    <div class="total-box">
+
+                        <div class="total-label">
+
+                            Total de la commande
+
+                        </div>
+
+                        <div class="total-value">
+
+                            {{ commande.total|number_format(0, ',', ' ') }} Ar
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {# =================================================
+               SUIVI
+               ================================================= #}
+
+            <section class="order-card">
+
+                <div class="order-card-header">
+
+                    <h2>
+                        <i class="bi bi-activity me-1"></i>
+                        Suivi de la commande
+                    </h2>
+
+                </div>
+
+
+                <div class="order-card-body">
+
+                    <div class="timeline">
+
+                        <div class="timeline-line"></div>
+
+
+                        {# CREATION #}
+
+                        <div class="timeline-item done">
+
+                            <div class="timeline-dot">
+                                <i class="bi bi-check"></i>
+                            </div>
+
+                            <div class="timeline-content">
+
+                                <strong>
+                                    Commande créée
+                                </strong>
+
+                                <span>
+                                    {{ commande.createdAt|date('d/m/Y à H:i') }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        {# CONFIRMATION #}
+
+                        <div class="timeline-item
+                            {% if commande.statut == 'CONFIRMEE' %}
+                                active
+                            {% elseif commande.statut == 'ANNULEE' %}
+                                done
+                            {% endif %}
+                        ">
+
+                            <div class="timeline-dot">
+
+                                {% if commande.statut == 'CONFIRMEE' %}
+
+                                    <i class="bi bi-check"></i>
+
+                                {% elseif commande.statut == 'ANNULEE' %}
+
+                                    <i class="bi bi-x"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-clock"></i>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="timeline-content">
+
+                                <strong>
+                                    Validation de la commande
+                                </strong>
+
+                                <span>
+
+                                    {% if commande.statut == 'EN_ATTENTE' %}
+
+                                        En attente de validation par l'administration.
+
+                                    {% elseif commande.statut == 'CONFIRMEE' %}
+
+                                        Commande validée.
+
+                                    {% elseif commande.statut == 'ANNULEE' %}
+
+                                        Commande annulée.
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        {# PAIEMENT #}
+
+                        <div class="timeline-item
+                            {% if paiement and paiement.statut == 'PAYE' %}
+                                done
+                            {% endif %}
+                        ">
+
+                            <div class="timeline-dot">
+
+                                {% if paiement and paiement.statut == 'PAYE' %}
+
+                                    <i class="bi bi-check"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-credit-card"></i>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="timeline-content">
+
+                                <strong>
+                                    Paiement
+                                </strong>
+
+                                <span>
+
+                                    {% if paiement and paiement.statut == 'PAYE' %}
+
+                                        Paiement confirmé.
+
+                                    {% elseif paiement and paiement.statut == 'EN_ATTENTE' %}
+
+                                        Paiement en attente de validation.
+
+                                    {% elseif paiement and paiement.statut == 'REFUSE' %}
+
+                                        Paiement refusé.
+
+                                    {% elseif commande.statut == 'CONFIRMEE' %}
+
+                                        Paiement non encore effectué.
+
+                                    {% else %}
+
+                                        Disponible après confirmation de la commande.
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        {# LIVRAISON #}
+
+                        <div class="timeline-item
+                            {% if livraison and livraison.statut == 'LIVREE' %}
+                                done
+                            {% elseif livraison and livraison.statut == 'EN_COURS' %}
+                                active
+                            {% endif %}
+                        ">
+
+                            <div class="timeline-dot">
+
+                                {% if livraison and livraison.statut == 'LIVREE' %}
+
+                                    <i class="bi bi-check"></i>
+
+                                {% elseif livraison and livraison.statut == 'EN_COURS' %}
+
+                                    <i class="bi bi-truck"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-box-seam"></i>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="timeline-content">
+
+                                <strong>
+                                    Livraison
+                                </strong>
+
+                                <span>
+
+                                    {% if livraison and livraison.statut == 'LIVREE' %}
+
+                                        Commande livrée.
+
+                                    {% elseif livraison and livraison.statut == 'EN_COURS' %}
+
+                                        Livraison actuellement en cours.
+
+                                    {% elseif livraison and livraison.statut == 'EN_ATTENTE' %}
+
+                                        Livraison en attente de traitement.
+
+                                    {% elseif paiement and paiement.statut == 'PAYE' %}
+
+                                        Vous pouvez configurer votre livraison.
+
+                                    {% else %}
+
+                                        Disponible après validation du paiement.
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {# =================================================
+               INFORMATIONS COMMANDE
+               ================================================= #}
+
+            <section class="order-card">
+
+                <div class="order-card-header">
+
+                    <h2>
+                        <i class="bi bi-info-circle me-1"></i>
+                        Informations de la commande
+                    </h2>
+
+                </div>
+
+
+                <div class="order-card-body">
+
+                    <div class="info-list">
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Numéro
+                            </span>
+
+                            <span class="info-value">
+                                {{ commande.numero }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Date de création
+                            </span>
+
+                            <span class="info-value">
+                                {{ commande.createdAt|date('d/m/Y à H:i') }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Statut
+                            </span>
+
+                            <span class="info-value">
+                                {{ commande.statut }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Nombre de produits
+                            </span>
+
+                            <span class="info-value">
+                                {{ lignes|length }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Total
+                            </span>
+
+                            <span class="info-value">
+                                {{ commande.total|number_format(0, ',', ' ') }} Ar
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        {# =====================================================
+           COLONNE DROITE
+           ===================================================== #}
+
+        <aside>
+
+            {# =================================================
+               PAIEMENT
+               ================================================= #}
+
+            <section class="order-card">
+
+                <div class="order-card-header">
+
+                    <h2>
+                        <i class="bi bi-credit-card me-1"></i>
+                        Paiement
+                    </h2>
+
+                </div>
+
+
+                <div class="order-card-body">
+
+                    {% if paiement %}
+
+                        <div class="status-box">
+
+                            <div class="status-icon">
+
+                                {% if paiement.statut == 'PAYE' %}
+
+                                    <i class="bi bi-check-circle"></i>
+
+                                {% elseif paiement.statut == 'REFUSE' %}
+
+                                    <i class="bi bi-x-circle"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-hourglass-split"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="status-title">
+
+                                    {% if paiement.statut == 'PAYE' %}
+
+                                        Paiement confirmé
+
+                                    {% elseif paiement.statut == 'REFUSE' %}
+
+                                        Paiement refusé
+
+                                    {% else %}
+
+                                        Paiement en attente
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="status-text">
+
+                                    Montant :
+
+                                    {{ paiement.montant|number_format(0, ',', ' ') }}
+                                    Ar
+
+                                </div>
+
+
+                                {% if paiement.mode %}
+
+                                    <div class="status-text">
+
+                                        Mode :
+                                        {{ paiement.mode }}
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if paiement.reference %}
+
+                                    <div class="status-text">
+
+                                        Référence :
+                                        {{ paiement.reference }}
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if paiement.statut == 'PAYE' %}
+
+                                    <span class="detail-badge badge-success">
+                                        PAYÉ
+                                    </span>
+
+                                {% elseif paiement.statut == 'REFUSE' %}
+
+                                    <span class="detail-badge badge-danger">
+                                        REFUSÉ
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="detail-badge badge-warning">
+                                        EN ATTENTE
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                    {% elseif commande.statut == 'CONFIRMEE' %}
+
+                        <div class="status-box">
+
+                            <div class="status-icon">
+
+                                <i class="bi bi-credit-card"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="status-title">
+                                    Aucun paiement
+                                </div>
+
+                                <div class="status-text">
+                                    Le paiement de cette commande
+                                    n'a pas encore été enregistré.
+                                </div>
+
+                                <span class="detail-badge badge-warning">
+                                    À EFFECTUER
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <a
+                            href="{{ path('app_client_paiement_new', {
+                                id: commande.id
+                            }) }}"
+                            class="action-button action-success"
+                        >
+
+                            <i class="bi bi-credit-card me-1"></i>
+
+                            Effectuer le paiement
+
+                        </a>
+
+                    {% else %}
+
+                        <div class="status-box">
+
+                            <div class="status-icon">
+                                <i class="bi bi-lock"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="status-title">
+                                    Paiement indisponible
+                                </div>
+
+                                <div class="status-text">
+                                    Le paiement sera disponible
+                                    après confirmation de la commande.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+            {# =================================================
+               LIVRAISON
+               ================================================= #}
+
+            <section class="order-card">
+
+                <div class="order-card-header">
+
+                    <h2>
+                        <i class="bi bi-truck me-1"></i>
+                        Livraison
+                    </h2>
+
+                </div>
+
+
+                <div class="order-card-body">
+
+                    {% if livraison %}
+
+                        <div class="status-box">
+
+                            <div class="status-icon">
+
+                                {% if livraison.statut == 'LIVREE' %}
+
+                                    <i class="bi bi-check-circle"></i>
+
+                                {% elseif livraison.statut == 'EN_COURS' %}
+
+                                    <i class="bi bi-truck"></i>
+
+                                {% elseif livraison.statut == 'ANNULEE' %}
+
+                                    <i class="bi bi-x-circle"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-clock"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="status-title">
+
+                                    {% if livraison.statut == 'LIVREE' %}
+
+                                        Livraison terminée
+
+                                    {% elseif livraison.statut == 'EN_COURS' %}
+
+                                        Livraison en cours
+
+                                    {% elseif livraison.statut == 'ANNULEE' %}
+
+                                        Livraison annulée
+
+                                    {% else %}
+
+                                        Livraison en attente
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="status-text">
+
+                                    Mode :
+                                    {{ livraison.modeLivraison }}
+
+                                </div>
+
+
+                                <div class="status-text">
+
+                                    Adresse :
+                                    {{ livraison.adresseLivraison }}
+
+                                </div>
+
+
+                                <div class="status-text">
+
+                                    Ville :
+                                    {{ livraison.ville }}
+
+                                </div>
+
+
+                                <div class="status-text">
+
+                                    Pays :
+                                    {{ livraison.pays }}
+
+                                </div>
+
+
+                                {% if livraison.dateLivraison %}
+
+                                    <div class="status-text">
+
+                                        Date de livraison :
+                                        {{ livraison.dateLivraison|date('d/m/Y à H:i') }}
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if livraison.statut == 'LIVREE' %}
+
+                                    <span class="detail-badge badge-success">
+                                        LIVRÉE
+                                    </span>
+
+                                {% elseif livraison.statut == 'EN_COURS' %}
+
+                                    <span class="detail-badge badge-info">
+                                        EN COURS
+                                    </span>
+
+                                {% elseif livraison.statut == 'ANNULEE' %}
+
+                                    <span class="detail-badge badge-danger">
+                                        ANNULÉE
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="detail-badge badge-warning">
+                                        EN ATTENTE
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                    {% elseif paiement and paiement.statut == 'PAYE' %}
+
+                        <div class="status-box">
+
+                            <div class="status-icon">
+                                <i class="bi bi-truck"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="status-title">
+                                    Livraison à configurer
+                                </div>
+
+                                <div class="status-text">
+                                    Le paiement est confirmé.
+                                    Vous pouvez maintenant renseigner
+                                    les informations de livraison.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <a
+                            href="{{ path('app_client_livraison_new', {
+                                id: commande.id
+                            }) }}"
+                            class="action-button action-success"
+                        >
+
+                            <i class="bi bi-truck me-1"></i>
+
+                            Configurer la livraison
+
+                        </a>
+
+
+                    {% else %}
+
+                        <div class="status-box">
+
+                            <div class="status-icon">
+                                <i class="bi bi-lock"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="status-title">
+                                    Livraison indisponible
+                                </div>
+
+                                <div class="status-text">
+                                    La livraison sera disponible
+                                    après validation du paiement.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+            {# =================================================
+               ACTIONS
+               ================================================= #}
+
+            <section class="order-card">
+
+                <div class="order-card-header">
+
+                    <h2>
+                        <i class="bi bi-lightning me-1"></i>
+                        Actions
+                    </h2>
+
+                </div>
+
+
+                <div class="order-card-body">
+
+                    <a
+                        href="{{ path('app_client_commandes') }}"
+                        class="action-button action-primary"
+                    >
+
+                        <i class="bi bi-list-ul me-1"></i>
+
+                        Mes commandes
+
+                    </a>
+
+
+                    <a
+                        href="{{ path('app_client_produit_index') }}"
+                        class="action-button action-secondary"
+                    >
+
+                        <i class="bi bi-shop me-1"></i>
+
+                        Continuer mes achats
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock %}
+

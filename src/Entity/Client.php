@@ -44,6 +44,19 @@ class Client
     #[ORM\Column(name: 'updated_at', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\OneToOne(
+        inversedBy: 'client',
+        targetEntity: User::class
+    )]
+    #[ORM\JoinColumn(
+        name: 'user_id',
+        referencedColumnName: 'id',
+        nullable: true,
+        unique: true,
+        onDelete: 'SET NULL'
+    )]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -173,5 +186,16 @@ class Client
 
         return $this;
     }
-}
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+}

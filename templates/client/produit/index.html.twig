@@ -1,0 +1,1511 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produits{% endblock %}
+
+{% block body %}
+
+<style>
+
+    /* =========================================================
+       CATALOGUE CLIENT
+       ========================================================= */
+
+    .client-products-page {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .products-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+
+        margin-bottom: 22px;
+    }
+
+    .products-title small {
+        display: block;
+
+        margin-bottom: 5px;
+
+        color: #7d8799;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .12em;
+    }
+
+    .products-title h1 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 29px;
+        font-weight: 800;
+    }
+
+    .products-title p {
+        margin: 7px 0 0;
+
+        color: #7f899c;
+
+        font-size: 12px;
+    }
+
+    .products-count {
+        flex-shrink: 0;
+
+        padding: 10px 13px;
+
+        border-radius: 10px;
+
+        background: white;
+        border: 1px solid #e8ebf1;
+
+        color: #566176;
+
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+
+    /* =========================================================
+       TOOLBAR
+       ========================================================= */
+
+    .products-toolbar {
+        display: grid;
+
+        grid-template-columns:
+            minmax(250px, 1.6fr)
+            minmax(160px, .7fr)
+            minmax(160px, .7fr);
+
+        gap: 12px;
+
+        padding: 15px;
+
+        margin-bottom: 22px;
+
+        background: white;
+
+        border: 1px solid #e8ebf1;
+        border-radius: 15px;
+
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box i {
+        position: absolute;
+
+        left: 13px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: #8c96a7;
+
+        font-size: 14px;
+    }
+
+    .products-input,
+    .products-select {
+        width: 100%;
+
+        height: 43px;
+
+        border: 1px solid #e2e6ed;
+        border-radius: 10px;
+
+        background: #f9fafc;
+
+        color: #273246;
+
+        font-size: 12px;
+
+        outline: none;
+
+        transition: .2s ease;
+    }
+
+    .products-input {
+        padding: 0 14px 0 37px;
+    }
+
+    .products-select {
+        padding: 0 12px;
+    }
+
+    .products-input:focus,
+    .products-select:focus {
+        background: white;
+
+        border-color: #9dbbff;
+
+        box-shadow:
+            0 0 0 3px rgba(37,99,235,.08);
+    }
+
+
+    /* =========================================================
+       CATEGORIES
+       ========================================================= */
+
+    .category-pills {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 8px;
+
+        margin-bottom: 20px;
+    }
+
+    .category-pill {
+        padding: 8px 11px;
+
+        border: 1px solid #e3e7ee;
+        border-radius: 999px;
+
+        background: white;
+
+        color: #667085;
+
+        font-size: 10px;
+        font-weight: 750;
+
+        cursor: pointer;
+
+        transition: .2s ease;
+    }
+
+    .category-pill:hover {
+        border-color: #bfd0fa;
+
+        color: #2563eb;
+    }
+
+    .category-pill.active {
+        background: #172033;
+
+        border-color: #172033;
+
+        color: white;
+    }
+
+
+    /* =========================================================
+       PRODUITS
+       ========================================================= */
+
+    .products-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+
+        gap: 17px;
+    }
+
+    .product-card {
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+
+        min-width: 0;
+
+        overflow: hidden;
+
+        background: white;
+
+        border: 1px solid #e8ebf1;
+        border-radius: 16px;
+
+        box-shadow:
+            0 3px 14px rgba(15,23,42,.05);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            border-color .2s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+
+        border-color: #d6e1ff;
+
+        box-shadow:
+            0 10px 28px rgba(15,23,42,.09);
+    }
+
+
+    /* =========================================================
+       VISUEL PRODUIT
+       ========================================================= */
+
+    .product-visual {
+        position: relative;
+
+        height: 205px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 14px;
+
+        overflow: hidden;
+
+        background:
+            radial-gradient(
+                circle at top right,
+                #edf4ff,
+                transparent 45%
+            ),
+            #f7f9fc;
+    }
+
+
+    /* =========================================================
+       IMAGE PRODUIT
+       ========================================================= */
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+
+        display: block;
+
+        object-fit: contain;
+        object-position: center;
+
+        border-radius: 14px;
+
+        transition:
+            transform .3s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.04);
+    }
+
+
+    /* =========================================================
+       IMAGE PAR DEFAUT
+       ========================================================= */
+
+    .product-icon {
+        width: 78px;
+        height: 78px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 22px;
+
+        background: white;
+
+        color: #2563eb;
+
+        font-size: 31px;
+
+        box-shadow:
+            0 7px 20px rgba(15,23,42,.08);
+    }
+
+
+    /* =========================================================
+       BADGE STOCK
+       ========================================================= */
+
+    .stock-badge {
+        position: absolute;
+
+        top: 12px;
+        left: 12px;
+
+        z-index: 3;
+
+        padding: 5px 8px;
+
+        border-radius: 999px;
+
+        font-size: 9px;
+        font-weight: 850;
+    }
+
+    .stock-ok {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .stock-low {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .stock-empty {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+
+    /* =========================================================
+       BADGE CATEGORIE
+       ========================================================= */
+
+    .product-category-badge {
+        position: absolute;
+
+        top: 12px;
+        right: 12px;
+
+        z-index: 3;
+
+        max-width: 45%;
+
+        padding: 5px 8px;
+
+        background: rgba(255,255,255,.88);
+
+        border:
+            1px solid rgba(255,255,255,.8);
+
+        border-radius: 999px;
+
+        color: #657086;
+
+        font-size: 9px;
+        font-weight: 750;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+    /* =========================================================
+       CONTENU
+       ========================================================= */
+
+    .product-content {
+        display: flex;
+        flex: 1;
+
+        flex-direction: column;
+
+        padding: 17px;
+    }
+
+    .product-reference {
+        color: #8b95a8;
+
+        font-size: 9px;
+        font-weight: 750;
+
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .product-name {
+        margin: 7px 0 5px;
+
+        color: #172033;
+
+        font-size: 15px;
+        font-weight: 800;
+
+        line-height: 1.35;
+    }
+
+    .product-description {
+        min-height: 38px;
+
+        color: #8590a2;
+
+        font-size: 10px;
+        line-height: 1.55;
+
+        display: -webkit-box;
+
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+       BAS DE CARTE
+       ========================================================= */
+
+    .product-bottom {
+        display: flex;
+
+        align-items: flex-end;
+        justify-content: space-between;
+
+        gap: 12px;
+
+        margin-top: 17px;
+    }
+
+    .product-price {
+        color: #172033;
+
+        font-size: 17px;
+        font-weight: 900;
+    }
+
+    .product-unit {
+        margin-top: 2px;
+
+        color: #929bad;
+
+        font-size: 9px;
+    }
+
+
+    /* =========================================================
+       BOUTON
+       ========================================================= */
+
+    .product-button {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        min-height: 37px;
+
+        padding: 0 11px;
+
+        border-radius: 10px;
+
+        background: #172033;
+        color: white;
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        white-space: nowrap;
+
+        transition: .2s ease;
+    }
+
+    .product-button:hover {
+        background: #263653;
+
+        color: white;
+    }
+
+    .product-button.disabled {
+        background: #eef0f4;
+        color: #8a94a6;
+
+        cursor: not-allowed;
+
+        pointer-events: none;
+    }
+
+
+    /* =========================================================
+       RESULTAT VIDE
+       ========================================================= */
+
+    .products-empty {
+        display: none;
+
+        padding: 55px 25px;
+
+        background: white;
+
+        border: 1px solid #e8ebf1;
+        border-radius: 16px;
+
+        text-align: center;
+    }
+
+    .products-empty i {
+        display: block;
+
+        margin-bottom: 12px;
+
+        color: #a4adbc;
+
+        font-size: 35px;
+    }
+
+    .products-empty strong {
+        display: block;
+
+        color: #172033;
+
+        font-size: 15px;
+    }
+
+    .products-empty span {
+        display: block;
+
+        margin-top: 6px;
+
+        color: #8a94a6;
+
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+       PANIER RAPIDE
+       ========================================================= */
+
+    .products-cart-shortcut {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 15px;
+
+        margin-top: 24px;
+        padding: 17px 19px;
+
+        background: #172033;
+
+        border-radius: 15px;
+
+        color: white;
+    }
+
+    .cart-shortcut-left {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+    }
+
+    .cart-shortcut-icon {
+        width: 39px;
+        height: 39px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: rgba(255,255,255,.10);
+
+        font-size: 16px;
+    }
+
+    .cart-shortcut-title {
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .cart-shortcut-info {
+        margin-top: 3px;
+
+        color: #aeb8c8;
+
+        font-size: 10px;
+    }
+
+    .cart-shortcut-button {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 9px 12px;
+
+        border-radius: 9px;
+
+        background: white;
+        color: #172033;
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .cart-shortcut-button:hover {
+        color: #172033;
+
+        background: #f5f7fb;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1200px) {
+
+        .products-grid {
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+        }
+
+    }
+
+
+    @media (max-width: 900px) {
+
+        .products-toolbar {
+            grid-template-columns: 1fr;
+        }
+
+        .products-grid {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .products-header {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .products-cart-shortcut {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+        .cart-shortcut-button {
+            width: 100%;
+        }
+
+    }
+
+
+    @media (max-width: 480px) {
+
+        .product-visual {
+            height: 220px;
+        }
+
+    }
+
+</style>
+
+
+<div class="client-products-page">
+
+
+    {# =========================================================
+       HEADER
+       ========================================================= #}
+
+    <div class="products-header">
+
+        <div class="products-title">
+
+            <small>
+                Boutique
+            </small>
+
+            <h1>
+                Nos produits
+            </h1>
+
+            <p>
+                Découvrez les produits disponibles et choisissez
+                ceux que vous souhaitez commander.
+            </p>
+
+        </div>
+
+
+        <div class="products-count">
+
+            <span id="productCount">
+                {{ produits|length }}
+            </span>
+
+            produit(s) disponible(s)
+
+        </div>
+
+    </div>
+
+
+    {# =========================================================
+       FILTRES
+       ========================================================= #}
+
+    <div class="products-toolbar">
+
+
+        <div class="search-box">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                id="productSearch"
+                class="products-input"
+                placeholder="Rechercher un produit, une référence..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <select
+            id="categoryFilter"
+            class="products-select"
+        >
+
+            <option value="">
+                Toutes les catégories
+            </option>
+
+
+            {% set categories = [] %}
+
+
+            {% for produit in produits %}
+
+                {% if produit.categorie %}
+
+                    {% set categoryName =
+                        produit.categorie.nom
+                    %}
+
+
+                    {% if categoryName not in categories %}
+
+                        {% set categories =
+                            categories|merge([categoryName])
+                        %}
+
+                    {% endif %}
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            {% for category in categories|sort %}
+
+                <option value="{{ category|lower }}">
+                    {{ category }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <select
+            id="sortProducts"
+            class="products-select"
+        >
+
+            <option value="default">
+                Trier par défaut
+            </option>
+
+            <option value="price-asc">
+                Prix croissant
+            </option>
+
+            <option value="price-desc">
+                Prix décroissant
+            </option>
+
+            <option value="name-asc">
+                Nom A → Z
+            </option>
+
+            <option value="name-desc">
+                Nom Z → A
+            </option>
+
+        </select>
+
+    </div>
+
+
+    {# =========================================================
+       CATEGORIES RAPIDES
+       ========================================================= #}
+
+    <div class="category-pills">
+
+
+        <button
+            type="button"
+            class="category-pill active"
+            data-category=""
+        >
+            Tous
+        </button>
+
+
+        {% for category in categories|sort %}
+
+            <button
+                type="button"
+                class="category-pill"
+                data-category="{{ category|lower }}"
+            >
+                {{ category }}
+            </button>
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {# =========================================================
+       PRODUITS
+       ========================================================= #}
+
+    <div
+        class="products-grid"
+        id="productsGrid"
+    >
+
+
+        {% for produit in produits %}
+
+
+            {% set categoryName =
+                produit.categorie
+                ? produit.categorie.nom
+                : 'Sans catégorie'
+            %}
+
+
+            <article
+                class="product-card"
+
+                data-name="{{ produit.nom|lower }}"
+
+                data-reference="{{ produit.reference|lower }}"
+
+                data-category="{{ categoryName|lower }}"
+
+                data-price="{{ produit.prixVente }}"
+            >
+
+
+                {# =================================================
+                   VISUEL
+                   ================================================= #}
+
+                <div class="product-visual">
+
+
+                    {# STOCK #}
+
+                    {% if produit.quantiteStock <= 0 %}
+
+                        <span class="stock-badge stock-empty">
+
+                            Rupture de stock
+
+                        </span>
+
+
+                    {% elseif produit.quantiteStock <= produit.seuilAlerte %}
+
+                        <span class="stock-badge stock-low">
+
+                            Stock limité
+
+                        </span>
+
+
+                    {% else %}
+
+                        <span class="stock-badge stock-ok">
+
+                            En stock
+
+                        </span>
+
+                    {% endif %}
+
+
+                    {# CATEGORIE #}
+
+                    <span class="product-category-badge">
+
+                        {{ categoryName }}
+
+                    </span>
+
+
+                    {# =================================================
+                       IMAGE ADMIN
+                       ================================================= #}
+
+                    {% if produit.image %}
+
+                        <img
+                            src="{{ asset('images/produits/' ~ produit.image) }}"
+                            alt="{{ produit.nom }}"
+                            class="product-image"
+                            loading="lazy"
+                        >
+
+                    {% else %}
+
+                        <div class="product-icon">
+
+                            <i class="bi bi-box-seam"></i>
+
+                        </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+                {# =================================================
+                   CONTENU
+                   ================================================= #}
+
+                <div class="product-content">
+
+
+                    <div class="product-reference">
+
+                        Réf.
+                        {{ produit.reference }}
+
+                    </div>
+
+
+                    <h2 class="product-name">
+
+                        {{ produit.nom }}
+
+                    </h2>
+
+
+                    <div class="product-description">
+
+                        {% if produit.description %}
+
+                            {{ produit.description }}
+
+                        {% else %}
+
+                            Découvrez les informations de ce produit
+                            dans sa fiche détaillée.
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="product-bottom">
+
+
+                        <div>
+
+                            <div class="product-price">
+
+                                {{
+                                    produit.prixVente
+                                    |number_format(
+                                        0,
+                                        ',',
+                                        ' '
+                                    )
+                                }}
+                                Ar
+
+                            </div>
+
+
+                            <div class="product-unit">
+
+                                par {{ produit.unite }}
+
+                                ·
+
+                                {{ produit.quantiteStock }}
+                                disponible(s)
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+
+                            {% if produit.quantiteStock > 0 %}
+
+                                <a
+                                    href="{{ path(
+                                        'app_client_produit_show',
+                                        {
+                                            id: produit.id
+                                        }
+                                    ) }}"
+                                    class="product-button"
+                                >
+
+                                    Voir le produit
+
+                                    <i class="bi bi-arrow-right"></i>
+
+                                </a>
+
+
+                            {% else %}
+
+                                <span class="product-button disabled">
+
+                                    Indisponible
+
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {# =========================================================
+       AUCUN RESULTAT
+       ========================================================= #}
+
+    <div
+        class="products-empty"
+        id="productsEmpty"
+    >
+
+        <i class="bi bi-search"></i>
+
+
+        <strong>
+            Aucun produit trouvé
+        </strong>
+
+
+        <span>
+            Essayez de modifier votre recherche ou votre catégorie.
+        </span>
+
+    </div>
+
+
+    {# =========================================================
+       RACCOURCI PANIER
+       ========================================================= #}
+
+    <div class="products-cart-shortcut">
+
+
+        <div class="cart-shortcut-left">
+
+
+            <div class="cart-shortcut-icon">
+
+                <i class="bi bi-cart3"></i>
+
+            </div>
+
+
+            <div>
+
+
+                <div class="cart-shortcut-title">
+
+                    Votre panier
+
+                </div>
+
+
+                <div class="cart-shortcut-info">
+
+
+                    {% if panierQuantity is defined and panierQuantity > 0 %}
+
+                        {{ panierQuantity }}
+                        article(s)
+
+                        ·
+
+                        {{
+                            panierTotal
+                            |number_format(
+                                0,
+                                ',',
+                                ' '
+                            )
+                        }}
+                        Ar
+
+
+                    {% else %}
+
+                        Votre panier est actuellement vide.
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <a
+            href="{{ path('app_client_cart') }}"
+            class="cart-shortcut-button"
+        >
+
+            <i class="bi bi-cart3 me-1"></i>
+
+            Ouvrir mon panier
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+{# =============================================================
+   JAVASCRIPT
+   ============================================================= #}
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const searchInput =
+            document.getElementById('productSearch');
+
+        const categoryFilter =
+            document.getElementById('categoryFilter');
+
+        const sortProducts =
+            document.getElementById('sortProducts');
+
+        const productsGrid =
+            document.getElementById('productsGrid');
+
+        const emptyState =
+            document.getElementById('productsEmpty');
+
+        const productCount =
+            document.getElementById('productCount');
+
+        const categoryPills =
+            document.querySelectorAll(
+                '.category-pill'
+            );
+
+
+        function getProducts() {
+
+            return Array.from(
+                productsGrid.querySelectorAll(
+                    '.product-card'
+                )
+            );
+
+        }
+
+
+        function applyFilters() {
+
+            const search =
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const selectedCategory =
+                categoryFilter.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const products =
+                getProducts();
+
+
+            let visibleCount = 0;
+
+
+            products.forEach(
+                function (product) {
+
+                    const name =
+                        product.dataset.name || '';
+
+                    const reference =
+                        product.dataset.reference || '';
+
+                    const category =
+                        product.dataset.category || '';
+
+
+                    const matchesSearch =
+                        search === '' ||
+                        name.includes(search) ||
+                        reference.includes(search) ||
+                        category.includes(search);
+
+
+                    const matchesCategory =
+                        selectedCategory === '' ||
+                        category === selectedCategory;
+
+
+                    if (
+                        matchesSearch &&
+                        matchesCategory
+                    ) {
+
+                        product.style.display = '';
+
+                        visibleCount++;
+
+                    } else {
+
+                        product.style.display = 'none';
+
+                    }
+
+                }
+            );
+
+
+            productCount.textContent =
+                visibleCount;
+
+
+            emptyState.style.display =
+                visibleCount === 0
+                    ? 'block'
+                    : 'none';
+
+        }
+
+
+        function sortProductsList() {
+
+            const value =
+                sortProducts.value;
+
+
+            const products =
+                getProducts();
+
+
+            products.sort(
+                function (a, b) {
+
+
+                    if (value === 'price-asc') {
+
+                        return (
+                            parseFloat(a.dataset.price) -
+                            parseFloat(b.dataset.price)
+                        );
+
+                    }
+
+
+                    if (value === 'price-desc') {
+
+                        return (
+                            parseFloat(b.dataset.price) -
+                            parseFloat(a.dataset.price)
+                        );
+
+                    }
+
+
+                    if (value === 'name-asc') {
+
+                        return a.dataset.name.localeCompare(
+                            b.dataset.name,
+                            'fr'
+                        );
+
+                    }
+
+
+                    if (value === 'name-desc') {
+
+                        return b.dataset.name.localeCompare(
+                            a.dataset.name,
+                            'fr'
+                        );
+
+                    }
+
+
+                    return 0;
+
+                }
+            );
+
+
+            products.forEach(
+                function (product) {
+
+                    productsGrid.appendChild(
+                        product
+                    );
+
+                }
+            );
+
+
+            applyFilters();
+
+        }
+
+
+        searchInput.addEventListener(
+            'input',
+            applyFilters
+        );
+
+
+        categoryFilter.addEventListener(
+            'change',
+            function () {
+
+                categoryPills.forEach(
+                    function (pill) {
+
+                        pill.classList.toggle(
+                            'active',
+                            pill.dataset.category ===
+                            categoryFilter.value
+                        );
+
+                    }
+                );
+
+
+                applyFilters();
+
+            }
+        );
+
+
+        sortProducts.addEventListener(
+            'change',
+            sortProductsList
+        );
+
+
+        categoryPills.forEach(
+            function (pill) {
+
+                pill.addEventListener(
+                    'click',
+                    function () {
+
+                        const category =
+                            this.dataset.category || '';
+
+
+                        categoryFilter.value =
+                            category;
+
+
+                        categoryPills.forEach(
+                            function (item) {
+
+                                item.classList.remove(
+                                    'active'
+                                );
+
+                            }
+                        );
+
+
+                        this.classList.add(
+                            'active'
+                        );
+
+
+                        applyFilters();
+
+                    }
+                );
+
+            }
+        );
+
+
+        applyFilters();
+
+    }
+);
+
+</script>
+
+{% endblock %}
+

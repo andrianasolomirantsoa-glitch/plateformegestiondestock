@@ -1,0 +1,712 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Client - {{ client.prenom }} {{ client.nom }}
+{% endblock %}
+
+{% block header_title %}
+    <div class="dashboard-heading">
+
+        <div>
+            <h1 class="page-title">
+                Fiche client
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Informations, commandes, paiements et livraisons du client.
+            </p>
+        </div>
+
+        <div class="dashboard-date">
+            <i class="bi bi-calendar3"></i>
+            {{ "now"|date("d/m/Y") }}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+
+        <a
+            href="{{ path('app_admin_client_index') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Retour aux clients
+        </a>
+
+    </div>
+
+
+    <!-- =========================================
+         EN-TÊTE CLIENT
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div
+                        class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
+                        style="width: 75px; height: 75px;"
+                    >
+                        <i
+                            class="bi bi-person"
+                            style="font-size: 35px;"
+                        ></i>
+                    </div>
+
+                    <div>
+
+                        <h2 class="mb-1">
+                            {{ client.prenom }}
+                            {{ client.nom }}
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Client #{{ client.id }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    {% if client.actif %}
+
+                        <span class="badge bg-success fs-6">
+                            Actif
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-danger fs-6">
+                            Inactif
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         STATISTIQUES
+    ========================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Commandes
+                            </small>
+
+                            <h2 class="mt-2 mb-0 text-primary">
+                                {{ nombreCommandes }}
+                            </h2>
+
+                        </div>
+
+                        <i class="bi bi-cart-check text-primary fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Total commandes
+                            </small>
+
+                            <h2 class="mt-2 mb-0 text-success">
+                                {{ totalCommandes|number_format(2, ',', ' ') }}
+                                Ar
+                            </h2>
+
+                        </div>
+
+                        <i class="bi bi-cash-stack text-success fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Compte lié
+                            </small>
+
+                            <h2 class="mt-2 mb-0">
+
+                                {% if user %}
+
+                                    <span class="text-success">
+                                        Oui
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-secondary">
+                                        Non
+                                    </span>
+
+                                {% endif %}
+
+                            </h2>
+
+                        </div>
+
+                        <i class="bi bi-person-check text-info fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- =====================================
+             INFORMATIONS CLIENT
+        ====================================== -->
+
+        <div class="col-lg-5">
+
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-body">
+
+                    <h4 class="mb-4">
+                        <i class="bi bi-person-vcard"></i>
+                        Informations client
+                    </h4>
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Nom
+                        </small>
+
+                        <strong>
+                            {{ client.nom }}
+                        </strong>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Prénom
+                        </small>
+
+                        <strong>
+                            {{ client.prenom ?: '—' }}
+                        </strong>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Email
+                        </small>
+
+                        <strong>
+                            {{ client.email ?: '—' }}
+                        </strong>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Téléphone
+                        </small>
+
+                        <strong>
+                            {{ client.telephone ?: '—' }}
+                        </strong>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Adresse
+                        </small>
+
+                        <strong>
+                            {{ client.adresse ?: '—' }}
+                        </strong>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Ville
+                        </small>
+
+                        <strong>
+                            {{ client.ville ?: '—' }}
+                        </strong>
+
+                    </div>
+
+                    <div>
+
+                        <small class="text-muted d-block">
+                            Pays
+                        </small>
+
+                        <strong>
+                            {{ client.pays ?: '—' }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 COMPTE USER
+            ================================== -->
+
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-body">
+
+                    <h4 class="mb-4">
+                        <i class="bi bi-shield-check"></i>
+                        Compte utilisateur
+                    </h4>
+
+                    {% if user %}
+
+                        <div class="mb-3">
+
+                            <small class="text-muted d-block">
+                                Identifiant
+                            </small>
+
+                            <strong>
+                                User #{{ user.id }}
+                            </strong>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <small class="text-muted d-block">
+                                Email de connexion
+                            </small>
+
+                            <strong>
+                                {{ user.email }}
+                            </strong>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <small class="text-muted d-block">
+                                Rôle
+                            </small>
+
+                            <span class="badge bg-primary">
+                                CLIENT
+                            </span>
+
+                        </div>
+
+                        <div>
+
+                            <small class="text-muted d-block">
+                                État du compte
+                            </small>
+
+                            {% if user.actif %}
+
+                                <span class="badge bg-success">
+                                    Actif
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+                                    Inactif
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="alert alert-secondary mb-0">
+
+                            <i class="bi bi-info-circle"></i>
+
+                            Aucun compte utilisateur n'est actuellement
+                            lié à ce profil client.
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 ACTION
+            ================================== -->
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h4 class="mb-3">
+                        Gestion du compte client
+                    </h4>
+
+                    <form
+                        action="{{ path(
+                            'app_admin_client_toggle',
+                            {'id': client.id}
+                        ) }}"
+                        method="post"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token('statut_client_' ~ client.id) }}"
+                        >
+
+                        {% if client.actif %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger w-100"
+                            >
+                                <i class="bi bi-person-slash"></i>
+                                Désactiver le client
+                            </button>
+
+                        {% else %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-success w-100"
+                            >
+                                <i class="bi bi-person-check"></i>
+                                Activer le client
+                            </button>
+
+                        {% endif %}
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             COMMANDES
+        ====================================== -->
+
+        <div class="col-lg-7">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <div>
+
+                            <h4 class="mb-1">
+                                Commandes du client
+                            </h4>
+
+                            <p class="text-muted mb-0">
+                                Historique des commandes
+                            </p>
+
+                        </div>
+
+                        <i class="bi bi-receipt text-primary fs-3"></i>
+
+                    </div>
+
+                    {% if commandes is empty %}
+
+                        <div class="text-center py-5">
+
+                            <i
+                                class="bi bi-receipt text-muted"
+                                style="font-size: 55px;"
+                            ></i>
+
+                            <h5 class="mt-3">
+                                Aucune commande
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Ce client n'a encore passé aucune commande.
+                            </p>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="table-responsive">
+
+                            <table class="table table-hover align-middle">
+
+                                <thead class="table-light">
+
+                                    <tr>
+                                        <th>Commande</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                        <th>Paiement</th>
+                                        <th>Livraison</th>
+                                        <th class="text-end">
+                                            Total
+                                        </th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {% for commande in commandes %}
+
+                                        <tr>
+
+                                            <td>
+
+                                                <strong>
+                                                    {{ commande.numero }}
+                                                </strong>
+
+                                            </td>
+
+                                            <td>
+                                                {{ commande.created_at|date('d/m/Y H:i') }}
+                                            </td>
+
+                                            <td>
+
+                                                {% if commande.statut == 'EN_ATTENTE' %}
+
+                                                    <span class="badge bg-warning text-dark">
+                                                        En attente
+                                                    </span>
+
+                                                {% elseif commande.statut == 'CONFIRMEE' %}
+
+                                                    <span class="badge bg-success">
+                                                        Confirmée
+                                                    </span>
+
+                                                {% elseif commande.statut == 'ANNULEE' %}
+
+                                                    <span class="badge bg-danger">
+                                                        Annulée
+                                                    </span>
+
+                                                {% else %}
+
+                                                    <span class="badge bg-secondary">
+                                                        {{ commande.statut }}
+                                                    </span>
+
+                                                {% endif %}
+
+                                            </td>
+
+                                            <td>
+
+                                                {% if commande.paiement_statut == 'PAYE' %}
+
+                                                    <span class="badge bg-success">
+                                                        Payé
+                                                    </span>
+
+                                                {% elseif commande.paiement_statut == 'EN_ATTENTE' %}
+
+                                                    <span class="badge bg-warning text-dark">
+                                                        En attente
+                                                    </span>
+
+                                                {% elseif commande.paiement_statut == 'REFUSE' %}
+
+                                                    <span class="badge bg-danger">
+                                                        Refusé
+                                                    </span>
+
+                                                {% else %}
+
+                                                    <span class="badge bg-secondary">
+                                                        Non déclaré
+                                                    </span>
+
+                                                {% endif %}
+
+                                            </td>
+
+                                            <td>
+
+                                                {% if commande.livraison_statut == 'LIVREE' %}
+
+                                                    <span class="badge bg-success">
+                                                        Livrée
+                                                    </span>
+
+                                                {% elseif commande.livraison_statut == 'EN_COURS' %}
+
+                                                    <span class="badge bg-primary">
+                                                        En cours
+                                                    </span>
+
+                                                {% elseif commande.livraison_statut == 'EN_ATTENTE' %}
+
+                                                    <span class="badge bg-warning text-dark">
+                                                        En attente
+                                                    </span>
+
+                                                {% elseif commande.livraison_statut == 'ANNULEE' %}
+
+                                                    <span class="badge bg-danger">
+                                                        Annulée
+                                                    </span>
+
+                                                {% else %}
+
+                                                    <span class="badge bg-secondary">
+                                                        Non programmée
+                                                    </span>
+
+                                                {% endif %}
+
+                                            </td>
+
+                                            <td class="text-end">
+
+                                                <strong class="text-primary">
+                                                    {{ commande.total|number_format(2, ',', ' ') }}
+                                                    Ar
+                                                </strong>
+
+                                            </td>
+
+                                        </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                                <tfoot class="table-light">
+
+                                    <tr>
+
+                                        <th colspan="5" class="text-end">
+                                            Total cumulé
+                                        </th>
+
+                                        <th class="text-end">
+
+                                            <strong class="text-primary">
+                                                {{ totalCommandes|number_format(2, ',', ' ') }}
+                                                Ar
+                                            </strong>
+
+                                        </th>
+
+                                    </tr>
+
+                                </tfoot>
+
+                            </table>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
