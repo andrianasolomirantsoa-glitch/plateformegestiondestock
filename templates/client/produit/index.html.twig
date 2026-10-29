@@ -1,1197 +1,1157 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Produits{% endblock %}
+{% block title %}Notre catalogue | Jumbo Score Madagascar{% endblock %}
 
 {% block body %}
 
 <style>
+/* =====================================================
+   CATALOGUE CLIENT - JUMBO SCORE MADAGASCAR
+   ===================================================== */
 
-    /* =========================================================
-       CATALOGUE CLIENT
-       ========================================================= */
+.client-products-page {
+    --jumbo-navy: #17213e;
+    --jumbo-red: #ed1c24;
+    --jumbo-yellow: #ffc900;
+    --jumbo-text: #202b42;
+    --jumbo-muted: #788196;
+    --jumbo-border: #e8ebf1;
+    --jumbo-bg: #f6f7fa;
 
-    .client-products-page {
-        max-width: 1500px;
-        margin: 0 auto;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding-bottom: 25px;
+    color: var(--jumbo-text);
+}
+
+.client-products-page * {
+    box-sizing: border-box;
+}
+
+.client-products-page button,
+.client-products-page input,
+.client-products-page select {
+    font: inherit;
+}
+
+/* ================= TOP BANDEAU ================= */
+
+.catalog-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 18px;
+    margin-bottom: 20px;
+    background: var(--jumbo-navy);
+    color: white;
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.catalog-topbar i {
+    color: var(--jumbo-yellow);
+    margin-right: 5px;
+}
+
+.catalog-topbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.catalog-topbar a:hover {
+    color: var(--jumbo-yellow);
+}
+
+/* ================= HERO ================= */
+
+.catalog-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 35px 35px;
+    margin-bottom: 25px;
+    border-radius: 17px;
+    color: white;
+    background:
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(237,28,36,.28),
+            transparent 30%
+        ),
+        linear-gradient(115deg, #17213e 0%, #222f50 70%, #17213e 100%);
+    box-shadow: 0 8px 25px rgba(23,33,62,.12);
+}
+
+.catalog-hero::after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    right: -65px;
+    bottom: -180px;
+    border: 45px solid rgba(255,201,0,.10);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.catalog-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+}
+
+.catalog-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    background: var(--jumbo-yellow);
+    color: var(--jumbo-navy);
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.catalog-hero h1 {
+    margin: 0;
+    color: white;
+    font-size: clamp(27px, 4vw, 42px);
+    line-height: 1.15;
+    font-weight: 900;
+    letter-spacing: -.8px;
+}
+
+.catalog-hero h1 span {
+    color: var(--jumbo-yellow);
+}
+
+.catalog-hero p {
+    max-width: 610px;
+    margin: 14px 0 22px;
+    color: #e0e5ef;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.catalog-hero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.catalog-hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 43px;
+    padding: 0 18px;
+    border-radius: 8px;
+    background: var(--jumbo-red);
+    color: white;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    transition: .2s;
+}
+
+.catalog-hero-button:hover {
+    background: #cb1119;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.catalog-hero-note {
+    color: #e0e5ef;
+    font-size: 11px;
+}
+
+/* ================= TITRE SECTION ================= */
+
+.catalog-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.catalog-section-heading small {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--jumbo-red);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.catalog-section-heading h2 {
+    margin: 0;
+    color: var(--jumbo-navy);
+    font-size: clamp(21px, 3vw, 28px);
+    font-weight: 900;
+}
+
+.catalog-section-heading p {
+    margin: 6px 0 0;
+    color: var(--jumbo-muted);
+    font-size: 12px;
+}
+
+.products-count {
+    flex-shrink: 0;
+    padding: 10px 13px;
+    background: white;
+    border: 1px solid var(--jumbo-border);
+    border-radius: 9px;
+    color: var(--jumbo-navy);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.products-count strong {
+    color: var(--jumbo-red);
+}
+
+/* ================= TOOLBAR ================= */
+
+.products-toolbar {
+    display: grid;
+    grid-template-columns: minmax(200px, 1.6fr)
+                           minmax(160px, .8fr)
+                           minmax(150px, .8fr);
+    gap: 12px;
+    padding: 15px;
+    margin-bottom: 17px;
+    background: white;
+    border: 1px solid var(--jumbo-border);
+    border-radius: 13px;
+    box-shadow: 0 3px 15px rgba(23,33,62,.04);
+}
+
+.search-box {
+    position: relative;
+    min-width: 0;
+}
+
+.search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8b94a5;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.products-input,
+.products-select {
+    width: 100%;
+    height: 45px;
+    border: 1px solid #e2e6ed;
+    border-radius: 8px;
+    background: #fafbfc;
+    color: var(--jumbo-text);
+    font-size: 12px;
+    outline: none;
+    transition: .2s;
+}
+
+.products-input {
+    padding: 0 14px 0 40px;
+}
+
+.products-select {
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.products-input:focus,
+.products-select:focus {
+    background: white;
+    border-color: var(--jumbo-red);
+    box-shadow: 0 0 0 3px rgba(237,28,36,.08);
+}
+
+/* ================= CATEGORIES ================= */
+
+.category-filter-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 11px;
+    color: var(--jumbo-navy);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.category-filter-heading i {
+    color: var(--jumbo-red);
+}
+
+.category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.category-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 35px;
+    padding: 7px 14px;
+    border: 1px solid #e1e5ec;
+    border-radius: 999px;
+    background: white;
+    color: #5e687b;
+    font-size: 11px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.category-pill:hover {
+    border-color: var(--jumbo-red);
+    color: var(--jumbo-red);
+}
+
+.category-pill.active {
+    background: var(--jumbo-red);
+    border-color: var(--jumbo-red);
+    color: white;
+    box-shadow: 0 3px 9px rgba(237,28,36,.15);
+}
+
+/* ================= GRID ================= */
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #e7eaf0;
+    border-radius: 13px;
+    box-shadow: 0 3px 12px rgba(23,33,62,.035);
+    transition: transform .22s ease, box-shadow .22s ease,
+                border-color .22s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    border-color: #f1b7ba;
+    box-shadow: 0 12px 26px rgba(23,33,62,.09);
+}
+
+.product-card[hidden] {
+    display: none !important;
+}
+
+/* ================= IMAGE ================= */
+
+.product-visual {
+    position: relative;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 45%, #fff 0%, #f9fafc 70%);
+    border-bottom: 1px solid #f0f1f4;
+}
+
+.product-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    transition: transform .3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.055);
+}
+
+.product-icon {
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: #fff1f1;
+    color: var(--jumbo-red);
+    font-size: 32px;
+}
+
+/* ================= STOCK ================= */
+
+.stock-badge {
+    position: absolute;
+    z-index: 2;
+    top: 12px;
+    left: 12px;
+    padding: 6px 9px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.stock-ok {
+    background: #e8f7ee;
+    color: #168044;
+}
+
+.stock-low {
+    background: #fff3d6;
+    color: #a55a00;
+}
+
+.stock-empty {
+    background: #ffe8e8;
+    color: #c51c24;
+}
+
+.product-category-badge {
+    position: absolute;
+    z-index: 2;
+    top: 12px;
+    right: 12px;
+    max-width: 48%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 6px 9px;
+    border: 1px solid #e7eaf0;
+    border-radius: 5px;
+    background: rgba(255,255,255,.94);
+    color: #687286;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+/* ================= CONTENU ================= */
+
+.product-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 16px;
+}
+
+.product-reference {
+    color: #8a94a6;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.product-name {
+    margin: 8px 0 7px;
+    color: var(--jumbo-navy);
+    font-size: 15px;
+    font-weight: 850;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.product-description {
+    min-height: 36px;
+    margin-bottom: 14px;
+    color: #818b9d;
+    font-size: 11px;
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 13px;
+    border-top: 1px solid #f0f1f4;
+}
+
+.product-price {
+    color: var(--jumbo-red);
+    font-size: 20px;
+    line-height: 1.25;
+    font-weight: 950;
+}
+
+.product-unit {
+    margin-top: 5px;
+    color: #858fa1;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.product-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 7px;
+    background: var(--jumbo-red);
+    color: white;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 850;
+    white-space: nowrap;
+    transition: .2s;
+}
+
+.product-button:hover {
+    background: #c9141c;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.product-button.disabled {
+    background: #eceef2;
+    color: #929aaa;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ================= AUCUN RESULTAT ================= */
+
+.products-empty {
+    display: none;
+    padding: 55px 20px;
+    margin-top: 5px;
+    border: 1px dashed #d9dee8;
+    border-radius: 14px;
+    background: white;
+    text-align: center;
+}
+
+.products-empty i {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--jumbo-red);
+    font-size: 37px;
+}
+
+.products-empty strong {
+    display: block;
+    color: var(--jumbo-navy);
+    font-size: 17px;
+}
+
+.products-empty span {
+    display: block;
+    margin: 8px 0 16px;
+    color: var(--jumbo-muted);
+    font-size: 12px;
+}
+
+.products-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 7px;
+    background: var(--jumbo-red);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* ================= PANIER ================= */
+
+.products-cart-shortcut {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 28px;
+    padding: 20px 22px;
+    overflow: hidden;
+    border-radius: 13px;
+    background: var(--jumbo-navy);
+    color: white;
+    position: relative;
+}
+
+.cart-shortcut-left {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.cart-shortcut-icon {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: rgba(255,255,255,.1);
+    color: var(--jumbo-yellow);
+    font-size: 20px;
+}
+
+.cart-shortcut-title {
+    color: white;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.cart-shortcut-info {
+    margin-top: 5px;
+    color: #c5ccda;
+    font-size: 11px;
+}
+
+.cart-shortcut-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 17px;
+    border-radius: 7px;
+    background: var(--jumbo-red);
+    color: white;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 850;
+    transition: .2s;
+}
+
+.cart-shortcut-button:hover {
+    background: #c9141c;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (min-width: 1501px) {
+    .products-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
     }
+}
 
-    /* =========================================================
-       HEADER
-       ========================================================= */
-
-    .products-header {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 20px;
-
-        margin-bottom: 22px;
+@media (max-width: 1200px) {
+    .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+}
 
-    .products-title small {
-        display: block;
-
-        margin-bottom: 5px;
-
-        color: #7d8799;
-
-        font-size: 10px;
-        font-weight: 800;
-
-        text-transform: uppercase;
-        letter-spacing: .12em;
-    }
-
-    .products-title h1 {
-        margin: 0;
-
-        color: #172033;
-
-        font-size: 29px;
-        font-weight: 800;
-    }
-
-    .products-title p {
-        margin: 7px 0 0;
-
-        color: #7f899c;
-
-        font-size: 12px;
-    }
-
-    .products-count {
-        flex-shrink: 0;
-
-        padding: 10px 13px;
-
-        border-radius: 10px;
-
-        background: white;
-        border: 1px solid #e8ebf1;
-
-        color: #566176;
-
-        font-size: 11px;
-        font-weight: 800;
-    }
-
-
-    /* =========================================================
-       TOOLBAR
-       ========================================================= */
-
+@media (max-width: 900px) {
     .products-toolbar {
-        display: grid;
-
-        grid-template-columns:
-            minmax(250px, 1.6fr)
-            minmax(160px, .7fr)
-            minmax(160px, .7fr);
-
-        gap: 12px;
-
-        padding: 15px;
-
-        margin-bottom: 22px;
-
-        background: white;
-
-        border: 1px solid #e8ebf1;
-        border-radius: 15px;
-
-        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+        grid-template-columns: 1fr 1fr;
     }
 
     .search-box {
-        position: relative;
+        grid-column: 1 / -1;
     }
-
-    .search-box i {
-        position: absolute;
-
-        left: 13px;
-        top: 50%;
-
-        transform: translateY(-50%);
-
-        color: #8c96a7;
-
-        font-size: 14px;
-    }
-
-    .products-input,
-    .products-select {
-        width: 100%;
-
-        height: 43px;
-
-        border: 1px solid #e2e6ed;
-        border-radius: 10px;
-
-        background: #f9fafc;
-
-        color: #273246;
-
-        font-size: 12px;
-
-        outline: none;
-
-        transition: .2s ease;
-    }
-
-    .products-input {
-        padding: 0 14px 0 37px;
-    }
-
-    .products-select {
-        padding: 0 12px;
-    }
-
-    .products-input:focus,
-    .products-select:focus {
-        background: white;
-
-        border-color: #9dbbff;
-
-        box-shadow:
-            0 0 0 3px rgba(37,99,235,.08);
-    }
-
-
-    /* =========================================================
-       CATEGORIES
-       ========================================================= */
-
-    .category-pills {
-        display: flex;
-        flex-wrap: wrap;
-
-        gap: 8px;
-
-        margin-bottom: 20px;
-    }
-
-    .category-pill {
-        padding: 8px 11px;
-
-        border: 1px solid #e3e7ee;
-        border-radius: 999px;
-
-        background: white;
-
-        color: #667085;
-
-        font-size: 10px;
-        font-weight: 750;
-
-        cursor: pointer;
-
-        transition: .2s ease;
-    }
-
-    .category-pill:hover {
-        border-color: #bfd0fa;
-
-        color: #2563eb;
-    }
-
-    .category-pill.active {
-        background: #172033;
-
-        border-color: #172033;
-
-        color: white;
-    }
-
-
-    /* =========================================================
-       PRODUITS
-       ========================================================= */
 
     .products-grid {
-        display: grid;
-
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr));
-
-        gap: 17px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
     }
 
-    .product-card {
-        position: relative;
+    .catalog-hero {
+        padding: 28px 23px;
+    }
+}
 
-        display: flex;
+@media (max-width: 600px) {
+    .catalog-topbar {
+        align-items: flex-start;
         flex-direction: column;
-
-        min-width: 0;
-
-        overflow: hidden;
-
-        background: white;
-
-        border: 1px solid #e8ebf1;
-        border-radius: 16px;
-
-        box-shadow:
-            0 3px 14px rgba(15,23,42,.05);
-
-        transition:
-            transform .2s ease,
-            box-shadow .2s ease,
-            border-color .2s ease;
     }
 
-    .product-card:hover {
-        transform: translateY(-4px);
-
-        border-color: #d6e1ff;
-
-        box-shadow:
-            0 10px 28px rgba(15,23,42,.09);
+    .catalog-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
+    .products-toolbar {
+        grid-template-columns: 1fr;
+    }
 
-    /* =========================================================
-       VISUEL PRODUIT
-       ========================================================= */
+    .search-box {
+        grid-column: auto;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
 
     .product-visual {
-        position: relative;
-
-        height: 205px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 14px;
-
-        overflow: hidden;
-
-        background:
-            radial-gradient(
-                circle at top right,
-                #edf4ff,
-                transparent 45%
-            ),
-            #f7f9fc;
+        height: 160px;
+        padding: 12px;
     }
-
-
-    /* =========================================================
-       IMAGE PRODUIT
-       ========================================================= */
-
-    .product-image {
-        width: 100%;
-        height: 100%;
-
-        display: block;
-
-        object-fit: contain;
-        object-position: center;
-
-        border-radius: 14px;
-
-        transition:
-            transform .3s ease;
-    }
-
-    .product-card:hover .product-image {
-        transform: scale(1.04);
-    }
-
-
-    /* =========================================================
-       IMAGE PAR DEFAUT
-       ========================================================= */
-
-    .product-icon {
-        width: 78px;
-        height: 78px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 22px;
-
-        background: white;
-
-        color: #2563eb;
-
-        font-size: 31px;
-
-        box-shadow:
-            0 7px 20px rgba(15,23,42,.08);
-    }
-
-
-    /* =========================================================
-       BADGE STOCK
-       ========================================================= */
-
-    .stock-badge {
-        position: absolute;
-
-        top: 12px;
-        left: 12px;
-
-        z-index: 3;
-
-        padding: 5px 8px;
-
-        border-radius: 999px;
-
-        font-size: 9px;
-        font-weight: 850;
-    }
-
-    .stock-ok {
-        background: #ecfdf3;
-        color: #15803d;
-    }
-
-    .stock-low {
-        background: #fff7ed;
-        color: #c2410c;
-    }
-
-    .stock-empty {
-        background: #fef2f2;
-        color: #b91c1c;
-    }
-
-
-    /* =========================================================
-       BADGE CATEGORIE
-       ========================================================= */
-
-    .product-category-badge {
-        position: absolute;
-
-        top: 12px;
-        right: 12px;
-
-        z-index: 3;
-
-        max-width: 45%;
-
-        padding: 5px 8px;
-
-        background: rgba(255,255,255,.88);
-
-        border:
-            1px solid rgba(255,255,255,.8);
-
-        border-radius: 999px;
-
-        color: #657086;
-
-        font-size: 9px;
-        font-weight: 750;
-
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-
-    /* =========================================================
-       CONTENU
-       ========================================================= */
 
     .product-content {
-        display: flex;
-        flex: 1;
-
-        flex-direction: column;
-
-        padding: 17px;
-    }
-
-    .product-reference {
-        color: #8b95a8;
-
-        font-size: 9px;
-        font-weight: 750;
-
-        text-transform: uppercase;
-        letter-spacing: .06em;
+        padding: 11px;
     }
 
     .product-name {
-        margin: 7px 0 5px;
-
-        color: #172033;
-
-        font-size: 15px;
-        font-weight: 800;
-
-        line-height: 1.35;
-    }
-
-    .product-description {
-        min-height: 38px;
-
-        color: #8590a2;
-
-        font-size: 10px;
-        line-height: 1.55;
-
-        display: -webkit-box;
-
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-
-        overflow: hidden;
-    }
-
-
-    /* =========================================================
-       BAS DE CARTE
-       ========================================================= */
-
-    .product-bottom {
-        display: flex;
-
-        align-items: flex-end;
-        justify-content: space-between;
-
-        gap: 12px;
-
-        margin-top: 17px;
+        font-size: 13px;
     }
 
     .product-price {
-        color: #172033;
-
-        font-size: 17px;
-        font-weight: 900;
-    }
-
-    .product-unit {
-        margin-top: 2px;
-
-        color: #929bad;
-
-        font-size: 9px;
-    }
-
-
-    /* =========================================================
-       BOUTON
-       ========================================================= */
-
-    .product-button {
-        display: inline-flex;
-
-        align-items: center;
-        justify-content: center;
-
-        gap: 6px;
-
-        min-height: 37px;
-
-        padding: 0 11px;
-
-        border-radius: 10px;
-
-        background: #172033;
-        color: white;
-
-        text-decoration: none;
-
-        font-size: 10px;
-        font-weight: 800;
-
-        white-space: nowrap;
-
-        transition: .2s ease;
-    }
-
-    .product-button:hover {
-        background: #263653;
-
-        color: white;
-    }
-
-    .product-button.disabled {
-        background: #eef0f4;
-        color: #8a94a6;
-
-        cursor: not-allowed;
-
-        pointer-events: none;
-    }
-
-
-    /* =========================================================
-       RESULTAT VIDE
-       ========================================================= */
-
-    .products-empty {
-        display: none;
-
-        padding: 55px 25px;
-
-        background: white;
-
-        border: 1px solid #e8ebf1;
-        border-radius: 16px;
-
-        text-align: center;
-    }
-
-    .products-empty i {
-        display: block;
-
-        margin-bottom: 12px;
-
-        color: #a4adbc;
-
-        font-size: 35px;
-    }
-
-    .products-empty strong {
-        display: block;
-
-        color: #172033;
-
-        font-size: 15px;
-    }
-
-    .products-empty span {
-        display: block;
-
-        margin-top: 6px;
-
-        color: #8a94a6;
-
-        font-size: 11px;
-    }
-
-
-    /* =========================================================
-       PANIER RAPIDE
-       ========================================================= */
-
-    .products-cart-shortcut {
-        display: flex;
-
-        align-items: center;
-        justify-content: space-between;
-
-        gap: 15px;
-
-        margin-top: 24px;
-        padding: 17px 19px;
-
-        background: #172033;
-
-        border-radius: 15px;
-
-        color: white;
-    }
-
-    .cart-shortcut-left {
-        display: flex;
-
-        align-items: center;
-
-        gap: 12px;
-    }
-
-    .cart-shortcut-icon {
-        width: 39px;
-        height: 39px;
-
-        display: flex;
-
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 10px;
-
-        background: rgba(255,255,255,.10);
-
         font-size: 16px;
     }
 
-    .cart-shortcut-title {
-        font-size: 12px;
-        font-weight: 800;
+    .product-bottom {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .cart-shortcut-info {
-        margin-top: 3px;
-
-        color: #aeb8c8;
-
+    .product-button {
+        width: 100%;
+        padding: 0 8px;
         font-size: 10px;
+    }
+
+    .stock-badge,
+    .product-category-badge {
+        top: 8px;
+        font-size: 8px;
+        padding: 5px 6px;
+    }
+
+    .stock-badge {
+        left: 8px;
+    }
+
+    .product-category-badge {
+        right: 8px;
+    }
+
+    .products-cart-shortcut {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 17px;
     }
 
     .cart-shortcut-button {
-        display: inline-flex;
-
-        align-items: center;
-        justify-content: center;
-
-        padding: 9px 12px;
-
-        border-radius: 9px;
-
-        background: white;
-        color: #172033;
-
-        text-decoration: none;
-
-        font-size: 10px;
-        font-weight: 800;
+        width: 100%;
     }
 
-    .cart-shortcut-button:hover {
-        color: #172033;
-
-        background: #f5f7fb;
+    .catalog-hero {
+        padding: 24px 17px;
     }
 
+    .catalog-hero h1 {
+        font-size: 28px;
+    }
+}
 
-    /* =========================================================
-       RESPONSIVE
-       ========================================================= */
-
-    @media (max-width: 1200px) {
-
-        .products-grid {
-            grid-template-columns:
-                repeat(3, minmax(0, 1fr));
-        }
-
+@media (max-width: 360px) {
+    .products-grid {
+        grid-template-columns: 1fr;
     }
 
-
-    @media (max-width: 900px) {
-
-        .products-toolbar {
-            grid-template-columns: 1fr;
-        }
-
-        .products-grid {
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-        }
-
+    .product-visual {
+        height: 220px;
     }
 
-
-    @media (max-width: 650px) {
-
-        .products-header {
-            align-items: flex-start;
-
-            flex-direction: column;
-        }
-
-        .products-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .products-cart-shortcut {
-            align-items: flex-start;
-
-            flex-direction: column;
-        }
-
-        .cart-shortcut-button {
-            width: 100%;
-        }
-
+    .product-bottom {
+        flex-direction: row;
+        align-items: flex-end;
     }
+}
 
-
-    @media (max-width: 480px) {
-
-        .product-visual {
-            height: 220px;
-        }
-
+@media (prefers-reduced-motion: reduce) {
+    .client-products-page *,
+    .client-products-page *::before,
+    .client-products-page *::after {
+        transition: none !important;
+        animation: none !important;
     }
-
+}
 </style>
-
 
 <div class="client-products-page">
 
+    {# BANDEAU #}
+    <div class="catalog-topbar">
+        <div>
+            <i class="bi bi-geo-alt-fill"></i>
+            Jumbo Score Madagascar
+        </div>
 
-    {# =========================================================
-       HEADER
-       ========================================================= #}
+        <a href="#catalogue">
+            <i class="bi bi-bag-check-fill"></i>
+            Découvrez notre catalogue de produits
+        </a>
+    </div>
 
-    <div class="products-header">
+    {# HERO #}
+    <section class="catalog-hero">
+        <div class="catalog-hero-content">
 
-        <div class="products-title">
-
-            <small>
-                Boutique
-            </small>
+            <div class="catalog-eyebrow">
+                <i class="bi bi-star-fill"></i>
+                Bienvenue chez Jumbo Score
+            </div>
 
             <h1>
-                Nos produits
+                Tous vos produits,<br>
+                <span>au même endroit.</span>
             </h1>
 
             <p>
-                Découvrez les produits disponibles et choisissez
-                ceux que vous souhaitez commander.
+                Découvrez notre catalogue et retrouvez facilement
+                les articles qui vous intéressent. Consultez les prix,
+                les disponibilités et les informations de chaque produit.
             </p>
 
-        </div>
+            <div class="catalog-hero-actions">
+                <a href="#catalogue" class="catalog-hero-button">
+                    Découvrir le catalogue
+                    <i class="bi bi-arrow-right"></i>
+                </a>
 
-
-        <div class="products-count">
-
-            <span id="productCount">
-                {{ produits|length }}
-            </span>
-
-            produit(s) disponible(s)
-
-        </div>
-
-    </div>
-
-
-    {# =========================================================
-       FILTRES
-       ========================================================= #}
-
-    <div class="products-toolbar">
-
-
-        <div class="search-box">
-
-            <i class="bi bi-search"></i>
-
-            <input
-                type="text"
-                id="productSearch"
-                class="products-input"
-                placeholder="Rechercher un produit, une référence..."
-                autocomplete="off"
-            >
+                <span class="catalog-hero-note">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Catalogue de produits
+                </span>
+            </div>
 
         </div>
+    </section>
 
+    {# TITRE #}
+    <section id="catalogue">
 
-        <select
-            id="categoryFilter"
-            class="products-select"
-        >
+        <div class="catalog-section-heading">
 
-            <option value="">
-                Toutes les catégories
-            </option>
+            <div>
+                <small>Notre sélection</small>
 
+                <h2>Explorez nos produits</h2>
 
-            {% set categories = [] %}
+                <p>
+                    Trouvez votre produit grâce à la recherche
+                    et aux filtres.
+                </p>
+            </div>
 
+            <div class="products-count" aria-live="polite">
+                <strong id="productCount">{{ produits|length }}</strong>
+                produit(s) affiché(s)
+            </div>
 
-            {% for produit in produits %}
+        </div>
 
-                {% if produit.categorie %}
+        {# FILTRES #}
+        {% set categories = [] %}
 
-                    {% set categoryName =
-                        produit.categorie.nom
-                    %}
+        {% for produit in produits %}
+            {% if produit.categorie %}
+                {% set categoryName = produit.categorie.nom %}
 
-
-                    {% if categoryName not in categories %}
-
-                        {% set categories =
-                            categories|merge([categoryName])
-                        %}
-
-                    {% endif %}
-
+                {% if categoryName not in categories %}
+                    {% set categories = categories|merge([categoryName]) %}
                 {% endif %}
+            {% endif %}
+        {% endfor %}
 
-            {% endfor %}
+        <div class="products-toolbar">
 
+            <div class="search-box">
+                <i class="bi bi-search"></i>
 
-            {% for category in categories|sort %}
+                <input
+                    type="search"
+                    id="productSearch"
+                    class="products-input"
+                    placeholder="Rechercher un produit, une référence..."
+                    aria-label="Rechercher un produit"
+                    autocomplete="off"
+                >
+            </div>
 
-                <option value="{{ category|lower }}">
-                    {{ category }}
-                </option>
+            <select
+                id="categoryFilter"
+                class="products-select"
+                aria-label="Filtrer par catégorie"
+            >
+                <option value="">Toutes les catégories</option>
 
-            {% endfor %}
+                {% for category in categories|sort %}
+                    <option value="{{ category|lower }}">
+                        {{ category }}
+                    </option>
+                {% endfor %}
+            </select>
 
-        </select>
+            <select
+                id="sortProducts"
+                class="products-select"
+                aria-label="Trier les produits"
+            >
+                <option value="default">Trier par défaut</option>
+                <option value="price-asc">Prix croissant</option>
+                <option value="price-desc">Prix décroissant</option>
+                <option value="name-asc">Nom A → Z</option>
+                <option value="name-desc">Nom Z → A</option>
+            </select>
 
+        </div>
 
-        <select
-            id="sortProducts"
-            class="products-select"
-        >
+        {# CATEGORIES RAPIDES #}
+        <div class="category-filter-heading">
+            <i class="bi bi-grid-fill"></i>
+            Parcourir par catégorie
+        </div>
 
-            <option value="default">
-                Trier par défaut
-            </option>
-
-            <option value="price-asc">
-                Prix croissant
-            </option>
-
-            <option value="price-desc">
-                Prix décroissant
-            </option>
-
-            <option value="name-asc">
-                Nom A → Z
-            </option>
-
-            <option value="name-desc">
-                Nom Z → A
-            </option>
-
-        </select>
-
-    </div>
-
-
-    {# =========================================================
-       CATEGORIES RAPIDES
-       ========================================================= #}
-
-    <div class="category-pills">
-
-
-        <button
-            type="button"
-            class="category-pill active"
-            data-category=""
-        >
-            Tous
-        </button>
-
-
-        {% for category in categories|sort %}
+        <div class="category-pills">
 
             <button
                 type="button"
-                class="category-pill"
-                data-category="{{ category|lower }}"
+                class="category-pill active"
+                data-category=""
+                aria-pressed="true"
             >
-                {{ category }}
+                Tous les produits
             </button>
 
-        {% endfor %}
-
-
-    </div>
-
-
-    {# =========================================================
-       PRODUITS
-       ========================================================= #}
-
-    <div
-        class="products-grid"
-        id="productsGrid"
-    >
-
-
-        {% for produit in produits %}
-
-
-            {% set categoryName =
-                produit.categorie
-                ? produit.categorie.nom
-                : 'Sans catégorie'
-            %}
-
-
-            <article
-                class="product-card"
-
-                data-name="{{ produit.nom|lower }}"
-
-                data-reference="{{ produit.reference|lower }}"
-
-                data-category="{{ categoryName|lower }}"
-
-                data-price="{{ produit.prixVente }}"
-            >
-
-
-                {# =================================================
-                   VISUEL
-                   ================================================= #}
-
-                <div class="product-visual">
-
-
-                    {# STOCK #}
-
-                    {% if produit.quantiteStock <= 0 %}
-
-                        <span class="stock-badge stock-empty">
-
-                            Rupture de stock
-
-                        </span>
-
-
-                    {% elseif produit.quantiteStock <= produit.seuilAlerte %}
-
-                        <span class="stock-badge stock-low">
-
-                            Stock limité
-
-                        </span>
-
-
-                    {% else %}
-
-                        <span class="stock-badge stock-ok">
-
-                            En stock
-
-                        </span>
-
-                    {% endif %}
-
-
-                    {# CATEGORIE #}
-
-                    <span class="product-category-badge">
-
-                        {{ categoryName }}
-
-                    </span>
-
-
-                    {# =================================================
-                       IMAGE ADMIN
-                       ================================================= #}
-
-                    {% if produit.image %}
-
-                        <img
-                            src="{{ asset('images/produits/' ~ produit.image) }}"
-                            alt="{{ produit.nom }}"
-                            class="product-image"
-                            loading="lazy"
-                        >
-
-                    {% else %}
-
-                        <div class="product-icon">
-
-                            <i class="bi bi-box-seam"></i>
-
-                        </div>
-
-                    {% endif %}
-
-
-                </div>
-
-
-                {# =================================================
-                   CONTENU
-                   ================================================= #}
-
-                <div class="product-content">
-
-
-                    <div class="product-reference">
-
-                        Réf.
-                        {{ produit.reference }}
-
-                    </div>
-
-
-                    <h2 class="product-name">
-
-                        {{ produit.nom }}
-
-                    </h2>
-
-
-                    <div class="product-description">
-
-                        {% if produit.description %}
-
-                            {{ produit.description }}
+            {% for category in categories|sort %}
+                <button
+                    type="button"
+                    class="category-pill"
+                    data-category="{{ category|lower }}"
+                    aria-pressed="false"
+                >
+                    {{ category }}
+                </button>
+            {% endfor %}
+
+        </div>
+
+        {# GRILLE PRODUITS #}
+        <div class="products-grid" id="productsGrid">
+
+            {% for produit in produits %}
+
+                {% set categoryName = produit.categorie
+                    ? produit.categorie.nom
+                    : 'Sans catégorie'
+                %}
+
+                <article
+                    class="product-card"
+                    data-name="{{ produit.nom|lower }}"
+                    data-reference="{{ produit.reference|default('')|lower }}"
+                    data-category="{{ categoryName|lower }}"
+                    data-price="{{ produit.prixVente }}"
+                >
+
+                    <div class="product-visual">
+
+                        {# STOCK #}
+                        {% if produit.quantiteStock <= 0 %}
+
+                            <span class="stock-badge stock-empty">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Rupture de stock
+                            </span>
+
+                        {% elseif produit.quantiteStock <= produit.seuilAlerte %}
+
+                            <span class="stock-badge stock-low">
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                                Stock limité
+                            </span>
 
                         {% else %}
 
-                            Découvrez les informations de ce produit
-                            dans sa fiche détaillée.
+                            <span class="stock-badge stock-ok">
+                                <i class="bi bi-check-circle-fill"></i>
+                                En stock
+                            </span>
+
+                        {% endif %}
+
+                        <span class="product-category-badge">
+                            {{ categoryName }}
+                        </span>
+
+                        {# IMAGE #}
+                        {% if produit.image %}
+
+                            <img
+                                src="{{ asset('images/produits/' ~ produit.image) }}"
+                                alt="{{ produit.nom }}"
+                                class="product-image"
+                                loading="lazy"
+                                onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                            >
+
+                            <div
+                                class="product-icon"
+                                hidden
+                                aria-label="Image indisponible"
+                            >
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+
+                        {% else %}
+
+                            <div class="product-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
 
                         {% endif %}
 
                     </div>
 
+                    <div class="product-content">
 
-                    <div class="product-bottom">
-
-
-                        <div>
-
-                            <div class="product-price">
-
-                                {{
-                                    produit.prixVente
-                                    |number_format(
-                                        0,
-                                        ',',
-                                        ' '
-                                    )
-                                }}
-                                Ar
-
-                            </div>
-
-
-                            <div class="product-unit">
-
-                                par {{ produit.unite }}
-
-                                ·
-
-                                {{ produit.quantiteStock }}
-                                disponible(s)
-
-                            </div>
-
+                        <div class="product-reference">
+                            Réf. {{ produit.reference }}
                         </div>
 
+                        <h3 class="product-name">
+                            {{ produit.nom }}
+                        </h3>
 
-                        <div>
-
-
-                            {% if produit.quantiteStock > 0 %}
-
-                                <a
-                                    href="{{ path(
-                                        'app_client_produit_show',
-                                        {
-                                            id: produit.id
-                                        }
-                                    ) }}"
-                                    class="product-button"
-                                >
-
-                                    Voir le produit
-
-                                    <i class="bi bi-arrow-right"></i>
-
-                                </a>
-
-
+                        <div class="product-description">
+                            {% if produit.description %}
+                                {{ produit.description }}
                             {% else %}
-
-                                <span class="product-button disabled">
-
-                                    Indisponible
-
-                                </span>
-
+                                Consultez la fiche détaillée pour
+                                découvrir ce produit.
                             {% endif %}
-
-
                         </div>
 
+                        <div class="product-bottom">
+
+                            <div>
+                                <div class="product-price">
+                                    {{ produit.prixVente|number_format(0, ',', ' ') }}
+                                    Ar
+                                </div>
+
+                                <div class="product-unit">
+                                    Par {{ produit.unite }}
+                                    <br>
+                                    {{ produit.quantiteStock }}
+                                    disponible(s)
+                                </div>
+                            </div>
+
+                            <div>
+                                {% if produit.quantiteStock > 0 %}
+
+                                    <a
+                                        href="{{ path('app_client_produit_show', {
+                                            id: produit.id
+                                        }) }}"
+                                        class="product-button"
+                                    >
+                                        Voir le produit
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+
+                                {% else %}
+
+                                    <span class="product-button disabled">
+                                        Indisponible
+                                    </span>
+
+                                {% endif %}
+                            </div>
+
+                        </div>
 
                     </div>
 
+                </article>
 
-                </div>
+            {% endfor %}
 
+        </div>
 
-            </article>
+        {# AUCUN RESULTAT #}
+        <div
+            class="products-empty"
+            id="productsEmpty"
+            role="status"
+            aria-live="polite"
+        >
+            <i class="bi bi-search"></i>
 
+            <strong>Aucun produit trouvé</strong>
 
-        {% endfor %}
+            <span>
+                Essayez de modifier votre recherche ou votre catégorie.
+            </span>
 
+            <button type="button" class="products-reset" id="resetFilters">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Réinitialiser les filtres
+            </button>
+        </div>
 
-    </div>
+    </section>
 
-
-    {# =========================================================
-       AUCUN RESULTAT
-       ========================================================= #}
-
-    <div
-        class="products-empty"
-        id="productsEmpty"
-    >
-
-        <i class="bi bi-search"></i>
-
-
-        <strong>
-            Aucun produit trouvé
-        </strong>
-
-
-        <span>
-            Essayez de modifier votre recherche ou votre catégorie.
-        </span>
-
-    </div>
-
-
-    {# =========================================================
-       RACCOURCI PANIER
-       ========================================================= #}
-
+    {# RACCOURCI PANIER #}
     <div class="products-cart-shortcut">
-
 
         <div class="cart-shortcut-left">
 
-
             <div class="cart-shortcut-icon">
-
                 <i class="bi bi-cart3"></i>
-
             </div>
 
-
             <div>
-
-
                 <div class="cart-shortcut-title">
-
                     Votre panier
-
                 </div>
-
 
                 <div class="cart-shortcut-info">
 
-
                     {% if panierQuantity is defined and panierQuantity > 0 %}
 
-                        {{ panierQuantity }}
-                        article(s)
-
+                        {{ panierQuantity }} article(s)
                         ·
-
-                        {{
-                            panierTotal
-                            |number_format(
-                                0,
-                                ',',
-                                ' '
-                            )
-                        }}
+                        {{ panierTotal|default(0)|number_format(0, ',', ' ') }}
                         Ar
-
 
                     {% else %}
 
@@ -1199,313 +1159,175 @@
 
                     {% endif %}
 
-
                 </div>
-
-
             </div>
-
 
         </div>
 
-
-        <a
-            href="{{ path('app_client_cart') }}"
-            class="cart-shortcut-button"
-        >
-
-            <i class="bi bi-cart3 me-1"></i>
-
+        <a href="{{ path('app_client_cart') }}"
+           class="cart-shortcut-button">
+            <i class="bi bi-cart3"></i>
             Ouvrir mon panier
-
+            <i class="bi bi-arrow-right"></i>
         </a>
-
 
     </div>
 
-
 </div>
 
-
-{# =============================================================
-   JAVASCRIPT
-   ============================================================= #}
+{# =====================================================
+   JAVASCRIPT - RECHERCHE / TRI / CATEGORIES
+   ===================================================== #}
 
 <script>
-
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
-
-        const searchInput =
-            document.getElementById('productSearch');
-
-        const categoryFilter =
-            document.getElementById('categoryFilter');
-
-        const sortProducts =
-            document.getElementById('sortProducts');
-
-        const productsGrid =
-            document.getElementById('productsGrid');
-
-        const emptyState =
-            document.getElementById('productsEmpty');
-
-        const productCount =
-            document.getElementById('productCount');
-
-        const categoryPills =
-            document.querySelectorAll(
-                '.category-pill'
-            );
-
-
-        function getProducts() {
-
-            return Array.from(
-                productsGrid.querySelectorAll(
-                    '.product-card'
-                )
-            );
-
-        }
-
-
-        function applyFilters() {
-
-            const search =
-                searchInput.value
-                    .trim()
-                    .toLowerCase();
-
-
-            const selectedCategory =
-                categoryFilter.value
-                    .trim()
-                    .toLowerCase();
-
-
-            const products =
-                getProducts();
-
-
-            let visibleCount = 0;
-
-
-            products.forEach(
-                function (product) {
-
-                    const name =
-                        product.dataset.name || '';
-
-                    const reference =
-                        product.dataset.reference || '';
-
-                    const category =
-                        product.dataset.category || '';
-
-
-                    const matchesSearch =
-                        search === '' ||
-                        name.includes(search) ||
-                        reference.includes(search) ||
-                        category.includes(search);
-
-
-                    const matchesCategory =
-                        selectedCategory === '' ||
-                        category === selectedCategory;
-
-
-                    if (
-                        matchesSearch &&
-                        matchesCategory
-                    ) {
-
-                        product.style.display = '';
-
-                        visibleCount++;
-
-                    } else {
-
-                        product.style.display = 'none';
-
-                    }
-
-                }
-            );
-
-
-            productCount.textContent =
-                visibleCount;
-
-
-            emptyState.style.display =
-                visibleCount === 0
-                    ? 'block'
-                    : 'none';
-
-        }
-
-
-        function sortProductsList() {
-
-            const value =
-                sortProducts.value;
-
-
-            const products =
-                getProducts();
-
-
-            products.sort(
-                function (a, b) {
-
-
-                    if (value === 'price-asc') {
-
-                        return (
-                            parseFloat(a.dataset.price) -
-                            parseFloat(b.dataset.price)
-                        );
-
-                    }
-
-
-                    if (value === 'price-desc') {
-
-                        return (
-                            parseFloat(b.dataset.price) -
-                            parseFloat(a.dataset.price)
-                        );
-
-                    }
-
-
-                    if (value === 'name-asc') {
-
-                        return a.dataset.name.localeCompare(
-                            b.dataset.name,
-                            'fr'
-                        );
-
-                    }
-
-
-                    if (value === 'name-desc') {
-
-                        return b.dataset.name.localeCompare(
-                            a.dataset.name,
-                            'fr'
-                        );
-
-                    }
-
-
-                    return 0;
-
-                }
-            );
-
-
-            products.forEach(
-                function (product) {
-
-                    productsGrid.appendChild(
-                        product
-                    );
-
-                }
-            );
-
-
-            applyFilters();
-
-        }
-
-
-        searchInput.addEventListener(
-            'input',
-            applyFilters
-        );
-
-
-        categoryFilter.addEventListener(
-            'change',
-            function () {
-
-                categoryPills.forEach(
-                    function (pill) {
-
-                        pill.classList.toggle(
-                            'active',
-                            pill.dataset.category ===
-                            categoryFilter.value
-                        );
-
-                    }
-                );
-
-
-                applyFilters();
-
+document.addEventListener('DOMContentLoaded', function () {
+
+    const searchInput = document.getElementById('productSearch');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const sortSelect = document.getElementById('sortProducts');
+    const productsGrid = document.getElementById('productsGrid');
+    const emptyState = document.getElementById('productsEmpty');
+    const productCount = document.getElementById('productCount');
+    const resetButton = document.getElementById('resetFilters');
+    const categoryPills = Array.from(
+        document.querySelectorAll('.category-pill')
+    );
+
+    if (!searchInput || !productsGrid) {
+        return;
+    }
+
+    const normalize = value =>
+        (value || '')
+            .toLocaleLowerCase('fr')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim();
+
+    const originalProducts = Array.from(
+        productsGrid.querySelectorAll('.product-card')
+    );
+
+    // Conserve un ordre initial stable.
+    originalProducts.forEach((product, index) => {
+        product.dataset.originalIndex = index;
+    });
+
+    function syncCategoryButtons() {
+        const selected = categoryFilter.value;
+
+        categoryPills.forEach(pill => {
+            const active = pill.dataset.category === selected;
+
+            pill.classList.toggle('active', active);
+            pill.setAttribute('aria-pressed', String(active));
+        });
+    }
+
+    function applyFilters() {
+        const search = normalize(searchInput.value);
+        const selectedCategory = normalize(categoryFilter.value);
+
+        let visibleCount = 0;
+
+        originalProducts.forEach(product => {
+            const name = normalize(product.dataset.name);
+            const reference = normalize(product.dataset.reference);
+            const category = normalize(product.dataset.category);
+
+            const matchesSearch =
+                !search ||
+                name.includes(search) ||
+                reference.includes(search) ||
+                category.includes(search);
+
+            const matchesCategory =
+                !selectedCategory ||
+                category === selectedCategory;
+
+            const visible = matchesSearch && matchesCategory;
+
+            product.hidden = !visible;
+
+            if (visible) {
+                visibleCount++;
             }
-        );
+        });
 
+        productCount.textContent = visibleCount;
+        emptyState.style.display =
+            visibleCount === 0 ? 'block' : 'none';
+    }
 
-        sortProducts.addEventListener(
-            'change',
-            sortProductsList
-        );
+    function sortProductsList() {
+        const mode = sortSelect.value;
 
+        const products = [...originalProducts];
 
-        categoryPills.forEach(
-            function (pill) {
+        products.sort((a, b) => {
+            const priceA = Number(a.dataset.price) || 0;
+            const priceB = Number(b.dataset.price) || 0;
 
-                pill.addEventListener(
-                    'click',
-                    function () {
+            const nameA = normalize(a.dataset.name);
+            const nameB = normalize(b.dataset.name);
 
-                        const category =
-                            this.dataset.category || '';
+            switch (mode) {
+                case 'price-asc':
+                    return priceA - priceB;
 
+                case 'price-desc':
+                    return priceB - priceA;
 
-                        categoryFilter.value =
-                            category;
+                case 'name-asc':
+                    return nameA.localeCompare(nameB, 'fr');
 
+                case 'name-desc':
+                    return nameB.localeCompare(nameA, 'fr');
 
-                        categoryPills.forEach(
-                            function (item) {
-
-                                item.classList.remove(
-                                    'active'
-                                );
-
-                            }
-                        );
-
-
-                        this.classList.add(
-                            'active'
-                        );
-
-
-                        applyFilters();
-
-                    }
-                );
-
+                default:
+                    return Number(a.dataset.originalIndex) -
+                           Number(b.dataset.originalIndex);
             }
-        );
+        });
 
+        products.forEach(product => {
+            productsGrid.appendChild(product);
+        });
 
         applyFilters();
-
     }
-);
 
+    searchInput.addEventListener('input', applyFilters);
+
+    categoryFilter.addEventListener('change', function () {
+        syncCategoryButtons();
+        applyFilters();
+    });
+
+    sortSelect.addEventListener('change', sortProductsList);
+
+    categoryPills.forEach(pill => {
+        pill.addEventListener('click', function () {
+            categoryFilter.value = this.dataset.category || '';
+
+            syncCategoryButtons();
+            applyFilters();
+        });
+    });
+
+    resetButton.addEventListener('click', function () {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        sortSelect.value = 'default';
+
+        syncCategoryButtons();
+        sortProductsList();
+        searchInput.focus();
+    });
+
+    syncCategoryButtons();
+    applyFilters();
+});
 </script>
 
 {% endblock %}
-

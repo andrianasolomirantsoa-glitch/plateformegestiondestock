@@ -1,1058 +1,707 @@
-
 {% extends 'auth_base.html.twig' %}
 
-{% block title %}Connexion - Gestion de Stock{% endblock %}
-
-{% block stylesheets %}
-{{ parent() }}
-
-<style>
-:root {
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
-    --primary-light: #eef2ff;
-    --accent-color: #f59e0b;
-    --text-dark: #0f172a;
-    --text-gray: #64748b;
-    --border-color: #e2e8f0;
-    --white: #ffffff;
-    --transition: all .3s ease;
-    --card-shadow: 0 30px 70px -20px rgba(15,23,42,.25);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    min-height: 100%;
-}
-
-body {
-    margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont,
-                 'Segoe UI', sans-serif;
-    background: #f8fafc;
-    color: var(--text-dark);
-}
-
-/* ==============================
-   CONTENEUR
-============================== */
-
-.auth-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    position: relative;
-    overflow: hidden;
-
-    background:
-        radial-gradient(circle at 10% 15%,
-            rgba(79,70,229,.10), transparent 40%),
-        radial-gradient(circle at 90% 85%,
-            rgba(245,158,11,.08), transparent 40%),
-        linear-gradient(135deg,#f8fafc,#eef2ff);
-}
-
-.auth-card {
-    width: 100%;
-    max-width: 1120px;
-    min-height: 660px;
-
-    display: grid;
-    grid-template-columns: 48% 52%;
-
-    background: white;
-    border-radius: 26px;
-    overflow: hidden;
-    box-shadow: var(--card-shadow);
-    position: relative;
-    z-index: 2;
-
-    animation: slideUp .65s ease;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ==============================
-   IMAGE GAUCHE
-============================== */
-
-.auth-image-panel {
-    position: relative;
-    min-height: 660px;
-    overflow: hidden;
-
-    background: #1e293b;
-}
-
-/*
-   IMAGE PLUS VISIBLE :
-   Le dégradé est volontairement moins sombre.
-*/
-
-.auth-image-panel::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background-image: url('{{ asset('images/log.jpg') }}');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-
-    filter: brightness(1.12) saturate(1.12);
-    transform: scale(1.01);
-    transition: transform .8s ease;
-}
-
-.auth-card:hover .auth-image-panel::before {
-    transform: scale(1.045);
-}
-
-/*
-   Overlay léger :
-   l'image reste visible même au centre.
-*/
-
-.auth-image-panel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(15,23,42,.04) 0%,
-            rgba(15,23,42,.08) 35%,
-            rgba(15,23,42,.68) 100%
-        );
-
-    z-index: 1;
-}
-
-/* ==============================
-   CONTENU IMAGE
-============================== */
-
-.image-content {
-    position: absolute;
-    left: 42px;
-    right: 42px;
-    bottom: 42px;
-    z-index: 3;
-    color: white;
-}
-
-.image-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 9px 15px;
-    margin-bottom: 20px;
-
-    border-radius: 50px;
-    background: rgba(15,23,42,.38);
-    border: 1px solid rgba(255,255,255,.35);
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.image-badge i {
-    color: #fbbf24;
-    font-size: 15px;
-}
-
-.image-content h2 {
-    margin: 0 0 13px;
-    color: white;
-    font-size: 34px;
-    line-height: 1.2;
-    font-weight: 800;
-    letter-spacing: -.7px;
-
-    text-shadow: 0 3px 12px rgba(0,0,0,.35);
-}
-
-.image-content p {
-    margin: 0;
-    max-width: 440px;
-    color: rgba(255,255,255,.96);
-    font-size: 14px;
-    line-height: 1.8;
-
-    text-shadow: 0 2px 8px rgba(0,0,0,.35);
-}
-
-.image-features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 24px;
-}
-
-.image-feature {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-
-    padding: 9px 12px;
-    border-radius: 10px;
-
-    background: rgba(15,23,42,.40);
-    border: 1px solid rgba(255,255,255,.25);
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-
-    color: white;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.image-feature i {
-    color: #fbbf24;
-    font-size: 13px;
-}
-
-/* ==============================
-   FORMULAIRE DROIT
-============================== */
-
-.auth-form-panel {
-    padding: 48px 58px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: #ffffff;
-    position: relative;
-}
-
-.auth-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-/* ==============================
-   LOGO OFFICIEL
-============================== */
-
-/* ==============================
-   GRAND LOGO OFFICIEL
-============================== */
-
-/* ==========================================
-   LOGO GRAND FORMAT — LARGEUR DU FORMULAIRE
-========================================== */
-
-.auth-logo-wrapper {
-    width: 100%;
-    height: 190px;
-
-    margin: 0 auto 25px;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-
-    overflow: hidden;
-}
-
-.auth-logo-wrapper img {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-    object-position: center;
-
-    border-radius: 0;
-}
-
-.auth-logo-wrapper:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-.logo-placeholder {
-    color: var(--primary-color);
-    font-size: 55px;
-}
-
-.logo-placeholder {
-    color: var(--primary-color);
-    font-size: 32px;
-}
-
-.auth-card h1 {
-    margin: 0 0 9px;
-    font-size: 30px;
-    font-weight: 800;
-    letter-spacing: -.7px;
-
-    background: linear-gradient(135deg,#0f172a,#4f46e5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.auth-subtitle {
-    margin: 0;
-    color: var(--text-gray);
-    font-size: 13.5px;
-    line-height: 1.6;
-    font-weight: 500;
-}
-
-.auth-subtitle i {
-    margin-right: 5px;
-    color: var(--primary-color);
-}
-
-/* ==============================
-   ALERTES
-============================== */
-
-.alert {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    padding: 12px 15px;
-    margin-bottom: 18px;
-    border-radius: 11px;
-
-    font-size: 12.5px;
-    font-weight: 500;
-}
-
-.alert i {
-    flex-shrink: 0;
-    font-size: 16px;
-}
-
-.alert-danger {
-    color: #b91c1c;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-}
-
-.alert-success {
-    color: #15803d;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-}
-
-/* ==============================
-   CHAMPS FORMULAIRE
-============================== */
-
-.form-group {
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-dark);
-    font-size: 13px;
-    font-weight: 650;
-}
-
-.form-group label i {
-    margin-right: 6px;
-    color: var(--primary-color);
-}
-
-.input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.input-icon {
-    position: absolute;
-    left: 15px;
-    z-index: 2;
-    color: #94a3b8;
-    font-size: 16px;
-    pointer-events: none;
-    transition: color .3s ease;
-}
-
-.input-wrapper:focus-within .input-icon {
-    color: var(--primary-color);
-}
-
-.input-wrapper input {
-    width: 100%;
-    padding: 14px 100px 14px 45px;
-
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-
-    background: #f8fafc;
-    color: var(--text-dark);
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 500;
-
-    transition: var(--transition);
-}
-
-.input-wrapper input:hover {
-    border-color: #cbd5e1;
-}
-
-.input-wrapper input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background: white;
-    box-shadow: 0 0 0 4px rgba(79,70,229,.12);
-}
-
-.input-wrapper input::placeholder {
-    color: #94a3b8;
-    font-size: 13px;
-    font-weight: 400;
-}
-
-/* ==============================
-   VOIR / CACHER
-============================== */
-
-.toggle-password {
-    position: absolute;
-    right: 9px;
-    top: 50%;
-    transform: translateY(-50%);
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-
-    padding: 7px 11px;
-    border: 1px solid #c7d2fe;
-    border-radius: 8px;
-
-    background: #eef2ff;
-    color: var(--primary-color);
-
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    z-index: 5;
-    transition: var(--transition);
-}
-
-.toggle-password:hover {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white;
-}
-
-.toggle-password:focus-visible {
-    outline: 3px solid rgba(79,70,229,.25);
-}
-
-/* ==============================
-   OPTIONS
-============================== */
-
-.form-options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 6px 0 22px;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text-gray);
-    font-size: 12.5px;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.checkbox-label input {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary-color);
-    cursor: pointer;
-}
-
-/* ==============================
-   BOUTON CONNEXION
-============================== */
-
-.btn-primary {
-    width: 100%;
-    padding: 15px 18px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-
-    border: none;
-    border-radius: 12px;
-
-    background: linear-gradient(135deg,#4f46e5,#6366f1,#7c3aed);
-    background-size: 200% 200%;
-
-    color: white;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: .2px;
-
-    cursor: pointer;
-    transition: var(--transition);
-
-    box-shadow: 0 10px 25px -8px rgba(79,70,229,.45);
-}
-
-.btn-primary:hover {
-    background-position: 100% 50%;
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px -8px rgba(79,70,229,.55);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
-}
-
-.btn-primary:disabled {
-    opacity: .75;
-    cursor: wait;
-    transform: none;
-}
-
-.btn-primary i {
-    font-size: 16px;
-}
-
-.spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* ==============================
-   FOOTER
-============================== */
-
-.auth-footer {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.auth-footer p {
-    margin: 0;
-    color: var(--text-gray);
-    font-size: 12.5px;
-    font-weight: 500;
-}
-
-.auth-footer a {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: 4px;
-
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 700;
-    transition: var(--transition);
-}
-
-.auth-footer a:hover {
-    color: var(--primary-hover);
-}
-
-/* ==============================
-   TABLETTE
-============================== */
-
-@media (max-width: 900px) {
-    .auth-container {
-        padding: 20px;
-    }
-
-    .auth-card {
-        max-width: 520px;
-        min-height: auto;
-        grid-template-columns: 1fr;
-    }
-
-    .auth-image-panel {
-        min-height: 320px;
-        order: 1;
-    }
-
-    .auth-form-panel {
-        order: 2;
-        padding: 42px 38px;
-    }
-
-    .image-content {
-        left: 30px;
-        right: 30px;
-        bottom: 28px;
-    }
-
-    .image-content h2 {
-        font-size: 27px;
-    }
-
-    .image-features {
-        display: none;
-    }
-}
-
-/* ==============================
-   MOBILE
-============================== */
-
-@media (max-width: 560px) {
-    .auth-container {
-        padding: 12px;
-    }
-
-    .auth-card {
-        border-radius: 20px;
-    }
-
-    .auth-image-panel {
-        min-height: 260px;
-    }
-
-    .image-content {
-        left: 22px;
-        right: 22px;
-        bottom: 22px;
-    }
-
-    .image-badge {
-        padding: 6px 11px;
-        margin-bottom: 10px;
-        font-size: 9px;
-    }
-
-    .image-content h2 {
-        font-size: 22px;
-        margin-bottom: 7px;
-    }
-
-    .image-content p {
-        font-size: 11.5px;
-        line-height: 1.5;
-    }
-
-    .auth-form-panel {
-        padding: 32px 22px;
-    }
-
-    .auth-card h1 {
-        font-size: 25px;
-    }
-
-    .auth-logo-wrapper {
-        width: 82px;
-        height: 82px;
-    }
-
-    .toggle-password {
-        padding: 6px 8px;
-        font-size: 10px;
-    }
-
-    .input-wrapper input {
-        padding-right: 82px;
-    }
-}
-
-@media (max-width: 380px) {
-    .auth-form-panel {
-        padding: 28px 18px;
-    }
-
-    .auth-image-panel {
-        min-height: 230px;
-    }
-
-    .image-content h2 {
-        font-size: 20px;
-    }
-
-    .auth-footer p {
-        font-size: 11.5px;
-    }
-}
-</style>
-{% endblock %}
+{% block title %}Connexion | Jumbo Score Madagascar{% endblock %}
 
 {% block body %}
+<style>
+    :root {
+        --jumbo-red: #d71920;
+        --jumbo-red-dark: #a90f16;
+        --jumbo-yellow: #ffcc00;
+        --jumbo-navy: #17223b;
+        --jumbo-text: #252a34;
+        --jumbo-muted: #737b8c;
+        --jumbo-light: #f5f6fa;
+    }
 
-<div class="auth-container">
+    * {
+        box-sizing: border-box;
+    }
 
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--jumbo-light);
+    }
+
+    .login-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 35px 20px;
+        background:
+            radial-gradient(circle at top left, rgba(255, 204, 0, .16), transparent 35%),
+            linear-gradient(135deg, #f8f9fc 0%, #eef0f6 100%);
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 1050px;
+        min-height: 590px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: #fff;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 22px 65px rgba(23, 34, 59, .15);
+    }
+
+    /* Partie visuelle */
+    .auth-visual {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 42px;
+        color: #fff;
+        background:
+            linear-gradient(145deg, rgba(23, 34, 59, .92), rgba(23, 34, 59, .72)),
+            url('{{ asset('images/log.jpg') }}') center / cover no-repeat;
+        isolation: isolate;
+    }
+
+    .auth-visual::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        width: 250px;
+        height: 250px;
+        right: -90px;
+        top: 90px;
+        border-radius: 50%;
+        background: rgba(255, 204, 0, .18);
+    }
+
+    .auth-visual::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        width: 300px;
+        height: 300px;
+        left: -130px;
+        bottom: -120px;
+        border-radius: 50%;
+        border: 45px solid rgba(255, 255, 255, .07);
+    }
+
+    .brand-logo {
+        width: 175px;
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+        padding: 10px;
+        background: #fff;
+        border-radius: 12px;
+    }
+
+    .visual-content {
+        position: relative;
+        z-index: 1;
+        margin: auto 0;
+        padding: 35px 0;
+    }
+
+    .visual-tag {
+        display: inline-block;
+        padding: 8px 14px;
+        margin-bottom: 20px;
+        color: var(--jumbo-yellow);
+        background: rgba(255, 204, 0, .13);
+        border: 1px solid rgba(255, 204, 0, .35);
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.3px;
+        text-transform: uppercase;
+    }
+
+    .visual-content h1 {
+        max-width: 420px;
+        margin: 0 0 18px;
+        font-size: clamp(30px, 3.5vw, 43px);
+        line-height: 1.18;
+        font-weight: 800;
+    }
+
+    .visual-content h1 span {
+        color: var(--jumbo-yellow);
+    }
+
+    .visual-content p {
+        max-width: 390px;
+        color: rgba(255, 255, 255, .82);
+        font-size: 15px;
+        line-height: 1.8;
+    }
+
+    .visual-footer {
+        position: relative;
+        z-index: 1;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, .2);
+        color: rgba(255, 255, 255, .75);
+        font-size: 12px;
+    }
+
+    /* Formulaire */
+    .auth-form-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 45px;
+    }
+
+    .auth-form-content {
+        width: 100%;
+        max-width: 390px;
+    }
+
+    .form-heading {
+        margin-bottom: 32px;
+    }
+
+    .form-heading .eyebrow {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--jumbo-red);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .form-heading h2 {
+        margin: 0 0 10px;
+        color: var(--jumbo-navy);
+        font-size: 31px;
+        font-weight: 800;
+    }
+
+    .form-heading p {
+        margin: 0;
+        color: var(--jumbo-muted);
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 13px 15px;
+        border-radius: 10px;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .alert-danger {
+        color: #9f1721;
+        background: #fff0f0;
+        border: 1px solid #ffd1d4;
+    }
+
+    .alert-success {
+        color: #17663b;
+        background: #edfff4;
+        border: 1px solid #bce9cd;
+    }
+
+    .form-group {
+        margin-bottom: 21px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 9px;
+        color: var(--jumbo-text);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #8a91a1;
+        font-size: 17px;
+        pointer-events: none;
+    }
+
+    .form-control {
+        width: 100%;
+        min-height: 51px;
+        padding: 13px 55px 13px 45px;
+        color: var(--jumbo-text);
+        background: #fbfcfe;
+        border: 1px solid #dfe3eb;
+        border-radius: 10px;
+        outline: none;
+        font-family: inherit;
+        font-size: 14px;
+        transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .form-control::placeholder {
+        color: #a3a9b5;
+    }
+
+    .form-control:focus {
+        background: #fff;
+        border-color: var(--jumbo-red);
+        box-shadow: 0 0 0 4px rgba(215, 25, 32, .09);
+    }
+
+    /* Bouton afficher/masquer le mot de passe */
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        padding: 0;
+        color: #777f90;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        transition: color .2s, background .2s;
+    }
+
+    .toggle-password:hover {
+        color: var(--jumbo-red);
+        background: #fff0f0;
+    }
+
+    .toggle-password:focus-visible {
+        outline: 2px solid var(--jumbo-red);
+        outline-offset: 2px;
+    }
+
+    .toggle-password i {
+        font-size: 19px;
+        line-height: 1;
+    }
+
+    .form-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 3px 0 25px;
+        color: var(--jumbo-muted);
+        font-size: 12px;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .remember-me input {
+        accent-color: var(--jumbo-red);
+    }
+
+    .btn-login {
+        width: 100%;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 18px;
+        color: #fff;
+        background: var(--jumbo-red);
+        border: none;
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 8px 18px rgba(215, 25, 32, .2);
+        transition: background .2s, transform .2s, box-shadow .2s;
+    }
+
+    .btn-login:hover {
+        background: var(--jumbo-red-dark);
+        box-shadow: 0 11px 22px rgba(215, 25, 32, .27);
+        transform: translateY(-1px);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+    }
+
+    .register-link {
+        margin-top: 27px;
+        color: var(--jumbo-muted);
+        font-size: 13px;
+        text-align: center;
+        line-height: 1.8;
+    }
+
+    .register-link a {
+        color: var(--jumbo-red);
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+
+    .security-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 22px;
+        color: #858c9a;
+        font-size: 11px;
+    }
+
+    .security-note i {
+        color: #29965b;
+        font-size: 14px;
+    }
+
+    @media (max-width: 800px) {
+        .auth-card {
+            max-width: 520px;
+            grid-template-columns: 1fr;
+        }
+
+        .auth-visual {
+            min-height: 260px;
+            padding: 28px;
+        }
+
+        .brand-logo {
+            width: 135px;
+        }
+
+        .visual-content {
+            padding: 28px 0 10px;
+        }
+
+        .visual-content h1 {
+            font-size: 30px;
+        }
+
+        .visual-content p {
+            font-size: 13px;
+        }
+
+        .visual-footer {
+            margin-top: 10px;
+        }
+
+        .auth-form-panel {
+            padding: 35px 28px;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .login-page {
+            padding: 15px 10px;
+        }
+
+        .auth-card {
+            border-radius: 16px;
+        }
+
+        .auth-visual {
+            padding: 22px;
+        }
+
+        .auth-form-panel {
+            padding: 30px 22px;
+        }
+
+        .form-heading h2 {
+            font-size: 27px;
+        }
+
+        .form-options {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            transition: none !important;
+            scroll-behavior: auto !important;
+        }
+    }
+    
+/* Correction définitive du champ mot de passe */
+.input-wrapper:has(#password) {
+    position: relative !important;
+    width: 100%;
+}
+
+.input-wrapper #password {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 45px !important;
+    padding-right: 65px !important;
+    overflow: hidden;
+}
+
+/* Icône œil : reste dans une zone réservée à droite */
+.input-wrapper #togglePassword {
+    position: absolute !important;
+    top: 50% !important;
+    right: 8px !important;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    transform: translateY(-50%) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+/* Évite que l'icône masque les derniers caractères */
+.input-wrapper #password:focus {
+    padding-right: 65px !important;
+}
+
+/* Corriger le champ e-mail / nom d'utilisateur */
+.input-wrapper #username {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 45px !important;
+    padding-right: 20px !important;
+}
+
+/* Garder l'icône utilisateur à gauche */
+.input-wrapper:has(#username) {
+    position: relative !important;
+    width: 100%;
+}
+
+.input-wrapper:has(#username) .input-icon {
+    left: 15px;
+    z-index: 2;
+}
+
+</style>
+
+<div class="login-page">
     <div class="auth-card">
 
-        {# ==============================
-           PANNEAU IMAGE
-        ============================== #}
+        {# Panneau visuel #}
+        <section class="auth-visual">
+            <div>
+                <img
+                    src="{{ asset('images/jumbo-score-logo.png') }}"
+                    alt="Jumbo Score Madagascar"
+                    class="brand-logo"
+                >
+            </div>
 
-        <div class="auth-image-panel">
+            <div class="visual-content">
+                <span class="visual-tag">Gestion de stock</span>
 
-            <div class="image-content">
-
-                <div class="image-badge">
-                    <i class="bi bi-box-seam"></i>
-                    Gestion de Stock
-                </div>
-
-                <h2>
-                    Gérez votre stock
-                    simplement.
-                </h2>
+                <h1>
+                    Bienvenue sur votre
+                    <span>espace de gestion.</span>
+                </h1>
 
                 <p>
-                    Une solution moderne pour gérer vos produits,
-                    suivre vos stocks et garder le contrôle de
-                    votre activité.
+                    Connectez-vous pour gérer vos produits, suivre les stocks
+                    et organiser vos opérations en toute simplicité.
                 </p>
+            </div>
 
-                <div class="image-features">
+            <div class="visual-footer">
+                &copy; {{ "now"|date("Y") }} Jumbo Score Madagascar.
+                Tous droits réservés.
+            </div>
+        </section>
 
-                    <div class="image-feature">
-                        <i class="bi bi-boxes"></i>
-                        Produits
-                    </div>
+        {# Panneau de connexion #}
+        <section class="auth-form-panel">
+            <div class="auth-form-content">
 
-                    <div class="image-feature">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        Suivi du stock
-                    </div>
-
-                    <div class="image-feature">
-                        <i class="bi bi-shield-check"></i>
-                        Sécurisé
-                    </div>
-
+                <div class="form-heading">
+                    <span class="eyebrow">Votre espace professionnel</span>
+                    <h2>Connexion</h2>
+                    <p>Entrez vos identifiants pour accéder à votre compte.</p>
                 </div>
 
-            </div>
-        </div>
+                {# Message d'erreur de connexion #}
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <div>
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    </div>
+                {% endif %}
 
-        {# ==============================
-           FORMULAIRE
-        ============================== #}
+                {# Messages flash #}
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success" role="status">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                {% endfor %}
 
-        <div class="auth-form-panel">
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                {% endfor %}
 
-            <div class="auth-header">
+                <form method="post" action="{{ path('app_login') }}">
+                    <div class="form-group">
+                        <label for="username">Nom d'utilisateur ou adresse e-mail</label>
 
-                <div class="auth-logo-wrapper">
+                        <div class="input-wrapper">
+                            <i class="bi bi-person input-icon" aria-hidden="true"></i>
 
-                    <img
-                        src="{{ asset('images/Fond.png') }}"
-                        alt="Logo Gestion de Stock"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                            <input
+                                type="text"
+                                id="username"
+                                name="_username"
+                                class="form-control"
+                                value="{{ last_username|default('') }}"
+                                placeholder="Entrez votre identifiant"
+                                autocomplete="username"
+                                required
+                                autofocus
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+
+                        <div class="input-wrapper">
+                            <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="_password"
+                                class="form-control"
+                                placeholder="Entrez votre mot de passe"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                id="togglePassword"
+                                aria-label="Afficher le mot de passe"
+                                aria-pressed="false"
+                                title="Afficher le mot de passe"
+                            >
+                                <i class="bi bi-eye" id="togglePasswordIcon" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me" for="rememberMe">
+                            <input
+                                type="checkbox"
+                                id="rememberMe"
+                                name="_remember_me"
+                            >
+                            <span>Se souvenir de moi</span>
+                        </label>
+                    </div>
+
+                    <input
+                        type="hidden"
+                        name="_csrf_token"
+                        value="{{ csrf_token('authenticate') }}"
                     >
 
-                    <span class="logo-placeholder" style="display:none;">
-                        <i class="bi bi-box-seam"></i>
-                    </span>
+                    <button type="submit" class="btn-login">
+                        <span>Se connecter</span>
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </form>
 
-                </div>
-
-                <h1>Connexion</h1>
-
-                <p class="auth-subtitle">
-                    <i class="bi bi-shield-check"></i>
-                    Accédez à votre espace de gestion
-                </p>
-
-            </div>
-
-            {# ERREUR #}
-
-            {% if error %}
-                <div class="alert alert-danger">
-                    <i class="bi bi-exclamation-circle-fill"></i>
-                    <span>
-                        {{ error.messageKey|trans(error.messageData, 'security') }}
-                    </span>
-                </div>
-            {% endif %}
-
-            {# SUCCÈS #}
-
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>{{ message }}</span>
-                </div>
-            {% endfor %}
-
-            {# FORMULAIRE SYMFONY #}
-
-            <form method="post"
-                  action="{{ path('app_login') }}"
-                  id="loginForm">
-
-                <input
-                    type="hidden"
-                    name="_csrf_token"
-                    value="{{ csrf_token('authenticate') }}"
-                >
-
-                {# EMAIL #}
-
-                <div class="form-group">
-
-                    <label for="email">
-                        <i class="bi bi-envelope"></i>
-                        Adresse email
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <span class="input-icon">
-                            <i class="bi bi-envelope-fill"></i>
-                        </span>
-
-                        <input
-                            type="email"
-                            id="email"
-                            name="_username"
-                            placeholder="exemple@email.com"
-                            required
-                            autofocus
-                            autocomplete="username"
-                            value="{{ last_username }}"
-                        >
-
-                    </div>
-                </div>
-
-                {# MOT DE PASSE #}
-
-                <div class="form-group">
-
-                    <label for="password">
-                        <i class="bi bi-key"></i>
-                        Mot de passe
-                    </label>
-
-                    <div class="input-wrapper">
-
-                        <span class="input-icon">
-                            <i class="bi bi-lock-fill"></i>
-                        </span>
-
-                        <input
-                            type="password"
-                            id="password"
-                            name="_password"
-                            placeholder="Votre mot de passe"
-                            required
-                            autocomplete="current-password"
-                        >
-
-                        <button
-                            type="button"
-                            id="togglePassword"
-                            class="toggle-password"
-                            aria-label="Afficher le mot de passe"
-                            aria-pressed="false">
-
-                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
-                            <span>Voir</span>
-
-                        </button>
-
-                    </div>
-                </div>
-
-                {# SE SOUVENIR #}
-
-                <div class="form-options">
-
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="_remember_me">
-                        <span>Se souvenir de moi</span>
-                    </label>
-
-                </div>
-
-                {# BOUTON #}
-
-                <button type="submit"
-                        class="btn-primary"
-                        id="loginBtn">
-
-                    <i class="bi bi-box-arrow-in-right"></i>
-                    <span>Se connecter</span>
-                    <i class="bi bi-arrow-right"></i>
-
-                </button>
-
-            </form>
-
-            {# FOOTER #}
-
-            <div class="auth-footer">
-
-                <p>
+                <div class="register-link">
                     Vous n'avez pas encore de compte ?
+                    <br>
+                    <a href="{{ path('app_register') }}">Créer un compte</a>
+                </div>
 
-                    <a href="{{ path('app_register') }}">
-                        <i class="bi bi-person-plus-fill"></i>
-                        Créer un compte
-                    </a>
-                </p>
+                <div class="security-note">
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    <span>Connexion sécurisée</span>
+                </div>
 
             </div>
+        </section>
 
-        </div>
     </div>
 </div>
 
-{% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
-
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.getElementById('togglePassword');
+        const toggleIcon = document.getElementById('togglePasswordIcon');
 
-    /* ==============================
-       VOIR / CACHER MOT DE PASSE
-    ============================== */
+        if (!passwordInput || !toggleButton || !toggleIcon) {
+            return;
+        }
 
-    const toggleBtn = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
+        toggleButton.addEventListener('click', function () {
+            const isPasswordHidden = passwordInput.type === 'password';
 
-    if (toggleBtn && passwordInput) {
+            passwordInput.type = isPasswordHidden ? 'text' : 'password';
 
-        toggleBtn.addEventListener('click', function () {
+            toggleIcon.classList.toggle('bi-eye', !isPasswordHidden);
+            toggleIcon.classList.toggle('bi-eye-slash', isPasswordHidden);
 
-            const icon = toggleBtn.querySelector('i');
-            const label = toggleBtn.querySelector('span');
+            toggleButton.setAttribute(
+                'aria-label',
+                isPasswordHidden ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
+            );
 
-            if (passwordInput.type === 'password') {
+            toggleButton.setAttribute(
+                'title',
+                isPasswordHidden ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
+            );
 
-                passwordInput.type = 'text';
-                icon.className = 'bi bi-eye-slash-fill';
-                label.textContent = 'Cacher';
-
-                toggleBtn.setAttribute(
-                    'aria-label',
-                    'Masquer le mot de passe'
-                );
-
-                toggleBtn.setAttribute('aria-pressed', 'true');
-
-            } else {
-
-                passwordInput.type = 'password';
-                icon.className = 'bi bi-eye-fill';
-                label.textContent = 'Voir';
-
-                toggleBtn.setAttribute(
-                    'aria-label',
-                    'Afficher le mot de passe'
-                );
-
-                toggleBtn.setAttribute('aria-pressed', 'false');
-            }
+            toggleButton.setAttribute(
+                'aria-pressed',
+                isPasswordHidden ? 'true' : 'false'
+            );
         });
-    }
-
-    /* ==============================
-       CHARGEMENT CONNEXION
-    ============================== */
-
-    const form = document.getElementById('loginForm');
-    const btn = document.getElementById('loginBtn');
-
-    if (form && btn) {
-
-        form.addEventListener('submit', function () {
-
-            if (!form.checkValidity()) {
-                return;
-            }
-
-            btn.innerHTML = `
-                <i class="bi bi-arrow-repeat spinner"></i>
-                <span>Connexion en cours...</span>
-            `;
-
-            btn.disabled = true;
-        });
-    }
-
-    /* ==============================
-       FALLBACK LOGO
-    ============================== */
-
-    const logoImg = document.querySelector('.auth-logo-wrapper img');
-
-    if (logoImg) {
-
-        logoImg.addEventListener('error', function () {
-
-            this.style.display = 'none';
-
-            const placeholder =
-                this.parentElement.querySelector('.logo-placeholder');
-
-            if (placeholder) {
-                placeholder.style.display = 'block';
-            }
-        });
-    }
-
-});
+    });
 </script>
-
 {% endblock %}

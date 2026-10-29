@@ -1,77 +1,24 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>Jumbo Score Madagascar | Accueil</title>
+    <meta name="description" content="Découvrez le catalogue Jumbo Score Madagascar et consultez les produits disponibles.">
 
-    <title>Bueble Mania — La fraîcheur qui fait sourire</title>
-
-    <meta
-        name="description"
-        content="Bueble Mania à Antanimena, Madagascar — découvrez nos glaces et préparez votre prochaine commande."
-    >
-
-    <!-- Google Fonts -->
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Pacifico&display=swap"
-        rel="stylesheet"
-    >
-
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
-    <!-- Bootstrap Icons -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-        rel="stylesheet"
-    >
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <style>
-
         :root {
-            --bm-dark: #141225;
-            --bm-dark-2: #1d1937;
-
-            --bm-pink: #ff5fa2;
-            --bm-pink-light: #ff8fbd;
-
-            --bm-blue: #5ed8ff;
-            --bm-purple: #9477ff;
-
-            --bm-cream: #fffaf4;
-            --bm-white: #ffffff;
-
-            --bm-text: #27243a;
-            --bm-muted: #76738a;
-
-            --bm-border: #eeeaf4;
+            --jumbo-red: #e31e24;
+            --jumbo-red-dark: #b8171c;
+            --jumbo-yellow: #ffcf00;
+            --jumbo-navy: #17213e;
+            --jumbo-gray: #f5f6f8;
+            --jumbo-white: #ffffff;
         }
-
-
-        /* =====================================================
-           GLOBAL
-           ===================================================== */
 
         * {
             box-sizing: border-box;
@@ -79,2113 +26,1016 @@
 
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: 90px;
         }
 
         body {
             margin: 0;
-
-            font-family:
-                "Inter",
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
-            color: var(--bm-text);
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #fffaff 0%,
-                    #fffdf9 50%,
-                    #f8f7ff 100%
-                );
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--jumbo-navy);
+            background: var(--jumbo-white);
         }
 
         a {
             text-decoration: none;
         }
 
+        /* Barre d'information */
+        .top-bar {
+            background: var(--jumbo-navy);
+            color: white;
+            padding: 9px 0;
+            font-size: 13px;
+        }
 
-        /* =====================================================
-           NAVBAR
-           ===================================================== */
+        .top-bar i {
+            color: var(--jumbo-yellow);
+        }
 
-        .bm-navbar {
-            position: fixed;
-
+        /* Navigation */
+        .main-navbar {
+            background: white;
+            position: sticky;
             top: 0;
-            left: 0;
-            right: 0;
-
             z-index: 1000;
-
-            padding: 14px 0;
-
-            background:
-                rgba(20, 18, 37, .82);
-
-            border-bottom:
-                1px solid rgba(255, 255, 255, .09);
-
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-
-            box-shadow:
-                0 10px 40px rgba(19, 16, 39, .14);
+            box-shadow: 0 3px 18px rgba(23, 33, 62, 0.09);
         }
 
-        .bm-navbar::after {
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-            right: 0;
-            bottom: 0;
-
-            height: 1px;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(94, 216, 255, .55),
-                    rgba(255, 95, 162, .60),
-                    rgba(148, 119, 255, .55),
-                    transparent
-                );
-
-            box-shadow:
-                0 0 10px rgba(94, 216, 255, .25);
-        }
-
-        .bm-nav-inner {
-            width: min(1220px, calc(100% - 32px));
-
-            margin: auto;
-
+        .navbar-brand {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-
-            gap: 20px;
+            gap: 10px;
+            color: var(--jumbo-red);
+            font-weight: 900;
+            font-size: 25px;
+            letter-spacing: -1px;
         }
 
+        .navbar-brand img {
+            max-width: 155px;
+            max-height: 58px;
+            object-fit: contain;
+        }
 
-        /* =====================================================
-           LOGO
-           ===================================================== */
-
-        .bm-brand {
+        .brand-fallback {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-
-            color: #ffffff !important;
-
+            gap: 8px;
+            color: var(--jumbo-red);
             font-weight: 900;
-
-            white-space: nowrap;
+            font-size: 24px;
+            letter-spacing: -1px;
         }
 
-        .bm-brand-icon {
-            width: 44px;
-            height: 44px;
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: var(--jumbo-red);
+            color: white;
+            border-bottom: 5px solid var(--jumbo-yellow);
+            border-radius: 8px;
+            font-size: 23px;
+        }
 
+        .navbar-nav .nav-link {
+            color: var(--jumbo-navy);
+            font-weight: 700;
+            padding: 12px 14px !important;
+            transition: color 0.2s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--jumbo-red);
+        }
+
+        .btn-jumbo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            border-radius: 8px;
+            background: var(--jumbo-red);
+            color: white;
+            padding: 12px 20px;
+            font-weight: 800;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .btn-jumbo:hover {
+            background: var(--jumbo-red-dark);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-jumbo-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 2px solid white;
+            border-radius: 8px;
+            padding: 11px 20px;
+            color: white;
+            font-weight: 800;
+            transition: all 0.2s;
+        }
+
+        .btn-jumbo-outline:hover {
+            background: white;
+            color: var(--jumbo-red);
+        }
+
+        /* Grande bannière */
+        .hero {
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background: var(--jumbo-navy);
+            color: white;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: heroAppear 0.8s ease-out;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(17, 25, 48, 0.94) 0%,
+                rgba(17, 25, 48, 0.75) 48%,
+                rgba(17, 25, 48, 0.18) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        .hero-label {
+            display: inline-block;
+            background: var(--jumbo-yellow);
+            color: var(--jumbo-navy);
+            border-radius: 5px;
+            padding: 8px 13px;
+            margin-bottom: 22px;
+            font-weight: 900;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            max-width: 700px;
+            font-size: clamp(35px, 5vw, 60px);
+            font-weight: 900;
+            line-height: 1.08;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            color: var(--jumbo-yellow);
+        }
+
+        .hero p {
+            max-width: 570px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 28px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .hero-decoration {
+            position: absolute;
+            z-index: 2;
+            right: 5%;
+            bottom: 25px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        @keyframes heroAppear {
+            from { opacity: 0.55; transform: scale(1.03); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Avantages */
+        .benefits {
+            position: relative;
+            z-index: 3;
+            margin-top: -1px;
+            background: white;
+            border-bottom: 1px solid #eceef2;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 25px 12px;
+            height: 100%;
+        }
+
+        .benefit-icon {
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            border-radius: 14px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--bm-pink),
-                    var(--bm-purple)
-                );
-
-            color: white;
-
-            border:
-                1px solid rgba(255, 255, 255, .15);
-
-            box-shadow:
-                0 0 16px rgba(255, 95, 162, .30),
-                0 0 28px rgba(148, 119, 255, .16);
-
-            transition: .25s ease;
+            width: 48px;
+            height: 48px;
+            background: #fff0f0;
+            color: var(--jumbo-red);
+            border-radius: 12px;
+            font-size: 23px;
         }
 
-        .bm-brand-icon i {
+        .benefit-item h3 {
+            font-size: 15px;
+            font-weight: 900;
+            margin: 0 0 5px;
+        }
+
+        .benefit-item p {
+            font-size: 12px;
+            color: #697184;
+            margin: 0;
+        }
+
+        /* Titres de sections */
+        .section {
+            padding: 75px 0;
+        }
+
+        .section-soft {
+            background: var(--jumbo-gray);
+        }
+
+        .section-eyebrow {
+            display: inline-block;
+            color: var(--jumbo-red);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            color: var(--jumbo-navy);
+            font-size: clamp(28px, 3vw, 39px);
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .section-description {
+            color: #6b7280;
+            line-height: 1.8;
+            max-width: 650px;
+        }
+
+        /* Catalogue */
+        .catalogue-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            height: 100%;
+            background: white;
+            border: 1px solid #eaecf0;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(23, 33, 62, 0.1);
+        }
+
+        .product-image-wrap {
+            height: 215px;
+            background: #f5f6f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: #a1a7b3;
+            font-size: 13px;
+        }
+
+        .product-placeholder i {
+            font-size: 45px;
+        }
+
+        .product-body {
+            padding: 20px;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: #fff0f0;
+            color: var(--jumbo-red);
+            border-radius: 4px;
+            padding: 5px 8px;
+            margin-bottom: 10px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .product-name {
+            font-size: 17px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: var(--jumbo-navy);
+        }
+
+        .product-description {
+            color: #747b8a;
+            font-size: 13px;
+            line-height: 1.7;
+            min-height: 44px;
+            margin-bottom: 18px;
+        }
+
+        .product-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            border-top: 1px solid #eceef2;
+            padding-top: 15px;
+        }
+
+        .product-price {
+            color: var(--jumbo-red);
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .stock-label {
+            font-size: 11px;
+            color: #667085;
+            text-align: right;
+        }
+
+        .stock-label i {
+            color: #16834a;
+        }
+
+        .empty-catalogue {
+            text-align: center;
+            padding: 55px 20px;
+            background: white;
+            border: 1px dashed #d4d8e0;
+            border-radius: 14px;
+        }
+
+        .empty-catalogue i {
+            font-size: 50px;
+            color: #a4aab6;
+        }
+
+        /* Bandeau promotionnel */
+        .promo-section {
+            padding: 65px 0;
+            background: var(--jumbo-red);
+            color: white;
+        }
+
+        .promo-section h2 {
+            font-weight: 900;
+            font-size: clamp(27px, 4vw, 40px);
+            margin-bottom: 12px;
+        }
+
+        .promo-section p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        .promo-icon {
+            font-size: 85px;
+            color: var(--jumbo-yellow);
+            text-align: center;
+        }
+
+        /* À propos */
+        .about-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background: linear-gradient(135deg, var(--jumbo-navy), #293b68);
+            border-radius: 18px;
+            color: var(--jumbo-yellow);
+            font-size: 115px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-icon::before,
+        .about-icon::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border: 25px solid rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+        }
+
+        .about-icon::before {
+            top: -65px;
+            left: -55px;
+        }
+
+        .about-icon::after {
+            bottom: -75px;
+            right: -45px;
+        }
+
+        .about-icon i {
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-point {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .about-point i {
+            color: var(--jumbo-red);
             font-size: 21px;
         }
 
-        .bm-brand:hover .bm-brand-icon {
-            transform: translateY(-1px) scale(1.03);
-
-            box-shadow:
-                0 0 20px rgba(255, 95, 162, .42),
-                0 0 32px rgba(148, 119, 255, .20);
+        .about-point strong {
+            display: block;
+            margin-bottom: 4px;
         }
 
-        .bm-brand-text {
-            font-family: "Pacifico", cursive;
-
-            font-size: 22px;
-
-            letter-spacing: .02em;
+        .about-point p {
+            margin: 0;
+            color: #697184;
+            font-size: 14px;
+            line-height: 1.7;
         }
 
-
-        /* =====================================================
-           MENU
-           ===================================================== */
-
-        .bm-nav-links {
-            display: flex;
-            align-items: center;
-
-            gap: 4px;
-        }
-
-        .bm-nav-links a {
-            padding: 10px 13px;
-
-            color: #dcd9e9;
-
-            border-radius: 11px;
-
-            font-size: 12px;
-            font-weight: 600;
-
-            transition: .2s ease;
-        }
-
-        .bm-nav-links a:hover {
-            color: #ffffff;
-
-            background:
-                rgba(255, 255, 255, .07);
-        }
-
-
-        /* =====================================================
-           ACTIONS
-           ===================================================== */
-
-        .bm-nav-actions {
-            display: flex;
-            align-items: center;
-
-            gap: 8px;
-        }
-
-        .bm-login {
-            padding: 10px 14px;
-
-            color: #ffffff;
-
-            font-size: 12px;
-            font-weight: 700;
-
-            border:
-                1px solid rgba(255, 255, 255, .16);
-
-            border-radius: 11px;
-
-            transition: .2s ease;
-        }
-
-        .bm-login:hover {
-            color: #ffffff;
-
-            background:
-                rgba(255, 255, 255, .08);
-        }
-
-        .bm-register {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-
-            padding: 10px 15px;
-
-            color: #ffffff;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--bm-pink),
-                    var(--bm-purple)
-                );
-
-            border-radius: 11px;
-
-            font-size: 12px;
-            font-weight: 800;
-
-            box-shadow:
-                0 8px 24px rgba(255, 95, 162, .22);
-
-            transition: .2s ease;
-        }
-
-        .bm-register:hover {
-            color: #ffffff;
-
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 12px 30px rgba(255, 95, 162, .30);
-        }
-
-
-        /* =====================================================
-           HERO
-           ===================================================== */
-
-        .bm-hero {
-            min-height: 760px;
-
-            padding:
-                150px 0
-                80px;
-
-            position: relative;
-
-            overflow: hidden;
-
-            background:
-                radial-gradient(
-                    circle at 75% 30%,
-                    rgba(94, 216, 255, .18),
-                    transparent 28%
-                ),
-                radial-gradient(
-                    circle at 20% 25%,
-                    rgba(255, 95, 162, .14),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 85% 90%,
-                    rgba(148, 119, 255, .18),
-                    transparent 32%
-                ),
-                linear-gradient(
-                    135deg,
-                    #171329 0%,
-                    #252044 55%,
-                    #171329 100%
-                );
-
+        /* Pied de page */
+        .footer {
+            padding-top: 55px;
+            background: var(--jumbo-navy);
             color: white;
         }
 
-        .bm-hero::before {
-            content: "";
-
-            position: absolute;
-
-            width: 420px;
-            height: 420px;
-
-            top: 90px;
-            right: -120px;
-
-            border-radius: 50%;
-
-            background:
-                rgba(255, 95, 162, .09);
-
-            filter: blur(50px);
+        .footer-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
         }
 
-        .bm-hero::after {
-            content: "";
-
-            position: absolute;
-
-            width: 300px;
-            height: 300px;
-
-            bottom: -120px;
-            left: -80px;
-
-            border-radius: 50%;
-
-            background:
-                rgba(94, 216, 255, .09);
-
-            filter: blur(45px);
+        .footer-description {
+            max-width: 370px;
+            color: #c4cad7;
+            line-height: 1.8;
+            font-size: 14px;
         }
 
-        .bm-hero-inner {
-            width: min(1220px, calc(100% - 32px));
-
-            margin: auto;
-
-            position: relative;
-            z-index: 2;
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1.05fr)
-                minmax(350px, .95fr);
-
-            align-items: center;
-
-            gap: 65px;
-        }
-
-
-        /* =====================================================
-           HERO TEXT
-           ===================================================== */
-
-        .bm-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-
-            padding: 8px 12px;
-
+        .footer h4 {
+            font-size: 15px;
+            font-weight: 900;
             margin-bottom: 18px;
-
-            border-radius: 999px;
-
-            color: #dffaff;
-
-            background:
-                rgba(94, 216, 255, .08);
-
-            border:
-                1px solid rgba(94, 216, 255, .20);
-
-            font-size: 11px;
-            font-weight: 700;
         }
 
-        .bm-badge i {
-            color: var(--bm-blue);
-
-            text-shadow:
-                0 0 10px rgba(94, 216, 255, .70);
-        }
-
-        .bm-hero h1 {
-            margin: 0;
-
-            font-size: clamp(45px, 6vw, 76px);
-
-            line-height: 1.02;
-
-            font-weight: 900;
-
-            letter-spacing: -.045em;
-        }
-
-        .bm-script {
-            display: block;
-
-            margin-top: 4px;
-
-            color: var(--bm-pink-light);
-
-            font-family: "Pacifico", cursive;
-
-            font-size: clamp(35px, 5vw, 64px);
-
-            font-weight: 400;
-
-            text-shadow:
-                0 0 24px rgba(255, 95, 162, .18);
-        }
-
-        .bm-hero-description {
-            max-width: 600px;
-
-            margin: 23px 0 0;
-
-            color: #cbc7db;
-
-            font-size: 15px;
-
-            line-height: 1.8;
-        }
-
-
-        /* =====================================================
-           HERO BUTTONS
-           ===================================================== */
-
-        .bm-hero-actions {
+        .footer-links {
             display: flex;
-            flex-wrap: wrap;
-
+            flex-direction: column;
             gap: 12px;
-
-            margin-top: 30px;
         }
 
-        .bm-primary-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-
-            padding: 13px 19px;
-
-            color: #221a32 !important;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #ffffff,
-                    #f9efff
-                );
-
-            border-radius: 13px;
-
-            font-size: 12px;
-            font-weight: 900;
-
-            box-shadow:
-                0 12px 30px rgba(0, 0, 0, .18);
-
-            transition: .22s ease;
+        .footer-links a {
+            color: #c4cad7;
+            font-size: 14px;
+            transition: color 0.2s;
         }
 
-        .bm-primary-btn:hover {
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 15px 35px rgba(0, 0, 0, .24);
+        .footer-links a:hover {
+            color: var(--jumbo-yellow);
         }
 
-        .bm-secondary-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-
-            padding: 13px 19px;
-
-            color: white !important;
-
-            background:
-                rgba(255, 255, 255, .045);
-
-            border:
-                1px solid rgba(255, 255, 255, .13);
-
-            border-radius: 13px;
-
-            font-size: 12px;
-            font-weight: 800;
-
-            transition: .22s ease;
-        }
-
-        .bm-secondary-btn:hover {
-            color: white !important;
-
-            background:
-                rgba(255, 255, 255, .09);
-        }
-
-
-        /* =====================================================
-           HERO VISUAL
-           ===================================================== */
-
-        .bm-visual {
-            min-height: 480px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            position: relative;
-        }
-
-        .bm-ice-card {
-            width: min(390px, 100%);
-
-            padding: 30px;
-
-            position: relative;
-
-            border-radius: 32px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255, 255, 255, .13),
-                    rgba(255, 255, 255, .035)
-                );
-
-            border:
-                1px solid rgba(255, 255, 255, .12);
-
-            box-shadow:
-                0 35px 90px rgba(0, 0, 0, .28),
-                inset 0 1px 0 rgba(255, 255, 255, .07);
-
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        .bm-ice-circle {
-            width: 230px;
-            height: 230px;
-
-            margin: 0 auto 25px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 50%;
-
-            background:
-                radial-gradient(
-                    circle at 35% 30%,
-                    #fff9fd 0%,
-                    #ffd5e7 38%,
-                    #ff7fb6 68%,
-                    #8c63f8 100%
-                );
-
-            box-shadow:
-                0 0 35px rgba(255, 95, 162, .24),
-                0 18px 45px rgba(0, 0, 0, .25);
-        }
-
-        .bm-ice-circle i {
-            font-size: 105px;
-
-            color: white;
-
-            filter:
-                drop-shadow(
-                    0 10px 10px
-                    rgba(89, 54, 110, .25)
-                );
-        }
-
-        .bm-ice-card-title {
-            text-align: center;
-
-            font-family: "Pacifico", cursive;
-
-            font-size: 28px;
-        }
-
-        .bm-ice-card-subtitle {
-            margin-top: 7px;
-
-            text-align: center;
-
-            color: #cbc7db;
-
-            font-size: 11px;
-            line-height: 1.6;
-        }
-
-        .bm-floating-tag {
-            position: absolute;
-
-            padding: 9px 12px;
-
-            border-radius: 12px;
-
-            color: white;
-
-            background:
-                rgba(20, 18, 37, .78);
-
-            border:
-                1px solid rgba(255, 255, 255, .12);
-
-            box-shadow:
-                0 15px 35px rgba(0, 0, 0, .20);
-
-            backdrop-filter: blur(12px);
-
-            font-size: 10px;
-            font-weight: 800;
-        }
-
-        .bm-floating-tag.one {
-            top: 35px;
-            left: -20px;
-        }
-
-        .bm-floating-tag.two {
-            right: -15px;
-            bottom: 100px;
-        }
-
-
-        /* =====================================================
-           BENEFITS
-           ===================================================== */
-
-        .bm-benefits {
-            margin-top: -45px;
-
-            position: relative;
-
-            z-index: 5;
-        }
-
-        .bm-benefits-inner {
-            width: min(1100px, calc(100% - 32px));
-
-            margin: auto;
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(3, 1fr);
-
-            gap: 14px;
-        }
-
-        .bm-benefit {
-            padding: 20px;
-
-            border-radius: 18px;
-
-            background: white;
-
-            border:
-                1px solid var(--bm-border);
-
-            box-shadow:
-                0 12px 30px rgba(42, 31, 65, .07);
-        }
-
-        .bm-benefit-icon {
-            width: 42px;
-            height: 42px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            margin-bottom: 12px;
-
-            border-radius: 12px;
-
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--bm-pink),
-                    var(--bm-purple)
-                );
-        }
-
-        .bm-benefit h3 {
-            margin: 0;
-
-            font-size: 13px;
-            font-weight: 900;
-        }
-
-        .bm-benefit p {
-            margin: 6px 0 0;
-
-            color: var(--bm-muted);
-
-            font-size: 11px;
-            line-height: 1.6;
-        }
-
-
-        /* =====================================================
-           SECTIONS
-           ===================================================== */
-
-        .bm-section {
-            padding: 95px 0;
-        }
-
-        .bm-section-inner {
-            width: min(1180px, calc(100% - 32px));
-
-            margin: auto;
-        }
-
-        .bm-kicker {
-            display: block;
-
-            margin-bottom: 8px;
-
-            color: var(--bm-pink);
-
-            font-size: 11px;
-            font-weight: 900;
-
-            text-transform: uppercase;
-
-            letter-spacing: .15em;
-        }
-
-        .bm-section-title {
-            margin: 0;
-
-            font-size: clamp(30px, 4vw, 46px);
-
-            line-height: 1.1;
-
-            font-weight: 900;
-
-            letter-spacing: -.035em;
-        }
-
-        .bm-section-description {
-            max-width: 680px;
-
-            margin: 12px 0 0;
-
-            color: var(--bm-muted);
-
-            font-size: 13px;
-
-            line-height: 1.8;
-        }
-
-
-        /* =====================================================
-           PRODUITS
-           ===================================================== */
-
-        .bm-product-preview {
-            margin-top: 38px;
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
-            gap: 16px;
-        }
-
-        .bm-product-card {
-            padding: 17px;
-
-            border-radius: 19px;
-
-            background: white;
-
-            border:
-                1px solid var(--bm-border);
-
-            box-shadow:
-                0 8px 25px rgba(42, 31, 65, .05);
-
-            transition:
-                transform .22s ease,
-                box-shadow .22s ease;
-        }
-
-        .bm-product-card:hover {
-            transform: translateY(-5px);
-
-            box-shadow:
-                0 18px 35px rgba(42, 31, 65, .10);
-        }
-
-        .bm-product-visual {
-            height: 150px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            margin-bottom: 15px;
-
-            border-radius: 15px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #fff0f7,
-                    #eef8ff
-                );
-        }
-
-        .bm-product-visual i {
-            font-size: 63px;
-
-            color: var(--bm-pink);
-
-            text-shadow:
-                0 0 20px rgba(255, 95, 162, .12);
-        }
-
-        .bm-product-card h3 {
-            margin: 0;
-
-            color: var(--bm-text);
-
-            font-size: 13px;
-            font-weight: 900;
-        }
-
-        .bm-product-description {
-            min-height: 35px;
-
-            margin: 5px 0 0;
-
-            color: var(--bm-muted);
-
-            font-size: 10px;
-
-            line-height: 1.6;
-        }
-
-        .bm-product-price {
-            margin-top: 13px;
-
-            color: var(--bm-purple);
-
-            font-size: 15px;
-
-            font-weight: 900;
-        }
-
-        .bm-product-bottom {
-            margin-top: 10px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 8px;
-        }
-
-        .bm-stock-badge {
-            display: inline-flex;
-            align-items: center;
-
-            padding: 5px 8px;
-
-            border-radius: 999px;
-
-            font-size: 9px;
-
-            font-weight: 800;
-        }
-
-        .bm-stock-badge.available {
-            color: #16834b;
-
-            background: #edfff5;
-        }
-
-        .bm-stock-badge.empty {
-            color: #c53030;
-
-            background: #fff0f0;
-        }
-
-        .bm-product-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-
-            margin-top: 12px;
-
-            color: var(--bm-purple);
-
-            font-size: 10px;
-            font-weight: 800;
-
-            transition: .2s ease;
-        }
-
-        .bm-product-link:hover {
-            color: var(--bm-pink);
-        }
-
-        .bm-catalog-button {
-            display: flex;
-
-            justify-content: center;
-
-            margin-top: 32px;
-        }
-
-
-        /* =====================================================
-           EMPTY PRODUCTS
-           ===================================================== */
-
-        .bm-empty-products {
-            grid-column: 1 / -1;
-
-            padding: 45px 25px;
-
-            text-align: center;
-
-            border-radius: 20px;
-
-            background: white;
-
-            border:
-                1px solid var(--bm-border);
-        }
-
-        .bm-empty-products > i {
-            font-size: 40px;
-
-            color: var(--bm-purple);
-        }
-
-        .bm-empty-products h3 {
-            margin-top: 15px;
-
-            font-size: 18px;
-
-            font-weight: 900;
-        }
-
-        .bm-empty-products p {
-            max-width: 450px;
-
-            margin: 8px auto 0;
-
-            color: var(--bm-muted);
-
+        .footer-bottom {
+            margin-top: 45px;
+            padding: 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.13);
+            color: #c4cad7;
             font-size: 12px;
         }
 
-
-        /* =====================================================
-           LOCALISATION
-           ===================================================== */
-
-        .bm-location {
-            padding: 30px;
-
-            display: grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap: 30px;
-
-            border-radius: 25px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #1b1731,
-                    #29234c
-                );
-
-            color: white;
-
-            box-shadow:
-                0 25px 60px rgba(38, 29, 69, .16);
-        }
-
-        .bm-location-icon {
-            width: 50px;
-            height: 50px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            margin-bottom: 15px;
-
-            border-radius: 15px;
-
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--bm-pink),
-                    var(--bm-purple)
-                );
-
-            box-shadow:
-                0 0 20px rgba(255, 95, 162, .20);
-        }
-
-        .bm-location h2 {
-            margin: 0;
-
-            font-size: 28px;
-
-            font-weight: 900;
-        }
-
-        .bm-location p {
-            margin: 12px 0 0;
-
-            color: #cbc7db;
-
-            font-size: 12px;
-
-            line-height: 1.8;
-        }
-
-        .bm-location-map {
-            min-height: 270px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 19px;
-
-            background:
-                radial-gradient(
-                    circle at center,
-                    rgba(94, 216, 255, .18),
-                    transparent 55%
-                ),
-                rgba(255, 255, 255, .045);
-
-            border:
-                1px solid rgba(255, 255, 255, .09);
-        }
-
-        .bm-location-map-content {
-            text-align: center;
-        }
-
-        .bm-location-map-content i {
-            display: block;
-
-            margin-bottom: 12px;
-
-            color: var(--bm-blue);
-
-            font-size: 45px;
-
-            text-shadow:
-                0 0 18px rgba(94, 216, 255, .65);
-        }
-
-        .bm-map-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-
-            margin-top: 15px;
-
-            padding: 11px 15px;
-
-            color: #20192d !important;
-
-            background: white;
-
-            border-radius: 11px;
-
-            font-size: 11px;
-            font-weight: 900;
-        }
-
-        .bm-map-button:hover {
-            color: #20192d !important;
-
-            background: #f7f4ff;
-        }
-
-
-        /* =====================================================
-           FINAL CTA
-           ===================================================== */
-
-        .bm-final-cta {
-            padding: 80px 20px;
-
-            text-align: center;
-        }
-
-        .bm-final-cta h2 {
-            margin: 0;
-
-            font-size: clamp(30px, 4vw, 48px);
-
-            font-weight: 900;
-        }
-
-        .bm-final-cta p {
-            max-width: 590px;
-
-            margin: 13px auto 0;
-
-            color: var(--bm-muted);
-
-            font-size: 13px;
-
-            line-height: 1.8;
-        }
-
-
-        /* =====================================================
-           FOOTER
-           ===================================================== */
-
-        .bm-footer {
-            padding: 28px 0;
-
-            background: var(--bm-dark);
-
-            color: #b8b4c9;
-        }
-
-        .bm-footer-inner {
-            width: min(1180px, calc(100% - 32px));
-
-            margin: auto;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 20px;
-        }
-
-        .bm-footer-brand {
-            color: white;
-
-            font-family: "Pacifico", cursive;
-
-            font-size: 18px;
-        }
-
-        .bm-footer small {
-            font-size: 10px;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-           ===================================================== */
-
-        @media (max-width: 1000px) {
-
-            .bm-nav-links {
+        @media (max-width: 767px) {
+            .top-bar {
+                font-size: 11px;
+            }
+
+            .hero {
+                min-height: 470px;
+            }
+
+            .hero-content {
+                padding-top: 55px;
+                padding-bottom: 55px;
+            }
+
+            .hero::after {
+                background: rgba(17, 25, 48, 0.78);
+            }
+
+            .hero-decoration {
                 display: none;
             }
 
-            .bm-hero-inner {
-                grid-template-columns: 1fr;
-
-                text-align: center;
+            .section {
+                padding: 55px 0;
             }
 
-            .bm-hero-description {
-                margin-left: auto;
-                margin-right: auto;
+            .product-image-wrap {
+                height: 180px;
             }
 
-            .bm-hero-actions {
-                justify-content: center;
+            .about-icon {
+                min-height: 220px;
+                font-size: 85px;
             }
 
-            .bm-visual {
-                min-height: 420px;
+            .benefit-item {
+                padding: 15px 5px;
             }
-
-            .bm-product-preview {
-                grid-template-columns:
-                    repeat(2, 1fr);
-            }
-
         }
-
-
-        @media (max-width: 700px) {
-
-            .bm-navbar {
-                padding: 10px 0;
-            }
-
-            .bm-register {
-                display: none;
-            }
-
-            .bm-brand-text {
-                font-size: 18px;
-            }
-
-            .bm-hero {
-                min-height: auto;
-
-                padding:
-                    130px 0
-                    70px;
-            }
-
-            .bm-benefits-inner {
-                grid-template-columns: 1fr;
-            }
-
-            .bm-product-preview {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .bm-location {
-                grid-template-columns: 1fr;
-
-                padding: 22px;
-            }
-
-            .bm-footer-inner {
-                flex-direction: column;
-
-                text-align: center;
-            }
-
-        }
-
-
-        @media (max-width: 480px) {
-
-            .bm-nav-inner {
-                width: calc(100% - 20px);
-            }
-
-            .bm-login {
-                padding: 8px 10px;
-            }
-
-            .bm-product-preview {
-                grid-template-columns: 1fr;
-            }
-
-            .bm-ice-card {
-                padding: 22px;
-            }
-
-            .bm-ice-circle {
-                width: 190px;
-                height: 190px;
-            }
-
-            .bm-ice-circle i {
-                font-size: 80px;
-            }
-
-            .bm-floating-tag.one {
-                left: 0;
-            }
-
-            .bm-floating-tag.two {
-                right: 0;
-            }
-
-        }
-        
-.bm-product-visual {
-    height: 220px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 18px;
-    margin-bottom: 18px;
-    background: linear-gradient(
-        135deg,
-        #fff0f7,
-        #eef8ff
-    );
-}
-
-
-.bm-product-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-
-    object-fit: contain;
-    object-position: center;
-
-    border-radius: 14px;
-
-    transition: transform .35s ease;
-}
-
-.bm-product-card:hover .bm-product-image {
-    transform: scale(1.04);
-}
-
-.bm-product-placeholder {
-    width: 120px;
-    height: 120px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 30px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ffe4f0,
-            #e5f6ff
-        );
-
-    color: #8b5cf6;
-}
-
-.bm-product-placeholder i {
-    font-size: 55px;
-}
-
-
-.bm-product-card:hover .bm-product-image {
-    transform: scale(1.06);
-}
-
-
-
     </style>
-
 </head>
-
 
 <body>
 
-
-<!-- ==========================================================
-     NAVBAR
-     ========================================================== -->
-
-<header class="bm-navbar">
-
-    <div class="bm-nav-inner">
-
-
-        <!-- LOGO -->
-
-        <a
-            href="{{ path('app_home') }}"
-            class="bm-brand"
-        >
-
-            <span class="bm-brand-icon">
-
-                <i class="bi bi-snow2"></i>
-
-            </span>
-
-            <span class="bm-brand-text">
-
-                Bueble Mania
-
-            </span>
-
-        </a>
-
-
-        <!-- MENU -->
-
-        <nav class="bm-nav-links">
-
-            <a href="#accueil">
-                Accueil
-            </a>
-
-            <a href="#glaces">
-                Nos glaces
-            </a>
-
-            <a href="#localisation">
-                Nous trouver
-            </a>
-
-            <a href="#contact">
-                Contact
-            </a>
-
-        </nav>
-
-
-        <!-- ACTIONS -->
-
-        <div class="bm-nav-actions">
-
-            <a
-                href="{{ path('app_login') }}"
-                class="bm-login"
-            >
-
-                Se connecter
-
-            </a>
-
-
-            <a
-                href="{{ path('app_register') }}"
-                class="bm-register"
-            >
-
-                <i class="bi bi-person-plus-fill"></i>
-
-                Créer un compte
-
-            </a>
-
-        </div>
-
-
-    </div>
-
-</header>
-
-
-<!-- ==========================================================
-     HERO
-     ========================================================== -->
-
-<section
-    id="accueil"
-    class="bm-hero"
->
-
-    <div class="bm-hero-inner">
-
-
-        <!-- TEXTE -->
-
-        <div>
-
-            <span class="bm-badge">
-
-                <i class="bi bi-geo-alt-fill"></i>
-
-                Antanimena · Madagascar
-
-            </span>
-
-
-            <h1>
-
-                Découvrez
-
-                <span class="bm-script">
-                    Bueble Mania
-                </span>
-
-            </h1>
-
-
-            <p class="bm-hero-description">
-
-                Des glaces gourmandes, une expérience fraîche
-                et un univers pensé pour vous faire plaisir.
-                Découvrez nos produits et préparez votre prochaine commande.
-
-            </p>
-
-
-            <div class="bm-hero-actions">
-
-
-                <a
-                    href="{{ path('app_login') }}"
-                    class="bm-primary-btn"
-                >
-
-                    <i class="bi bi-bag-heart-fill"></i>
-
-                    Commander maintenant
-
-                </a>
-
-
-                <a
-                    href="#glaces"
-                    class="bm-secondary-btn"
-                >
-
-                    <i class="bi bi-arrow-down-circle"></i>
-
-                    Découvrir nos glaces
-
-                </a>
-
-
-            </div>
-
-        </div>
-
-
-        <!-- VISUEL -->
-
-        <div class="bm-visual">
-
-
-            <div class="bm-ice-card">
-
-
-                <div class="bm-floating-tag one">
-
-                    <i class="bi bi-stars"></i>
-
-                    Gourmand & frais
-
-                </div>
-
-
-                <div class="bm-ice-circle">
-
-                    <i class="bi bi-cup-straw"></i>
-
-                </div>
-
-
-                <div class="bm-ice-card-title">
-
-                    Une envie de fraîcheur ?
-
-                </div>
-
-
-                <div class="bm-ice-card-subtitle">
-
-                    Explorez notre univers et trouvez
-                    votre prochaine glace préférée.
-
-                </div>
-
-
-                <div class="bm-floating-tag two">
-
-                    🍦 Bueble Mania
-
-                </div>
-
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-</section>
-
-
-<!-- ==========================================================
-     BENEFITS
-     ========================================================== -->
-
-<section class="bm-benefits">
-
-    <div class="bm-benefits-inner">
-
-
-        <div class="bm-benefit">
-
-            <div class="bm-benefit-icon">
-
-                <i class="bi bi-heart-fill"></i>
-
-            </div>
-
-            <h3>
-                Pensé pour le plaisir
-            </h3>
-
-            <p>
-                Une expérience agréable pour découvrir
-                les produits Bueble Mania.
-            </p>
-
-        </div>
-
-
-        <div class="bm-benefit">
-
-            <div class="bm-benefit-icon">
-
-                <i class="bi bi-lightning-charge-fill"></i>
-
-            </div>
-
-            <h3>
-                Commande simplifiée
-            </h3>
-
-            <p>
-                Consultez les produits, ajoutez-les au panier
-                et suivez vos commandes.
-            </p>
-
-        </div>
-
-
-        <div class="bm-benefit">
-
-            <div class="bm-benefit-icon">
-
-                <i class="bi bi-geo-alt-fill"></i>
-
-            </div>
-
-            <h3>
-                Facile à retrouver
-            </h3>
-
-            <p>
-                Retrouvez facilement Bueble Mania
-                depuis votre téléphone.
-            </p>
-
-        </div>
-
-
-    </div>
-
-</section>
-
-
-<!-- ==========================================================
-     PRODUITS
-     ========================================================== -->
-
-<section
-    id="glaces"
-    class="bm-section"
->
-
-    <div class="bm-section-inner">
-
-
-        <span class="bm-kicker">
-            Notre univers
+{# Images locales : une image différente peut apparaître à chaque actualisation #}
+{% set imagesJumbo = [
+    'images/jumbo/jumbo-1.jpg',
+    'images/jumbo/jumbo-2.jpg',
+    'images/jumbo/jumbo-3.jpg',
+    'images/jumbo/jumbo-4.jpg'
+] %}
+
+{% set imageJumbo = random(imagesJumbo) %}
+
+<!-- Barre d'information -->
+<div class="top-bar">
+    <div class="container d-flex justify-content-between align-items-center gap-2">
+        <span>
+            <i class="bi bi-geo-alt-fill me-1"></i>
+            Jumbo Score Madagascar
         </span>
-
-
-        <h2 class="bm-section-title">
-
-            Des glaces qui donnent envie.
-
-        </h2>
-
-
-        <p class="bm-section-description">
-
-            Découvrez les produits actuellement disponibles
-            dans notre catalogue Bueble Mania.
-
-        </p>
-
-
-        <div class="bm-product-preview">
-
-
-            {% if produits is defined and produits is not empty %}
-
-
-                {% for produit in produits %}
-
-
-                    <div class="bm-product-card">
-
-
-
-<div class="bm-product-visual">
-
-    {% if produit.image %}
-
-        <img
-            src="{{ asset('images/produits/' ~ produit.image) }}"
-            alt="{{ produit.nom }}"
-            class="bm-product-image"
-        >
-
-    {% else %}
-
-        <div class="bm-product-placeholder">
-
-            <i class="bi bi-cup-straw"></i>
-
-        </div>
-
-    {% endif %}
-
+        <span>
+            <i class="bi bi-bag-check-fill me-1"></i>
+            Découvrez notre catalogue de produits
+        </span>
+    </div>
 </div>
 
-
-
-
-                        <h3>
-
-                            {{ produit.nom }}
-
-                        </h3>
-
-
-                        <p class="bm-product-description">
-
-                            {% if produit.description %}
-
-                                {{ produit.description|slice(0, 70) }}
-
-                                {% if produit.description|length > 70 %}
-                                    ...
-                                {% endif %}
-
-                            {% else %}
-
-                                Une délicieuse gourmandise
-                                signée Bueble Mania.
-
-                            {% endif %}
-
-                        </p>
-
-
-                        <div class="bm-product-price">
-
-                            {{ produit.prixVente|number_format(0, ',', ' ') }}
-
-                            Ar
-
-                        </div>
-
-
-                        <div class="bm-product-bottom">
-
-
-                            {% if produit.quantiteStock > 0 %}
-
-                                <span class="bm-stock-badge available">
-
-                                    <i class="bi bi-check-circle-fill me-1"></i>
-
-                                    Disponible
-
-                                </span>
-
-                            {% else %}
-
-                                <span class="bm-stock-badge empty">
-
-                                    <i class="bi bi-x-circle-fill me-1"></i>
-
-                                    Épuisé
-
-                                </span>
-
-                            {% endif %}
-
-
-                        </div>
-
-
-                        <a
-                            href="{{ path('app_login') }}"
-                            class="bm-product-link"
-                        >
-
-                            {% if produit.quantiteStock > 0 %}
-
-                                Commander
-
-                            {% else %}
-
-                                Voir le produit
-
-                            {% endif %}
-
-
-                            <i class="bi bi-arrow-right"></i>
-
-                        </a>
-
-
-                    </div>
-
-
-                {% endfor %}
-
-
-            {% else %}
-
-
-                <div class="bm-empty-products">
-
-
-                    <i class="bi bi-box-seam"></i>
-
-
-                    <h3>
-
-                        Nos glaces arrivent bientôt
-
-                    </h3>
-
-
-                    <p>
-
-                        Aucun produit actif n'est actuellement
-                        disponible dans le catalogue.
-
-                    </p>
-
-
-                </div>
-
-
-            {% endif %}
-
-
-        </div>
-
-
-        <!-- CATALOGUE COMPLET -->
-
-        <div class="bm-catalog-button">
-
-            <a
-                href="{{ path('app_login') }}"
-                class="bm-primary-btn"
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg main-navbar">
+    <div class="container">
+
+        <a class="navbar-brand" href="{{ path('app_home') }}" aria-label="Accueil Jumbo Score">
+            <img
+                src="{{ asset('images/jumbo-score-logo.png') }}"
+                alt="Jumbo Score"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
             >
+            <span class="brand-fallback" style="display:none;">
+                <span class="brand-mark"><i class="bi bi-shop"></i></span>
+                JUMBO SCORE
+            </span>
+        </a>
 
-                <i class="bi bi-grid-3x3-gap-fill"></i>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavigation"
+            aria-controls="mainNavigation"
+            aria-expanded="false"
+            aria-label="Ouvrir la navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-                Voir tout le catalogue
-
-            </a>
-
-        </div>
-
-
-    </div>
-
-</section>
-
-
-<!-- ==========================================================
-     LOCALISATION
-     ========================================================== -->
-
-<section
-    id="localisation"
-    class="bm-section pt-0"
->
-
-    <div class="bm-section-inner">
-
-
-        <div class="bm-location">
-
-
-            <div>
-
-
-                <div class="bm-location-icon">
-
-                    <i class="bi bi-geo-alt-fill"></i>
-
-                </div>
-
-
-                <h2>
-
-                    Retrouvez Bueble Mania
-
-                </h2>
-
-
-                <p>
-
-                    Notre société se trouve à
-                    <strong>Antanimena, Madagascar</strong>.
-
-                    La carte interactive et le guidage GPS
-                    seront intégrés avec l'emplacement officiel
-                    de Bueble Mania.
-
-                </p>
-
-
-                <a
-                    href="https://www.google.com/maps/search/?api=1&query=Bueble+Mania+Antanimena+Madagascar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="bm-map-button"
-                >
-
-                    <i class="bi bi-map-fill"></i>
-
-                    Rechercher sur Google Maps
-
-                </a>
-
-
-            </div>
-
-
-            <div class="bm-location-map">
-
-
-                <div class="bm-location-map-content">
-
-
-                    <i class="bi bi-pin-map-fill"></i>
-
-
-                    <strong>
-
-                        Antanimena
-
-                    </strong>
-
-
-                    <div
-                        style="
-                            margin-top: 5px;
-                            color: #aaa5bb;
-                            font-size: 10px;
-                        "
-                    >
-
-                        Madagascar
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
+        <div class="collapse navbar-collapse" id="mainNavigation">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#catalogue">Catalogue</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#avantages">Nos avantages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#apropos">À propos</a>
+                </li>
+                <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                    <a class="btn-jumbo" href="{{ path('app_login') }}">
+                        <i class="bi bi-person-circle"></i>
+                        Connexion
+                    </a>
+                </li>
+            </ul>
         </div>
 
     </div>
+</nav>
 
-</section>
-
-
-<!-- ==========================================================
-     FINAL CTA
-     ========================================================== -->
-
-<section
-    id="contact"
-    class="bm-final-cta"
->
-
-
-    <h2>
-
-        Une petite envie de glace ? 🍦
-
-    </h2>
-
-
-    <p>
-
-        Créez votre compte pour découvrir le catalogue,
-        ajouter vos produits au panier et suivre vos commandes.
-
-    </p>
-
-
-    <div
-        class="bm-hero-actions"
-        style="justify-content: center;"
+<!-- Grande bannière Jumbo Score -->
+<header class="hero">
+    <img
+        class="hero-image"
+        src="{{ asset(imageJumbo) }}"
+        alt="Découverte du supermarché Jumbo Score Madagascar"
+        fetchpriority="high"
     >
 
+    <div class="container hero-content">
+        <span class="hero-label">
+            <i class="bi bi-star-fill me-1"></i>
+            Bienvenue chez Jumbo Score
+        </span>
 
-        <a
-            href="{{ path('app_register') }}"
-            class="bm-primary-btn"
-        >
+        <h1>
+            Tout ce qu'il vous faut,
+            <span>au même endroit.</span>
+        </h1>
 
-            <i class="bi bi-person-plus-fill"></i>
+        <p>
+            Découvrez notre catalogue de produits et consultez les informations
+            disponibles. Retrouvez facilement les articles qui vous intéressent
+            grâce à une présentation simple et agréable.
+        </p>
 
-            Créer mon compte
+        <div class="hero-buttons">
+            <a href="#catalogue" class="btn-jumbo">
+                Découvrir le catalogue
+                <i class="bi bi-arrow-right"></i>
+            </a>
 
-        </a>
-
-
-        <a
-            href="{{ path('app_login') }}"
-            class="bm-secondary-btn"
-            style="
-                color: #27243a !important;
-                background: #f2eff8;
-                border-color: #ebe5f3;
-            "
-        >
-
-            <i class="bi bi-box-arrow-in-right"></i>
-
-            Se connecter
-
-        </a>
-
-
+            <a href="#apropos" class="btn-jumbo-outline">
+                En savoir plus
+            </a>
+        </div>
     </div>
 
+    <div class="hero-decoration">
+        JUMBO SCORE · MADAGASCAR
+    </div>
+</header>
+
+<!-- Avantages -->
+<section class="benefits" id="avantages">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-6 col-lg-3">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="bi bi-basket2"></i>
+                    </div>
+                    <div>
+                        <h3>Grand choix</h3>
+                        <p>Un catalogue varié</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="bi bi-tags"></i>
+                    </div>
+                    <div>
+                        <h3>Prix consultables</h3>
+                        <p>Les prix affichés en ligne</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div>
+                        <h3>Stock affiché</h3>
+                        <p>Quantités renseignées au catalogue</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+                    <div>
+                        <h3>Simple à consulter</h3>
+                        <p>Sur ordinateur et mobile</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </section>
 
+<!-- Catalogue -->
+<section class="section section-soft" id="catalogue">
+    <div class="container">
 
-<!-- ==========================================================
-     FOOTER
-     ========================================================== -->
+        <div class="catalogue-heading">
+            <div>
+                <span class="section-eyebrow">Notre sélection</span>
+                <h2 class="section-title">Catalogue de produits</h2>
+                <p class="section-description mb-0">
+                    Retrouvez ci-dessous les produits enregistrés dans notre catalogue.
+                </p>
+            </div>
 
-<footer class="bm-footer">
+            <a href="{{ path('app_login') }}" class="btn-jumbo">
+                <i class="bi bi-person-lock"></i>
+                Accès à l'espace de gestion
+            </a>
+        </div>
 
-    <div class="bm-footer-inner">
+        {% if produits is defined and produits|length > 0 %}
 
+            <div class="row g-4">
+                {% for produit in produits %}
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <article class="product-card">
 
-        <div class="bm-footer-brand">
+                            <div class="product-image-wrap">
+                                {% if produit.image is defined and produit.image %}
+                                    <img
+                                        class="product-image"
+                                        src="{{ asset('images/produits/' ~ produit.image) }}"
+                                        alt="{{ produit.nom }}"
+                                        loading="lazy"
+                                    >
+                                {% else %}
+                                    <div class="product-placeholder">
+                                        <i class="bi bi-box-seam"></i>
+                                        <span>Image non disponible</span>
+                                    </div>
+                                {% endif %}
+                            </div>
 
-            Bueble Mania
+                            <div class="product-body">
+                                <span class="product-category">
+                                    <i class="bi bi-bag me-1"></i>
+                                    Produit
+                                </span>
+
+                                <h3 class="product-name">
+                                    {{ produit.nom }}
+                                </h3>
+
+                                <p class="product-description">
+                                    {% if produit.description is defined and produit.description %}
+                                        {{ produit.description|length > 95
+                                            ? produit.description|slice(0, 95) ~ '…'
+                                            : produit.description }}
+                                    {% else %}
+                                        Découvrez ce produit dans notre catalogue.
+                                    {% endif %}
+                                </p>
+
+                                <div class="product-bottom">
+                                    <div class="product-price">
+                                        {% if produit.prixVente is defined and produit.prixVente is not null %}
+                                            {{ produit.prixVente|number_format(0, ',', ' ') }} Ar
+                                        {% else %}
+                                            Prix non renseigné
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+
+            <div class="empty-catalogue">
+                <i class="bi bi-inboxes"></i>
+                <h3 class="mt-3 fw-bold">Le catalogue est en préparation</h3>
+                <p class="text-secondary mb-4">
+                    Aucun produit n'est disponible à l'affichage pour le moment.
+                </p>
+                <a href="{{ path('app_login') }}" class="btn-jumbo">
+                    <i class="bi bi-person-circle"></i>
+                    Se connecter
+                </a>
+            </div>
+
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- Bandeau rouge -->
+<section class="promo-section">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <h2>Découvrez notre catalogue en quelques clics.</h2>
+                <p>
+                    Consultez les produits présentés sur notre site et accédez
+                    à l'espace de gestion si vous disposez d'un compte autorisé.
+                </p>
+            </div>
+
+            <div class="col-lg-4 text-lg-end">
+                <a href="{{ path('app_login') }}" class="btn btn-light fw-bold px-4 py-3">
+                    Accéder à mon compte
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- À propos -->
+<section class="section" id="apropos">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-5">
+                <div class="about-icon">
+                    <i class="bi bi-shop-window"></i>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <span class="section-eyebrow">À propos</span>
+                <h2 class="section-title">
+                    Bienvenue dans l'univers Jumbo Score
+                </h2>
+
+                <p class="section-description">
+                    Cette page vous permet de découvrir les produits présentés
+                    dans notre catalogue et de consulter les informations
+                    disponibles sur chacun d'eux.
+                </p>
+
+                <div class="about-point">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div>
+                        <strong>Un catalogue facile à parcourir</strong>
+                        <p>Les produits sont présentés avec leur nom, leur description et leur prix lorsqu'ils sont renseignés.</p>
+                    </div>
+                </div>
+
+                <div class="about-point">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div>
+                        <strong>Une consultation pratique</strong>
+                        <p>Une interface adaptée aux écrans d'ordinateur, de tablette et de téléphone.</p>
+                    </div>
+                </div>
+
+                <div class="about-point">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div>
+                        <strong>Un espace de gestion protégé</strong>
+                        <p>Les utilisateurs autorisés peuvent accéder à leur espace via la page de connexion.</p>
+                    </div>
+                </div>
+
+                <a href="{{ path('app_login') }}" class="btn-jumbo mt-4">
+                    Accéder à l'espace de gestion
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Pied de page -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+
+            <div class="col-lg-5">
+                <div class="footer-brand mb-3">
+                    <i class="bi bi-shop me-2" style="color: var(--jumbo-yellow);"></i>
+                    JUMBO SCORE
+                </div>
+
+                <p class="footer-description">
+                    Bienvenue sur notre page d'accueil. Découvrez les produits
+                    disponibles dans le catalogue et consultez les informations
+                    présentées sur notre site.
+                </p>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <h4>Navigation</h4>
+                <div class="footer-links">
+                    <a href="{{ path('app_home') }}">Accueil</a>
+                    <a href="#catalogue">Catalogue</a>
+                    <a href="#avantages">Nos avantages</a>
+                    <a href="#apropos">À propos</a>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-4">
+                <h4>Espace utilisateur</h4>
+                <div class="footer-links">
+                    <a href="{{ path('app_login') }}">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Connexion
+                    </a>
+                    <a href="{{ path('app_register') }}">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Inscription
+                    </a>
+                </div>
+            </div>
 
         </div>
 
-
-        <small>
-
-            © {{ "now"|date("Y") }}
-            Bueble Mania · Antanimena, Madagascar
-
-        </small>
-
-
-        <small>
-
-            Fraîcheur · Gourmandise · Plaisir
-
-        </small>
-
-
+        <div class="footer-bottom">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                <span>
+                    &copy; {{ "now"|date("Y") }} Jumbo Score Madagascar.
+                    Tous droits réservés.
+                </span>
+                <span>Site développé avec Symfony</span>
+            </div>
+        </div>
     </div>
-
 </footer>
 
-
-<!-- Bootstrap JS -->
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>
-

@@ -1,441 +1,284 @@
 {% extends 'auth_base.html.twig' %}
 
-{% block title %}Inscription - Gestion de Stock{% endblock %}
+{% block title %}Inscription | Jumbo Score Madagascar{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
 
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --primary-light: #eef2ff;
-            --primary-accent: #6366f1;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --border-color: #e2e8f0;
-            --border-light: #f1f5f9;
-            --bg-light: #f8fafc;
-            --bg-subtle: #fafbfc;
-            --text-dark: #0f172a;
-            --text-medium: #334155;
-            --text-gray: #64748b;
-            --text-light: #94a3b8;
-            --card-shadow: 0 20px 60px -15px rgba(15, 23, 42, 0.15);
-            --input-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --jumbo-red: #d71920;
+            --jumbo-red-dark: #a90f16;
+            --jumbo-yellow: #ffcc00;
+            --jumbo-navy: #17223b;
+            --jumbo-text: #252a34;
+            --jumbo-muted: #737b8c;
+            --jumbo-light: #f5f6fa;
+            --border-color: #dfe3eb;
+            --success: #16834a;
+            --danger: #c62828;
         }
 
         * {
             box-sizing: border-box;
         }
 
-        body {
-            font-family: var(--font-family);
-        }
-
-        /* =========================================================
-           CONTAINER
-        ========================================================= */
-
         .auth-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 30px 20px;
             background:
-                radial-gradient(
-                    circle at 15% 20%,
-                    rgba(79, 70, 229, 0.06) 0%,
-                    transparent 40%
-                ),
-                radial-gradient(
-                    circle at 85% 80%,
-                    rgba(99, 102, 241, 0.05) 0%,
-                    transparent 40%
-                ),
-                linear-gradient(
-                    135deg,
-                    #f8fafc 0%,
-                    #f1f5f9 100%
-                );
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
+                radial-gradient(circle at top left, rgba(255, 204, 0, .15), transparent 35%),
+                linear-gradient(135deg, #f8f9fc, #eef0f6);
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
-
-        .auth-container::before,
-        .auth-container::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            filter: blur(2px);
-        }
-
-        .auth-container::before {
-            width: 480px;
-            height: 480px;
-            background: radial-gradient(
-                circle,
-                rgba(79, 70, 229, 0.07) 0%,
-                transparent 70%
-            );
-            top: -180px;
-            right: -120px;
-            animation: float 9s ease-in-out infinite;
-        }
-
-        .auth-container::after {
-            width: 420px;
-            height: 420px;
-            background: radial-gradient(
-                circle,
-                rgba(99, 102, 241, 0.05) 0%,
-                transparent 70%
-            );
-            bottom: -140px;
-            left: -120px;
-            animation: float 11s ease-in-out infinite reverse;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            50% {
-                transform: translate(25px, -25px) scale(1.04);
-            }
-        }
-
-        /* =========================================================
-           CARD
-        ========================================================= */
 
         .auth-card {
-            display: grid;
-            grid-template-columns: 1.05fr 1fr;
-            background: #ffffff;
-            border-radius: 28px;
             width: 100%;
-            max-width: 1080px;
-            min-height: 700px;
-            box-shadow: var(--card-shadow);
-            animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid rgba(226, 232, 240, 0.6);
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            background: #fff;
+            border: 1px solid rgba(223, 227, 235, .8);
+            border-radius: 22px;
             overflow: hidden;
-            position: relative;
-            z-index: 1;
+            box-shadow: 0 22px 65px rgba(23, 34, 59, .15);
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.98);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* =========================================================
-           PANNEAU FORMULAIRE
-        ========================================================= */
+        /* Formulaire */
 
         .auth-form-panel {
-            padding: 48px;
+            min-width: 0;
+            padding: 38px 42px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            background: #ffffff;
         }
 
         .auth-header {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
-        /* ==============================
-   GRAND LOGO OFFICIEL
-============================== */
-/* ==========================================
-   LOGO GRAND FORMAT — LARGEUR DU FORMULAIRE
-========================================== */
+        .auth-logo-wrapper {
+            width: 100%;
+            height: 105px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.auth-logo-wrapper {
-    width: 100%;
-    height: 190px;
-
-    margin: 0 auto 25px;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-
-    overflow: hidden;
-}
-
-.auth-logo-wrapper img {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-    object-position: center;
-
-    border-radius: 0;
-}
-
-.auth-logo-wrapper:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-.logo-placeholder {
-    color: var(--primary-color);
-    font-size: 55px;
-}
-       
-
-        .logo-placeholder {
-            font-size: 34px;
-            color: var(--primary-color);
+        .auth-logo-wrapper img {
+            display: block;
+            width: 100%;
+            max-width: 210px;
+            height: 100%;
+            object-fit: contain;
         }
 
         .auth-card h1 {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin: 0 0 8px;
-            letter-spacing: -0.6px;
-            line-height: 1.2;
+            margin: 0 0 9px;
+            color: var(--jumbo-navy);
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: -.5px;
         }
 
         .auth-subtitle {
-            color: var(--text-gray);
-            font-size: 14px;
             margin: 0;
-            line-height: 1.6;
+            color: var(--jumbo-muted);
+            font-size: 13px;
+            line-height: 1.7;
         }
 
         .auth-subtitle i {
-            color: var(--primary-color);
             margin-right: 5px;
+            color: var(--jumbo-red);
         }
 
-        /* =========================================================
-           FORM
-        ========================================================= */
+        /* Alertes */
+
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 14px;
+            margin-bottom: 17px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .alert i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-danger {
+            color: #9f1721;
+            background: #fff0f0;
+            border: 1px solid #ffd1d4;
+        }
+
+        .alert-success {
+            color: #17663b;
+            background: #edfff4;
+            border: 1px solid #bce9cd;
+        }
+
+        /* Champs */
 
         .form-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 14px;
         }
 
         .form-group {
-            margin-bottom: 18px;
-            position: relative;
+            min-width: 0;
+            margin-bottom: 17px;
         }
 
         .form-group label {
             display: block;
+            margin-bottom: 8px;
+            color: var(--jumbo-text);
             font-size: 13px;
-            font-weight: 600;
-            color: var(--text-medium);
-            margin-bottom: 7px;
+            font-weight: 700;
         }
 
-        .form-group label i {
-            margin-right: 6px;
-            color: var(--primary-color);
-            font-size: 13px;
+        .form-group label > i {
+            margin-right: 5px;
+            color: var(--jumbo-red);
         }
-
-        /* =========================================================
-           INPUT
-        ========================================================= */
 
         .input-wrapper {
             position: relative;
-            display: flex;
-            align-items: center;
             width: 100%;
+            min-width: 0;
         }
 
         .input-wrapper .input-icon {
             position: absolute;
             left: 14px;
-            color: var(--text-light);
-            font-size: 15px;
-            transition: color 0.3s ease;
-            pointer-events: none;
+            top: 50%;
+            transform: translateY(-50%);
             z-index: 2;
+            color: #858d9d;
+            font-size: 15px;
+            pointer-events: none;
         }
 
         .input-wrapper input {
+            display: block;
             width: 100%;
-            height: 46px;
-            padding: 12px 14px 12px 42px;
-
-            border: 1.5px solid var(--border-color);
-            border-radius: 12px;
-
-            font-size: 14px;
-            font-family: var(--font-family);
-            transition: var(--transition-smooth);
-
-            background: var(--bg-subtle);
-            color: var(--text-dark);
-            font-weight: 500;
-        }
-
-        /* Espace réservé au bouton Voir */
-        .input-wrapper input.has-toggle {
-            padding-right: 92px;
-        }
-
-        .input-wrapper input:hover {
-            border-color: #cbd5e1;
-            background: #ffffff;
-        }
-
-        .input-wrapper input:focus {
+            min-width: 0;
+            height: 48px;
+            padding: 12px 16px 12px 42px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
             outline: none;
-            border-color: var(--primary-color);
-            background: #ffffff;
-            box-shadow: var(--input-shadow);
-        }
-
-        .input-wrapper input:focus ~ .input-icon {
-            color: var(--primary-color);
+            background: #fbfcfe;
+            color: var(--jumbo-text);
+            font-family: inherit;
+            font-size: 13px;
+            transition: border-color .2s, box-shadow .2s, background .2s;
         }
 
         .input-wrapper input::placeholder {
-            color: var(--text-light);
-            font-size: 13px;
-            font-weight: 400;
+            color: #a3a9b5;
+            font-size: 12px;
         }
 
-        /* =========================================================
-           BOUTON VOIR / CACHER
-        ========================================================= */
+        .input-wrapper input:hover {
+            border-color: #bdc5d3;
+            background: #fff;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--jumbo-red);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(215, 25, 32, .09);
+        }
+
+        .input-wrapper input:focus ~ .input-icon {
+            color: var(--jumbo-red);
+        }
+
+        /* Espace réservé au bouton Voir/Cacher */
+
+        .input-wrapper input.has-toggle {
+            padding-right: 88px !important;
+        }
 
         .toggle-password {
             position: absolute;
-            right: 8px;
             top: 50%;
+            right: 7px;
+            z-index: 5;
             transform: translateY(-50%);
-
+            min-width: 66px;
             height: 34px;
-            min-width: 68px;
-
+            padding: 0 8px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 5px;
-
-            padding: 0 9px;
-
-            border: 1px solid #c7d2fe;
+            border: 1px solid #f1c7c9;
             border-radius: 8px;
-
-            background: #eef2ff;
-            color: var(--primary-color);
-
-            font-family: var(--font-family);
+            background: #fff3f3;
+            color: var(--jumbo-red);
+            font-family: inherit;
             font-size: 11px;
             font-weight: 700;
-
             cursor: pointer;
-            user-select: none;
-
-            transition: var(--transition-smooth);
-
-            z-index: 10;
-
-            outline: none;
+            transition: background .2s, color .2s;
         }
 
         .toggle-password:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            color: #ffffff;
-
-            transform: translateY(-50%) scale(1.03);
-
-            box-shadow:
-                0 5px 14px rgba(79, 70, 229, 0.25);
-        }
-
-        .toggle-password:active {
-            transform: translateY(-50%) scale(0.97);
+            background: var(--jumbo-red);
+            color: #fff;
+            border-color: var(--jumbo-red);
         }
 
         .toggle-password:focus-visible {
-            box-shadow:
-                0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: 2px solid var(--jumbo-red);
+            outline-offset: 2px;
         }
 
-        .toggle-password i {
-            font-size: 13px;
-            line-height: 1;
+        .toggle-password i,
+        .toggle-password span {
             pointer-events: none;
         }
 
-        .toggle-password .toggle-label {
-            line-height: 1;
-            pointer-events: none;
-        }
-
-        /* =========================================================
-           FORCE PASSWORD
-        ========================================================= */
+        /* Indicateur de force */
 
         .password-strength {
-            margin-top: 0;
-            display: flex;
+            display: none;
             align-items: center;
-            gap: 8px;
-
-            opacity: 0;
-            max-height: 0;
-            overflow: hidden;
-
-            transition: var(--transition-smooth);
-        }
-
-        .password-strength.visible {
-            opacity: 1;
-            max-height: 30px;
+            gap: 9px;
             margin-top: 8px;
         }
 
+        .password-strength.visible {
+            display: flex;
+        }
+
         .strength-bar {
+            flex: 1;
             display: flex;
             gap: 4px;
-            flex: 1;
         }
 
         .strength-bar .bar {
             height: 4px;
             flex: 1;
-            background: var(--border-color);
-            border-radius: 2px;
-            transition: var(--transition-smooth);
+            border-radius: 5px;
+            background: #e5e7eb;
         }
 
         .strength-bar .bar.active.weak {
@@ -451,9 +294,9 @@
         }
 
         .strength-label {
+            min-width: 46px;
             font-size: 11px;
-            font-weight: 600;
-            min-width: 60px;
+            font-weight: 700;
             text-align: right;
         }
 
@@ -462,24 +305,22 @@
         }
 
         .strength-label.medium {
-            color: #f59e0b;
+            color: #b77900;
         }
 
         .strength-label.strong {
-            color: #10b981;
+            color: #16834a;
         }
 
-        /* =========================================================
-           CONFIRMATION MOT DE PASSE
-        ========================================================= */
+        /* Correspondance des mots de passe */
 
         .password-match {
             display: none;
+            align-items: center;
+            gap: 6px;
             margin-top: 7px;
             font-size: 11px;
             font-weight: 600;
-            align-items: center;
-            gap: 5px;
         }
 
         .password-match.visible {
@@ -487,135 +328,68 @@
         }
 
         .password-match.success {
-            color: var(--success-color);
+            color: var(--success);
         }
 
         .password-match.error {
-            color: var(--danger-color);
+            color: var(--danger);
         }
 
-        /* =========================================================
-           BOUTON INSCRIPTION
-        ========================================================= */
+        /* Bouton inscription */
 
         .btn-primary {
             width: 100%;
-            padding: 15px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--primary-color),
-                    var(--primary-accent)
-                );
-
-            color: white;
-            border: none;
-            border-radius: 12px;
-
-            font-size: 15px;
-            font-weight: 600;
-            font-family: var(--font-family);
-
-            cursor: pointer;
-
-            transition: var(--transition-smooth);
-
+            min-height: 50px;
+            margin-top: 5px;
+            padding: 13px 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-
-            position: relative;
-            overflow: hidden;
-
-            letter-spacing: 0.2px;
-
-            box-shadow:
-                0 4px 14px rgba(79, 70, 229, 0.25);
-
-            margin-top: 6px;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-
-            width: 100%;
-            height: 100%;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(255,255,255,0.25),
-                    transparent
-                );
-
-            transition: left 0.7s ease;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
+            border: none;
+            border-radius: 10px;
+            background: var(--jumbo-red);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 7px 18px rgba(215, 25, 32, .19);
+            transition: background .2s, transform .2s, box-shadow .2s;
         }
 
         .btn-primary:hover {
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--primary-hover),
-                    var(--primary-color)
-                );
-
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 10px 28px rgba(79, 70, 229, 0.35);
+            background: var(--jumbo-red-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(215, 25, 32, .25);
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
+        .btn-primary:disabled {
+            opacity: .7;
+            cursor: wait;
+            transform: none;
         }
 
-        .btn-primary i {
-            font-size: 17px;
-        }
-
-        .btn-primary .spinner {
+        .spinner {
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
             to {
                 transform: rotate(360deg);
             }
         }
 
-        .btn-primary:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* =========================================================
-           FOOTER
-        ========================================================= */
+        /* Lien de connexion */
 
         .auth-footer {
-            text-align: center;
             margin-top: 22px;
-            padding-top: 20px;
-
-            border-top: 1px solid var(--border-light);
-
-            color: var(--text-gray);
-            font-size: 13px;
+            padding-top: 19px;
+            border-top: 1px solid #edf0f5;
+            color: var(--jumbo-muted);
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.8;
         }
 
         .auth-footer p {
@@ -623,567 +397,322 @@
         }
 
         .auth-footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-
-            transition: var(--transition-smooth);
-
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            margin-left: 4px;
+            color: var(--jumbo-red);
+            font-weight: 800;
+            text-decoration: none;
         }
 
         .auth-footer a:hover {
-            color: var(--primary-hover);
-            gap: 8px;
+            text-decoration: underline;
         }
 
-        .auth-footer a i {
-            font-size: 13px;
-        }
-
-        /* =========================================================
-           PANNEAU DROIT
-        ========================================================= */
+        /* Panneau de présentation */
 
         .auth-visual-panel {
-            background:
-                linear-gradient(
-                    145deg,
-                    #1e1b4b 0%,
-                    #312e81 45%,
-                    #4338ca 100%
-                );
-
-            padding: 52px 44px;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
             position: relative;
+            isolation: isolate;
             overflow: hidden;
-
-            color: white;
+            display: flex;
+            align-items: center;
+            padding: 48px 42px;
+            color: #fff;
+            background:
+                linear-gradient(145deg, rgba(23, 34, 59, .95), rgba(23, 34, 59, .78)),
+                url('{{ asset('images/log.jpg') }}') center / cover no-repeat;
         }
 
         .auth-visual-panel::before {
-            content: '';
+            content: "";
             position: absolute;
-            inset: 0;
-
-            background-image:
-                linear-gradient(
-                    rgba(255, 255, 255, 0.03) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(255, 255, 255, 0.03) 1px,
-                    transparent 1px
-                );
-
-            background-size: 40px 40px;
-            pointer-events: none;
+            z-index: -1;
+            width: 320px;
+            height: 320px;
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+            background: rgba(255, 204, 0, .17);
         }
 
         .auth-visual-panel::after {
-            content: '';
-
+            content: "";
             position: absolute;
-
-            width: 380px;
-            height: 380px;
-
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(139, 92, 246, 0.25) 0%,
-                    transparent 70%
-                );
-
+            z-index: -1;
+            width: 280px;
+            height: 280px;
+            left: -140px;
+            bottom: -150px;
             border-radius: 50%;
-
-            top: -100px;
-            right: -100px;
-
-            animation: pulse 6s ease-in-out infinite;
-
-            pointer-events: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-
-            50% {
-                transform: scale(1.15);
-                opacity: 0.9;
-            }
+            border: 38px solid rgba(255, 255, 255, .07);
         }
 
         .visual-content {
+            width: 100%;
             position: relative;
-            z-index: 2;
+            z-index: 1;
         }
 
         .visual-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-
-            background: rgba(255, 255, 255, 0.1);
-
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-
-            padding: 8px 16px;
-
-            border-radius: 50px;
-
+            margin-bottom: 25px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 204, 0, .35);
+            border-radius: 30px;
+            background: rgba(255, 204, 0, .12);
+            color: var(--jumbo-yellow);
             font-size: 11px;
-            font-weight: 600;
-
+            font-weight: 800;
             letter-spacing: 1px;
             text-transform: uppercase;
-
-            margin-bottom: 26px;
-
-            border: 1px solid rgba(255, 255, 255, 0.15);
-
-            width: fit-content;
-
-            color: rgba(255, 255, 255, 0.95);
-        }
-
-        .visual-badge i {
-            font-size: 13px;
-            color: #a5b4fc;
         }
 
         .visual-title {
-            font-size: 28px;
-            font-weight: 700;
-
-            margin: 0 0 14px;
-
+            margin: 0 0 17px;
+            color: #fff;
+            font-size: clamp(27px, 3vw, 37px);
             line-height: 1.25;
-            letter-spacing: -0.6px;
-
-            color: #ffffff;
+            font-weight: 800;
         }
 
         .visual-title span {
-            background:
-                linear-gradient(
-                    135deg,
-                    #a5b4fc,
-                    #c7d2fe
-                );
-
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--jumbo-yellow);
         }
 
         .visual-description {
+            margin: 0 0 29px;
+            color: rgba(255, 255, 255, .84);
             font-size: 14px;
-            line-height: 1.7;
-
-            opacity: 0.85;
-
-            margin: 0 0 32px;
-
-            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
         }
 
-        /* =========================================================
-           FEATURES
-        ========================================================= */
-
         .feature-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 32px;
-
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
         }
 
         .feature-list li {
             display: flex;
             align-items: center;
             gap: 12px;
-
-            font-size: 13.5px;
-
-            color: rgba(255, 255, 255, 0.92);
-
-            font-weight: 500;
+            color: rgba(255, 255, 255, .93);
+            font-size: 13px;
         }
 
         .feature-icon {
-            width: 32px;
-            height: 32px;
-
-            border-radius: 10px;
-
-            background: rgba(255, 255, 255, 0.08);
-
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            flex-shrink: 0;
-
-            border: 1px solid rgba(255, 255, 255, 0.1);
-
-            transition: var(--transition-smooth);
+            border: 1px solid rgba(255, 255, 255, .14);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .08);
+            color: var(--jumbo-yellow);
         }
-
-        .feature-list li:hover .feature-icon {
-            background: rgba(165, 180, 252, 0.2);
-
-            border-color:
-                rgba(165, 180, 252, 0.4);
-
-            transform: scale(1.05);
-        }
-
-        .feature-icon i {
-            font-size: 14px;
-            color: #a5b4fc;
-        }
-
-        /* =========================================================
-           ETAPES
-        ========================================================= */
 
         .progress-steps {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-
+            align-items: flex-start;
             gap: 8px;
-
-            padding-top: 28px;
-
-            border-top:
-                1px solid rgba(255, 255, 255, 0.12);
+            margin-top: 34px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, .17);
         }
 
         .progress-step {
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-
-            gap: 6px;
-
-            flex: 1;
+            gap: 8px;
         }
 
         .step-dot {
-            width: 28px;
-            height: 28px;
-
-            border-radius: 50%;
-
-            background: rgba(255, 255, 255, 0.1);
-
-            border:
-                1.5px solid rgba(255, 255, 255, 0.2);
-
+            width: 31px;
+            height: 31px;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            font-size: 11px;
-            font-weight: 700;
-
-            color: rgba(255, 255, 255, 0.7);
-
-            transition: var(--transition-smooth);
+            border: 1px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .09);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
         }
 
         .progress-step.active .step-dot {
-            background: #a5b4fc;
-            border-color: #a5b4fc;
-
-            color: #1e1b4b;
-
-            box-shadow:
-                0 0 0 4px rgba(165, 180, 252, 0.2);
+            background: var(--jumbo-yellow);
+            border-color: var(--jumbo-yellow);
+            color: var(--jumbo-navy);
         }
 
         .step-label {
+            color: rgba(255, 255, 255, .76);
             font-size: 10px;
-            font-weight: 600;
-
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-
-            opacity: 0.7;
-
+            font-weight: 700;
             text-align: center;
         }
 
         .progress-step.active .step-label {
-            opacity: 1;
-            color: #c7d2fe;
+            color: var(--jumbo-yellow);
         }
 
-        /* =========================================================
-           ALERTES
-        ========================================================= */
+        /* Responsive */
 
-        .alert {
-            padding: 12px 16px;
-
-            border-radius: 12px;
-
-            margin-bottom: 20px;
-
-            display: flex;
-            align-items: center;
-
-            gap: 11px;
-
-            animation: slideDown 0.4s ease-out;
-
-            border: 1px solid transparent;
-
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-danger {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #b91c1c;
-        }
-
-        .alert-success {
-            background: #f0fdf4;
-            border-color: #bbf7d0;
-            color: #15803d;
-        }
-
-        .alert i {
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        /* =========================================================
-           RESPONSIVE
-        ========================================================= */
-
-        @media (max-width: 950px) {
-
+        @media (max-width: 900px) {
             .auth-card {
-                grid-template-columns: 1fr;
-                max-width: 500px;
-                min-height: auto;
+                max-width: 550px;
+                grid-template-columns: minmax(0, 1fr);
             }
 
             .auth-visual-panel {
-                padding: 36px 32px;
                 order: -1;
+                padding: 32px;
             }
 
             .visual-title {
-                font-size: 22px;
-            }
-
-            .feature-list {
-                display: none;
+                font-size: 28px;
             }
 
             .visual-description {
                 margin-bottom: 20px;
             }
 
+            .feature-list {
+                gap: 11px;
+            }
+
             .progress-steps {
+                margin-top: 23px;
                 padding-top: 20px;
             }
 
             .auth-form-panel {
-                padding: 36px 28px;
+                padding: 34px 30px;
             }
         }
 
         @media (max-width: 480px) {
-
             .auth-container {
                 padding: 12px;
             }
 
             .auth-card {
-                border-radius: 22px;
+                border-radius: 16px;
             }
 
             .auth-form-panel {
-                padding: 28px 20px;
+                padding: 27px 20px;
             }
 
             .auth-visual-panel {
-                padding: 28px 20px;
-            }
-
-            .auth-card h1 {
-                font-size: 22px;
-            }
-
-            .visual-title {
-                font-size: 20px;
-            }
-
-            .auth-logo-wrapper {
-                width: 62px;
-                height: 62px;
-                padding: 11px;
-            }
-
-            .logo-placeholder {
-                font-size: 28px;
+                padding: 27px 22px;
             }
 
             .form-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
                 gap: 0;
             }
 
-            .progress-step .step-label {
-                font-size: 9px;
+            .auth-card h1 {
+                font-size: 25px;
+            }
+
+            .visual-title {
+                font-size: 25px;
+            }
+
+            .auth-logo-wrapper {
+                height: 80px;
+            }
+
+            .auth-logo-wrapper img {
+                max-width: 170px;
             }
 
             .toggle-password {
-                min-width: 64px;
-                font-size: 10px;
-                right: 7px;
+                right: 6px;
+                min-width: 62px;
+                padding: 0 6px;
             }
 
             .input-wrapper input.has-toggle {
-                padding-right: 86px;
+                padding-right: 80px !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
             }
         }
     </style>
 {% endblock %}
 
-
-{# ================================================================
-   BODY
-================================================================ #}
-
 {% block body %}
-
 <div class="auth-container">
-
     <div class="auth-card">
 
-        <!-- =====================================================
-             PANNEAU FORMULAIRE
-        ====================================================== -->
-
-        <div class="auth-form-panel">
-
+        <section class="auth-form-panel">
             <div class="auth-header">
-
                 <div class="auth-logo-wrapper">
-
                     <img
                         src="{{ asset('images/Fond.png') }}"
-                        alt="Logo Gestion de Stock"
+                        alt="Logo Jumbo Score Madagascar"
                     >
-
-                    <span
-                        class="logo-placeholder"
-                        style="display:none;"
-                    >
-                        <i class="bi bi-box-seam"></i>
-                    </span>
-
                 </div>
 
                 <h1>Créer un compte</h1>
 
                 <p class="auth-subtitle">
-                    <i class="bi bi-person-plus"></i>
-                    Inscrivez-vous pour accéder à votre espace
+                    <i class="bi bi-person-plus" aria-hidden="true"></i>
+                    Inscrivez-vous pour accéder à votre espace client.
                 </p>
-
             </div>
 
-
-            <!-- =================================================
-                 ALERTES
-            ================================================== -->
-
             {% for flash in app.flashes('error') %}
-
-                <div class="alert alert-danger">
-
-                    <i class="bi bi-exclamation-circle-fill"></i>
-
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
                     <span>{{ flash }}</span>
-
                 </div>
-
             {% endfor %}
-
 
             {% for flash in app.flashes('success') %}
-
-                <div class="alert alert-success">
-
-                    <i class="bi bi-check-circle-fill"></i>
-
+                <div class="alert alert-success" role="status">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
                     <span>{{ flash }}</span>
-
                 </div>
-
             {% endfor %}
-
-
-            <!-- =================================================
-                 FORMULAIRE
-            ================================================== -->
 
             <form
                 method="post"
                 action="{{ path('app_register') }}"
                 id="registerForm"
-                autocomplete="off"
+                autocomplete="on"
             >
-
-                <!-- PRÉNOM + NOM -->
-
                 <div class="form-row">
-
                     <div class="form-group">
-
                         <label for="prenom">
-                            <i class="bi bi-person"></i>
+                            <i class="bi bi-person" aria-hidden="true"></i>
                             Prénom
                         </label>
 
                         <div class="input-wrapper">
-
                             <input
                                 type="text"
                                 id="prenom"
@@ -1193,24 +722,19 @@
                                 autocomplete="given-name"
                             >
 
-                            <span class="input-icon">
+                            <span class="input-icon" aria-hidden="true">
                                 <i class="bi bi-person-fill"></i>
                             </span>
-
                         </div>
-
                     </div>
 
-
                     <div class="form-group">
-
                         <label for="nom">
-                            <i class="bi bi-person-badge"></i>
+                            <i class="bi bi-person-badge" aria-hidden="true"></i>
                             Nom
                         </label>
 
                         <div class="input-wrapper">
-
                             <input
                                 type="text"
                                 id="nom"
@@ -1220,28 +744,20 @@
                                 autocomplete="family-name"
                             >
 
-                            <span class="input-icon">
+                            <span class="input-icon" aria-hidden="true">
                                 <i class="bi bi-person-badge-fill"></i>
                             </span>
-
                         </div>
-
                     </div>
-
                 </div>
 
-
-                <!-- EMAIL -->
-
                 <div class="form-group">
-
                     <label for="email">
-                        <i class="bi bi-envelope"></i>
-                        Adresse email
+                        <i class="bi bi-envelope" aria-hidden="true"></i>
+                        Adresse e-mail
                     </label>
 
                     <div class="input-wrapper">
-
                         <input
                             type="email"
                             id="email"
@@ -1251,43 +767,33 @@
                             autocomplete="email"
                         >
 
-                        <span class="input-icon">
+                        <span class="input-icon" aria-hidden="true">
                             <i class="bi bi-envelope-fill"></i>
                         </span>
-
                     </div>
-
                 </div>
 
-
-                <!-- =================================================
-                     MOT DE PASSE
-                ================================================== -->
-
                 <div class="form-group">
-
                     <label for="password">
-                        <i class="bi bi-key"></i>
+                        <i class="bi bi-key" aria-hidden="true"></i>
                         Mot de passe
                     </label>
 
                     <div class="input-wrapper">
-
                         <input
                             type="password"
                             id="password"
                             name="password"
                             class="has-toggle"
-                            placeholder="Votre mot de passe"
+                            placeholder="Choisissez un mot de passe"
                             required
+                            minlength="8"
                             autocomplete="new-password"
                         >
 
-                        <span class="input-icon">
+                        <span class="input-icon" aria-hidden="true">
                             <i class="bi bi-lock-fill"></i>
                         </span>
-
-                        <!-- BOUTON VOIR -->
 
                         <button
                             type="button"
@@ -1297,76 +803,43 @@
                             aria-pressed="false"
                             title="Afficher le mot de passe"
                         >
-
-                            <i class="bi bi-eye-fill"></i>
-
-                            <span class="toggle-label">
-                                Voir
-                            </span>
-
+                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
+                            <span class="toggle-label">Voir</span>
                         </button>
-
                     </div>
 
-
-                    <!-- FORCE DU MOT DE PASSE -->
-
-                    <div
-                        class="password-strength"
-                        id="passwordStrength"
-                    >
-
+                    <div class="password-strength" id="passwordStrength" aria-live="polite">
                         <div class="strength-bar">
-
                             <div class="bar"></div>
                             <div class="bar"></div>
                             <div class="bar"></div>
                             <div class="bar"></div>
-
                         </div>
-
                         <span class="strength-label"></span>
-
                     </div>
-
                 </div>
 
-
-                <!-- =================================================
-                     CONFIRMATION MOT DE PASSE
-                ================================================== -->
-
                 <div class="form-group">
-
                     <label for="password_confirmation">
-
-                        <i class="bi bi-shield-lock"></i>
-
+                        <i class="bi bi-shield-lock" aria-hidden="true"></i>
                         Confirmer le mot de passe
-
                     </label>
 
-
                     <div class="input-wrapper">
-
                         <input
                             type="password"
                             id="password_confirmation"
                             name="password_confirmation"
                             class="has-toggle"
-                            placeholder="Confirmez votre mot de passe"
+                            placeholder="Répétez votre mot de passe"
                             required
+                            minlength="8"
                             autocomplete="new-password"
                         >
 
-                        <span class="input-icon">
-
+                        <span class="input-icon" aria-hidden="true">
                             <i class="bi bi-shield-lock-fill"></i>
-
                         </span>
-
-
-                        <!-- BOUTON VOIR -->
 
                         <button
                             type="button"
@@ -1376,722 +849,276 @@
                             aria-pressed="false"
                             title="Afficher la confirmation du mot de passe"
                         >
-
-                            <i class="bi bi-eye-fill"></i>
-
-                            <span class="toggle-label">
-                                Voir
-                            </span>
-
+                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
+                            <span class="toggle-label">Voir</span>
                         </button>
-
                     </div>
 
-
-                    <!-- MESSAGE CORRESPONDANCE -->
-
-                    <div
-                        class="password-match"
-                        id="passwordMatch"
-                    >
-
-                        <i class="bi"></i>
-
+                    <div class="password-match" id="passwordMatch" aria-live="polite">
+                        <i class="bi" aria-hidden="true"></i>
                         <span></span>
-
                     </div>
-
                 </div>
 
-
-                <!-- =================================================
-                     BOUTON INSCRIPTION
-                ================================================== -->
-
-                <button
-                    type="submit"
-                    class="btn-primary"
-                    id="registerBtn"
-                >
-
-                    <i class="bi bi-person-plus-fill"></i>
-
+                <button type="submit" class="btn-primary" id="registerBtn">
+                    <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
                     <span>S'inscrire</span>
-
-                    <i class="bi bi-arrow-right"></i>
-
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </button>
-
             </form>
 
-
-            <!-- =================================================
-                 FOOTER
-            ================================================== -->
-
             <div class="auth-footer">
-
                 <p>
-
                     Vous avez déjà un compte ?
-
                     <a href="{{ path('app_login') }}">
-
-                        <i class="bi bi-box-arrow-in-right"></i>
-
+                        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
                         Se connecter
-
                     </a>
-
                 </p>
-
             </div>
+        </section>
 
-        </div>
-
-
-        <!-- =====================================================
-             PANNEAU DROIT
-        ====================================================== -->
-
-        <div class="auth-visual-panel">
-
+        <aside class="auth-visual-panel">
             <div class="visual-content">
-
                 <div class="visual-badge">
-
-                    <i class="bi bi-stars"></i>
-
-                    Nouveau compte
-
+                    <i class="bi bi-stars" aria-hidden="true"></i>
+                    Espace client
                 </div>
-
 
                 <h2 class="visual-title">
-
-                    Rejoignez la plateforme
-
-                    <span>
-                        de gestion de stock
-                    </span>
-
+                    Bienvenue chez
+                    <span>Jumbo Score Madagascar.</span>
                 </h2>
 
-
                 <p class="visual-description">
-
-                    Créez votre compte en quelques secondes et commencez
-                    à gérer votre inventaire efficacement dès aujourd'hui.
-
+                    Créez votre compte client pour accéder à votre espace
+                    et profiter d'une expérience de gestion simple et pratique.
                 </p>
 
-
                 <ul class="feature-list">
-
                     <li>
-
                         <span class="feature-icon">
-                            <i class="bi bi-lightning-charge"></i>
+                            <i class="bi bi-person-check" aria-hidden="true"></i>
                         </span>
-
-                        Inscription rapide et sécurisée
-
+                        Création rapide de votre compte
                     </li>
 
-
                     <li>
-
                         <span class="feature-icon">
-                            <i class="bi bi-shield-check"></i>
+                            <i class="bi bi-shield-check" aria-hidden="true"></i>
                         </span>
-
-                        Données protégées et sécurisées
-
+                        Mot de passe protégé
                     </li>
 
-
                     <li>
-
                         <span class="feature-icon">
-                            <i class="bi bi-box-seam"></i>
+                            <i class="bi bi-box-seam" aria-hidden="true"></i>
                         </span>
-
-                        Gestion complète de votre stock
-
+                        Un espace client dédié
                     </li>
-
-
-                    <li>
-
-                        <span class="feature-icon">
-                            <i class="bi bi-headset"></i>
-                        </span>
-
-                        Support technique dédié
-
-                    </li>
-
                 </ul>
 
-
-                <!-- ÉTAPES -->
-
                 <div class="progress-steps">
-
                     <div class="progress-step active">
-
                         <div class="step-dot">
-
-                            <i class="bi bi-pencil"></i>
-
+                            <i class="bi bi-pencil" aria-hidden="true"></i>
                         </div>
-
-                        <span class="step-label">
-                            Inscription
-                        </span>
-
+                        <span class="step-label">Inscription</span>
                     </div>
-
 
                     <div class="progress-step">
-
-                        <div class="step-dot">
-                            2
-                        </div>
-
-                        <span class="step-label">
-                            Vérification
-                        </span>
-
+                        <div class="step-dot">2</div>
+                        <span class="step-label">Compte créé</span>
                     </div>
-
 
                     <div class="progress-step">
-
-                        <div class="step-dot">
-                            3
-                        </div>
-
-                        <span class="step-label">
-                            Connexion
-                        </span>
-
+                        <div class="step-dot">3</div>
+                        <span class="step-label">Connexion</span>
                     </div>
-
                 </div>
-
             </div>
-
-        </div>
+        </aside>
 
     </div>
-
 </div>
-
 {% endblock %}
 
-
-{# ================================================================
-   JAVASCRIPT
-   IMPORTANT : ce bloc est EN DEHORS du block body
-================================================================ #}
-
 {% block javascripts %}
-
     {{ parent() }}
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('registerForm');
+            const passwordInput = document.getElementById('password');
+            const confirmationInput = document.getElementById('password_confirmation');
+            const strengthContainer = document.getElementById('passwordStrength');
+            const matchContainer = document.getElementById('passwordMatch');
+            const registerButton = document.getElementById('registerBtn');
 
-            /* =====================================================
-               VOIR / CACHER LES MOTS DE PASSE
-            ====================================================== */
-
-            const toggleButtons =
-                document.querySelectorAll('.toggle-password');
-
-            toggleButtons.forEach(function (button) {
-
-                button.addEventListener('click', function (event) {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    const targetId =
-                        this.getAttribute('data-target');
-
-                    const input =
-                        document.getElementById(targetId);
+            /* Afficher / masquer chaque mot de passe */
+            document.querySelectorAll('.toggle-password').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const input = document.getElementById(this.dataset.target);
 
                     if (!input) {
-                        console.error(
-                            'Champ mot de passe introuvable : ' +
-                            targetId
-                        );
                         return;
                     }
 
-                    const icon =
-                        this.querySelector('i');
+                    const showPassword = input.type === 'password';
+                    input.type = showPassword ? 'text' : 'password';
 
-                    const label =
-                        this.querySelector('.toggle-label');
+                    const icon = this.querySelector('i');
+                    const label = this.querySelector('.toggle-label');
 
-
-                    /* =================================================
-                       SI LE CHAMP EST MASQUÉ → AFFICHER
-                    ================================================== */
-
-                    if (input.type === 'password') {
-
-                        input.type = 'text';
-
-                        if (icon) {
-                            icon.className =
-                                'bi bi-eye-slash-fill';
-                        }
-
-                        if (label) {
-                            label.textContent =
-                                'Cacher';
-                        }
-
-                        this.setAttribute(
-                            'aria-label',
-                            'Masquer le mot de passe'
-                        );
-
-                        this.setAttribute(
-                            'aria-pressed',
-                            'true'
-                        );
-
-                        this.setAttribute(
-                            'title',
-                            'Masquer le mot de passe'
-                        );
-
+                    if (icon) {
+                        icon.className = showPassword
+                            ? 'bi bi-eye-slash-fill'
+                            : 'bi bi-eye-fill';
                     }
 
-                    /* =================================================
-                       SI LE CHAMP EST VISIBLE → CACHER
-                    ================================================== */
-
-                    else {
-
-                        input.type = 'password';
-
-                        if (icon) {
-                            icon.className =
-                                'bi bi-eye-fill';
-                        }
-
-                        if (label) {
-                            label.textContent =
-                                'Voir';
-                        }
-
-                        this.setAttribute(
-                            'aria-label',
-                            'Afficher le mot de passe'
-                        );
-
-                        this.setAttribute(
-                            'aria-pressed',
-                            'false'
-                        );
-
-                        this.setAttribute(
-                            'title',
-                            'Afficher le mot de passe'
-                        );
+                    if (label) {
+                        label.textContent = showPassword ? 'Cacher' : 'Voir';
                     }
 
+                    const fieldLabel = this.dataset.target === 'password'
+                        ? 'le mot de passe'
+                        : 'la confirmation du mot de passe';
+
+                    this.setAttribute(
+                        'aria-label',
+                        (showPassword ? 'Masquer ' : 'Afficher ') + fieldLabel
+                    );
+
+                    this.setAttribute('aria-pressed', String(showPassword));
+                    this.setAttribute(
+                        'title',
+                        (showPassword ? 'Masquer ' : 'Afficher ') + fieldLabel
+                    );
                 });
-
             });
 
-
-            /* =====================================================
-               FORCE DU MOT DE PASSE
-            ====================================================== */
-
-            const passwordInput =
-                document.getElementById('password');
-
-            const strengthContainer =
-                document.getElementById('passwordStrength');
-
-            const bars =
-                strengthContainer
-                    ? strengthContainer.querySelectorAll('.bar')
-                    : [];
-
-            const strengthLabel =
-                strengthContainer
-                    ? strengthContainer.querySelector('.strength-label')
-                    : null;
-
-
+            /* Évaluer la force du mot de passe */
             function updatePasswordStrength() {
-
-                if (
-                    !passwordInput ||
-                    !strengthContainer ||
-                    !strengthLabel
-                ) {
+                if (!passwordInput || !strengthContainer) {
                     return;
                 }
 
-                const value =
-                    passwordInput.value;
+                const value = passwordInput.value;
+                const bars = strengthContainer.querySelectorAll('.bar');
+                const label = strengthContainer.querySelector('.strength-label');
 
-
-                if (value.length === 0) {
-
-                    strengthContainer.classList.remove(
-                        'visible'
-                    );
-
+                if (!value) {
+                    strengthContainer.classList.remove('visible');
                     bars.forEach(function (bar) {
-
-                        bar.classList.remove(
-                            'active',
-                            'weak',
-                            'medium',
-                            'strong'
-                        );
-
+                        bar.className = 'bar';
                     });
-
-                    strengthLabel.textContent = '';
-
+                    label.textContent = '';
+                    label.className = 'strength-label';
                     return;
                 }
 
-
-                strengthContainer.classList.add(
-                    'visible'
-                );
-
+                strengthContainer.classList.add('visible');
 
                 let score = 0;
+                if (value.length >= 8) score++;
+                if (/[A-Z]/.test(value)) score++;
+                if (/[0-9]/.test(value)) score++;
+                if (/[^A-Za-z0-9]/.test(value)) score++;
 
-
-                if (value.length >= 8) {
-                    score++;
-                }
-
-                if (/[A-Z]/.test(value)) {
-                    score++;
-                }
-
-                if (/[0-9]/.test(value)) {
-                    score++;
-                }
-
-                if (/[^A-Za-z0-9]/.test(value)) {
-                    score++;
-                }
-
+                const level = score <= 2 ? 'weak' : (score === 3 ? 'medium' : 'strong');
+                const text = score <= 2 ? 'Faible' : (score === 3 ? 'Moyen' : 'Fort');
 
                 bars.forEach(function (bar, index) {
-
-                    bar.classList.remove(
-                        'active',
-                        'weak',
-                        'medium',
-                        'strong'
-                    );
-
+                    bar.className = 'bar';
 
                     if (index < score) {
-
-                        bar.classList.add('active');
-
-
-                        if (score <= 2) {
-
-                            bar.classList.add('weak');
-
-                        } else if (score === 3) {
-
-                            bar.classList.add('medium');
-
-                        } else {
-
-                            bar.classList.add('strong');
-
-                        }
-
+                        bar.classList.add('active', level);
                     }
-
                 });
 
-
-                strengthLabel.classList.remove(
-                    'weak',
-                    'medium',
-                    'strong'
-                );
-
-
-                if (score <= 2) {
-
-                    strengthLabel.textContent =
-                        'Faible';
-
-                    strengthLabel.classList.add(
-                        'weak'
-                    );
-
-                } else if (score === 3) {
-
-                    strengthLabel.textContent =
-                        'Moyen';
-
-                    strengthLabel.classList.add(
-                        'medium'
-                    );
-
-                } else {
-
-                    strengthLabel.textContent =
-                        'Fort';
-
-                    strengthLabel.classList.add(
-                        'strong'
-                    );
-
-                }
-
+                label.textContent = text;
+                label.className = 'strength-label ' + level;
             }
 
-
-            /* =====================================================
-               CONFIRMATION MOT DE PASSE
-            ====================================================== */
-
-            const confirmationInput =
-                document.getElementById(
-                    'password_confirmation'
-                );
-
-            const passwordMatch =
-                document.getElementById(
-                    'passwordMatch'
-                );
-
-
+            /* Vérifier que les deux mots de passe sont identiques */
             function checkPasswordMatch() {
-
-                if (
-                    !passwordInput ||
-                    !confirmationInput ||
-                    !passwordMatch
-                ) {
-                    return;
+                if (!passwordInput || !confirmationInput || !matchContainer) {
+                    return true;
                 }
 
+                const password = passwordInput.value;
+                const confirmation = confirmationInput.value;
+                const icon = matchContainer.querySelector('i');
+                const text = matchContainer.querySelector('span');
 
-                const icon =
-                    passwordMatch.querySelector('i');
-
-                const text =
-                    passwordMatch.querySelector('span');
-
-
-                const password =
-                    passwordInput.value;
-
-                const confirmation =
-                    confirmationInput.value;
-
-
-                if (confirmation.length === 0) {
-
-                    passwordMatch.classList.remove(
-                        'visible',
-                        'success',
-                        'error'
-                    );
-
-                    return;
+                if (!confirmation) {
+                    matchContainer.className = 'password-match';
+                    text.textContent = '';
+                    return false;
                 }
 
-
-                passwordMatch.classList.add(
-                    'visible'
-                );
-
+                matchContainer.classList.add('visible');
 
                 if (password === confirmation) {
-
-                    passwordMatch.classList.remove(
-                        'error'
-                    );
-
-                    passwordMatch.classList.add(
-                        'success'
-                    );
-
-
-                    if (icon) {
-                        icon.className =
-                            'bi bi-check-circle-fill';
-                    }
-
-
-                    if (text) {
-                        text.textContent =
-                            'Les mots de passe correspondent.';
-                    }
-
-                } else {
-
-                    passwordMatch.classList.remove(
-                        'success'
-                    );
-
-                    passwordMatch.classList.add(
-                        'error'
-                    );
-
-
-                    if (icon) {
-                        icon.className =
-                            'bi bi-x-circle-fill';
-                    }
-
-
-                    if (text) {
-                        text.textContent =
-                            'Les mots de passe ne correspondent pas.';
-                    }
-
+                    matchContainer.classList.remove('error');
+                    matchContainer.classList.add('success');
+                    icon.className = 'bi bi-check-circle-fill';
+                    text.textContent = 'Les mots de passe correspondent.';
+                    return true;
                 }
 
+                matchContainer.classList.remove('success');
+                matchContainer.classList.add('error');
+                icon.className = 'bi bi-x-circle-fill';
+                text.textContent = 'Les mots de passe ne correspondent pas.';
+                return false;
             }
-
-
-            /* =====================================================
-               ÉVÉNEMENTS PASSWORD
-            ====================================================== */
 
             if (passwordInput) {
+                passwordInput.addEventListener('input', function () {
+                    updatePasswordStrength();
 
-                passwordInput.addEventListener(
-                    'input',
-                    function () {
-
-                        updatePasswordStrength();
-
+                    if (confirmationInput && confirmationInput.value) {
                         checkPasswordMatch();
-
                     }
-                );
-
+                });
             }
-
 
             if (confirmationInput) {
-
-                confirmationInput.addEventListener(
-                    'input',
-                    checkPasswordMatch
-                );
-
+                confirmationInput.addEventListener('input', checkPasswordMatch);
             }
 
-
-            /* =====================================================
-               SUBMIT
-            ====================================================== */
-
-            const form =
-                document.getElementById(
-                    'registerForm'
-                );
-
-            const registerBtn =
-                document.getElementById(
-                    'registerBtn'
-                );
-
-
-            if (form && registerBtn) {
-
-                form.addEventListener(
-                    'submit',
-                    function (event) {
-
-                        if (
-                            passwordInput &&
-                            confirmationInput &&
-                            passwordInput.value !==
-                            confirmationInput.value
-                        ) {
-
-                            event.preventDefault();
-
-                            checkPasswordMatch();
-
-                            confirmationInput.focus();
-
-                            return;
-                        }
-
-
-                        registerBtn.innerHTML = `
-                            <i class="bi bi-arrow-repeat spinner"></i>
-                            <span>Création du compte...</span>
-                        `;
-
-                        registerBtn.disabled = true;
-
+            /* Vérification avant l'envoi */
+            if (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        return;
                     }
-                );
 
-            }
-
-
-            /* =====================================================
-               FALLBACK LOGO
-            ====================================================== */
-
-            const logoImg =
-                document.querySelector(
-                    '.auth-logo-wrapper img'
-                );
-
-
-            if (logoImg) {
-
-                logoImg.addEventListener(
-                    'error',
-                    function () {
-
-                        this.style.display = 'none';
-
-                        const placeholder =
-                            this.parentElement.querySelector(
-                                '.logo-placeholder'
-                            );
-
-
-                        if (placeholder) {
-
-                            placeholder.style.display =
-                                'flex';
-
-                        }
-
+                    if (passwordInput.value !== confirmationInput.value) {
+                        event.preventDefault();
+                        checkPasswordMatch();
+                        confirmationInput.focus();
+                        return;
                     }
-                );
 
+                    if (registerButton) {
+                        registerButton.disabled = true;
+                        registerButton.innerHTML =
+                            '<i class="bi bi-arrow-repeat spinner" aria-hidden="true"></i>' +
+                            '<span>Création du compte...</span>';
+                    }
+                });
             }
 
+            /* Afficher un message de secours si le logo est introuvable */
+            const logo = document.querySelector('.auth-logo-wrapper img');
+
+            if (logo) {
+                logo.addEventListener('error', function () {
+                    this.style.display = 'none';
+                });
+            }
         });
     </script>
-
 {% endblock %}

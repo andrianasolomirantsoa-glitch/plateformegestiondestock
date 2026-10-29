@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Image;
+use Doctrine\ORM\EntityRepository;
 
 class ProduitType extends AbstractType
 {
@@ -47,12 +48,20 @@ class ProduitType extends AbstractType
                 ],
             ])
 
-            ->add('categorie', EntityType::class, [
-                'class' => Categorie::class,
-                'choice_label' => 'nom',
-                'label' => 'Catégorie',
-                'placeholder' => 'Sélectionner une catégorie',
-            ])
+            
+->add('categorie', EntityType::class, [
+    'class' => Categorie::class,
+    'choice_label' => 'nom',
+    'label' => 'Catégorie',
+    'placeholder' => 'Sélectionner une catégorie',
+
+    'query_builder' => function (EntityRepository $er) {
+        return $er->createQueryBuilder('c')
+            ->andWhere('c.actif = :actif')
+            ->setParameter('actif', true)
+            ->orderBy('c.nom', 'ASC');
+    },
+])
 
             ->add('prixAchat', MoneyType::class, [
                 'label' => 'Prix d’achat',

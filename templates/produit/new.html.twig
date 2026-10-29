@@ -1,113 +1,600 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau produit{% endblock %}
+{% block title %}Nouveau produit | Gestion de stock{% endblock %}
 
 {% block body %}
+<style>
+    .product-page {
+        --product-primary: #3457d5;
+        --product-primary-dark: #2845b0;
+        --product-text: #172033;
+        --product-muted: #748094;
+        --product-border: #e5e9f0;
+        --product-surface: #ffffff;
+        color: var(--product-text);
+        padding-bottom: 2rem;
+    }
 
-<div class="container-fluid py-4">
+    .product-page .page-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
 
-<div class="d-flex align-items-center gap-3 mb-4">
-    <a href="{{ path('app_produit_index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i>
-    </a>
+    .product-page .heading-main {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 
-    <div>
-        <h1 class="fw-bold mb-1">Nouveau produit</h1>
-        <p class="text-muted mb-0">
-            Ajouter un nouveau produit au catalogue
-        </p>
+    .product-page .back-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        border: 1px solid var(--product-border);
+        border-radius: 12px;
+        color: #465269;
+        background: #fff;
+        text-decoration: none;
+        transition: all .2s ease;
+    }
+
+    .product-page .back-button:hover {
+        border-color: var(--product-primary);
+        color: var(--product-primary);
+        background: #f5f7ff;
+        transform: translateX(-2px);
+    }
+
+    .product-page .eyebrow {
+        margin-bottom: .35rem;
+        color: var(--product-primary);
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .product-page .page-title {
+        margin: 0;
+        font-size: clamp(1.5rem, 2.5vw, 2rem);
+        font-weight: 750;
+        letter-spacing: -.04em;
+    }
+
+    .product-page .page-subtitle {
+        margin: .4rem 0 0;
+        color: var(--product-muted);
+        font-size: .93rem;
+    }
+
+    .product-page .form-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    .product-page .form-card,
+    .product-page .side-card {
+        overflow: hidden;
+        border: 1px solid var(--product-border);
+        border-radius: 16px;
+        background: var(--product-surface);
+        box-shadow: 0 5px 24px rgba(25, 39, 75, .045);
+    }
+
+    .product-page .card-heading {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--product-border);
+    }
+
+    .product-page .heading-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: #edf1ff;
+        color: var(--product-primary);
+        font-size: 1.2rem;
+    }
+
+    .product-page .section-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 750;
+    }
+
+    .product-page .section-description {
+        margin: .25rem 0 0;
+        color: var(--product-muted);
+        font-size: .83rem;
+    }
+
+    .product-page .form-content {
+        padding: 1.5rem;
+    }
+
+    .product-page .form-section + .form-section {
+        margin-top: 1.8rem;
+        padding-top: 1.6rem;
+        border-top: 1px solid var(--product-border);
+    }
+
+    .product-page .form-section-title {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        margin-bottom: 1.15rem;
+        font-size: .9rem;
+        font-weight: 750;
+    }
+
+    .product-page .form-section-title i {
+        color: var(--product-primary);
+        font-size: 1rem;
+    }
+
+    .product-page .form-label {
+        margin-bottom: .45rem;
+        color: #354056;
+        font-size: .84rem;
+        font-weight: 650;
+    }
+
+    .product-page .form-control,
+    .product-page .form-select {
+        min-height: 45px;
+        border: 1px solid #dce2ec;
+        border-radius: 9px;
+        color: var(--product-text);
+        background-color: #fff;
+        font-size: .9rem;
+        box-shadow: none;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .product-page textarea.form-control {
+        min-height: 115px;
+        resize: vertical;
+    }
+
+    .product-page .form-control:focus,
+    .product-page .form-select:focus {
+        border-color: var(--product-primary);
+        box-shadow: 0 0 0 3px rgba(52, 87, 213, .12);
+    }
+
+    .product-page .form-text {
+        color: var(--product-muted);
+        font-size: .78rem;
+    }
+
+    .product-page .form-check {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        min-height: 46px;
+        margin: 0;
+        padding: .75rem 1rem;
+        border: 1px solid var(--product-border);
+        border-radius: 10px;
+        background: #fafbfe;
+    }
+
+    .product-page .form-check .form-check-input {
+        float: none;
+        margin: 0;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .product-page .form-check .form-check-label {
+        font-size: .88rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .product-page .form-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--product-border);
+    }
+
+    .product-page .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        min-height: 43px;
+        padding: .65rem 1.05rem;
+        border-radius: 9px;
+        font-size: .87rem;
+        font-weight: 650;
+        transition: all .2s ease;
+    }
+
+    .product-page .btn-save {
+        border: 1px solid var(--product-primary);
+        background: var(--product-primary);
+        color: #fff;
+    }
+
+    .product-page .btn-save:hover {
+        border-color: var(--product-primary-dark);
+        background: var(--product-primary-dark);
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px rgba(52, 87, 213, .2);
+    }
+
+    .product-page .btn-cancel {
+        border: 1px solid var(--product-border);
+        background: #fff;
+        color: #526078;
+        text-decoration: none;
+    }
+
+    .product-page .btn-cancel:hover {
+        background: #f6f8fc;
+        color: var(--product-text);
+    }
+
+    .product-page .side-card {
+        padding: 1.25rem;
+    }
+
+    .product-page .side-card + .side-card {
+        margin-top: 1rem;
+    }
+
+    .product-page .side-title {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin-bottom: 1rem;
+        font-size: .9rem;
+        font-weight: 750;
+    }
+
+    .product-page .side-title i {
+        color: var(--product-primary);
+        font-size: 1.1rem;
+    }
+
+    .product-page .guide-item {
+        display: flex;
+        align-items: flex-start;
+        gap: .7rem;
+    }
+
+    .product-page .guide-item + .guide-item {
+        margin-top: 1rem;
+    }
+
+    .product-page .guide-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 27px;
+        height: 27px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #edf1ff;
+        color: var(--product-primary);
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .product-page .guide-item strong {
+        display: block;
+        margin-bottom: .2rem;
+        font-size: .82rem;
+    }
+
+    .product-page .guide-item p {
+        margin: 0;
+        color: var(--product-muted);
+        font-size: .78rem;
+        line-height: 1.55;
+    }
+
+    .product-page .info-note {
+        padding: .9rem;
+        border: 1px solid #e1e8ff;
+        border-radius: 10px;
+        background: #f6f8ff;
+        color: #4e5d82;
+        font-size: .8rem;
+        line-height: 1.6;
+    }
+
+    .product-page .info-note i {
+        margin-right: .35rem;
+        color: var(--product-primary);
+    }
+
+    .product-page .invalid-feedback {
+        font-size: .79rem;
+    }
+
+    @media (max-width: 1199.98px) {
+        .product-page .form-layout {
+            grid-template-columns: minmax(0, 1fr) 250px;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .product-page .form-layout {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .product-page .side-column {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .product-page .side-card + .side-card {
+            margin-top: 0;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .product-page .page-heading {
+            align-items: flex-start;
+        }
+
+        .product-page .heading-main {
+            align-items: flex-start;
+            gap: .7rem;
+        }
+
+        .product-page .back-button {
+            width: 39px;
+            height: 39px;
+        }
+
+        .product-page .form-content {
+            padding: 1rem;
+        }
+
+        .product-page .card-heading {
+            padding: 1rem;
+        }
+
+        .product-page .side-column {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .product-page .form-footer {
+            align-items: stretch;
+            flex-direction: column-reverse;
+        }
+
+        .product-page .footer-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .product-page .footer-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4 product-page">
+
+    <div class="page-heading">
+        <div class="heading-main">
+            <a
+                href="{{ path('app_produit_index') }}"
+                class="back-button"
+                aria-label="Retour à la liste des produits"
+                title="Retour à la liste des produits"
+            >
+                <i class="bi bi-arrow-left"></i>
+            </a>
+
+            <div>
+                <div class="eyebrow">Catalogue produits</div>
+                <h1 class="page-title">Nouveau produit</h1>
+                <p class="page-subtitle">
+                    Ajoutez un article et renseignez ses informations commerciales.
+                </p>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="row justify-content-center">
+    {{ form_start(form, {
+        attr: {
+            class: 'product-form',
+            novalidate: 'novalidate'
+        }
+    }) }}
 
-    <div class="col-12 col-xl-9">
+    <div class="form-layout">
 
-        <div class="card border-0 shadow-sm">
+        <div class="form-card">
 
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0">
-                    <i class="bi bi-box-seam me-2"></i>
-                    Informations du produit
-                </h5>
+            <div class="card-heading">
+                <div class="heading-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Informations du produit</h2>
+                    <p class="section-description">
+                        Renseignez les informations nécessaires à la création de l'article.
+                    </p>
+                </div>
             </div>
 
-            <div class="card-body p-4">
+            <div class="form-content">
 
-                {{ form_start(form) }}
+                <section class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="bi bi-card-text"></i>
+                        Identification
+                    </h3>
 
-                <div class="row g-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form_row(form.reference) }}
+                        </div>
 
-                    <div class="col-md-6">
-                        {{ form_row(form.reference) }}
+                        <div class="col-md-6">
+                            {{ form_row(form.nom) }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_row(form.categorie) }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_row(form.description) }}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="bi bi-currency-exchange"></i>
+                        Informations commerciales
+                    </h3>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form_row(form.unite) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form_row(form.prixAchat) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form_row(form.prixVente) }}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="bi bi-boxes"></i>
+                        Gestion du stock
+                    </h3>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form_row(form.quantiteStock) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form_row(form.seuilAlerte) }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_row(form.actif) }}
+                        </div>
+                    </div>
+                </section>
+
+                <div class="form-footer">
+                    <div class="text-muted small">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Vérifiez les informations avant l'enregistrement.
                     </div>
 
-                    <div class="col-md-6">
-                        {{ form_row(form.nom) }}
-                    </div>
+                    <div class="footer-actions d-flex flex-wrap gap-2">
+                        <a
+                            href="{{ path('app_produit_index') }}"
+                            class="btn btn-cancel"
+                        >
+                            Annuler
+                        </a>
 
-                    <div class="col-12">
-                        {{ form_row(form.description) }}
+                        <button type="submit" class="btn btn-save">
+                            <i class="bi bi-check2-circle"></i>
+                            Enregistrer le produit
+                        </button>
                     </div>
-
-                    <div class="col-md-6">
-                        {{ form_row(form.categorie) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_row(form.unite) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_row(form.prixAchat) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_row(form.prixVente) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_row(form.quantiteStock) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_row(form.seuilAlerte) }}
-                    </div>
-
-                    <div class="col-12">
-                        {{ form_row(form.actif) }}
-                    </div>
-
                 </div>
-
-                <hr class="my-4">
-
-                <div class="d-flex justify-content-end gap-2">
-
-                    <a
-                        href="{{ path('app_produit_index') }}"
-                        class="btn btn-light border"
-                    >
-                        Annuler
-                    </a>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg me-1"></i>
-                        Enregistrer le produit
-                    </button>
-
-                </div>
-
-                {{ form_end(form) }}
 
             </div>
-
         </div>
 
+        <aside class="side-column">
+
+            <div class="side-card">
+                <h2 class="side-title">
+                    <i class="bi bi-lightbulb"></i>
+                    Conseils de saisie
+                </h2>
+
+                <div class="guide-item">
+                    <span class="guide-number">1</span>
+                    <div>
+                        <strong>Identification</strong>
+                        <p>Utilisez une référence unique et un nom facile à reconnaître.</p>
+                    </div>
+                </div>
+
+                <div class="guide-item">
+                    <span class="guide-number">2</span>
+                    <div>
+                        <strong>Catégorie et unité</strong>
+                        <p>Classez le produit correctement et choisissez l'unité adaptée à sa vente.</p>
+                    </div>
+                </div>
+
+                <div class="guide-item">
+                    <span class="guide-number">3</span>
+                    <div>
+                        <strong>Prix</strong>
+                        <p>Vérifiez les prix d'achat et de vente avant de valider.</p>
+                    </div>
+                </div>
+
+                <div class="guide-item">
+                    <span class="guide-number">4</span>
+                    <div>
+                        <strong>Stock et alerte</strong>
+                        <p>Renseignez la quantité initiale et le seuil à partir duquel surveiller le stock.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="side-card">
+                <h2 class="side-title">
+                    <i class="bi bi-info-circle"></i>
+                    À savoir
+                </h2>
+
+                <div class="info-note">
+                    <i class="bi bi-check-circle"></i>
+                    Les informations saisies seront enregistrées selon les règles de validation déjà définies dans votre application.
+                </div>
+            </div>
+
+        </aside>
+
     </div>
 
-</div>
-
+    {{ form_end(form) }}
 
 </div>
 {% endblock %}

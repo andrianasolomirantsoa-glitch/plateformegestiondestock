@@ -322,103 +322,78 @@ class ProduitController extends AbstractController
     }
 
 
-    #[Route('/{id}/supprimer', name: 'app_produit_delete', methods: ['POST'])]
-    public function delete(
-        Request $request,
-        Produit $produit,
-        EntityManagerInterface $entityManager
-    ): Response {
-        if (
-            $this->isCsrfTokenValid(
-                'delete' . $produit->getId(),
-                $request->request->get('_token')
-            )
-        ) {
+    
+#[Route('/{id}/supprimer', name: 'app_produit_delete', methods: ['POST'])]
+public function delete(
+    Request $request,
+    Produit $produit,
+    EntityManagerInterface $entityManager
+): Response {
+    if (!$this->isCsrfTokenValid(
+        'delete' . $produit->getId(),
+        $request->request->get('_token')
+    )) {
+        $this->addFlash('danger', 'Jeton de sécurité invalide.');
 
-            $uploadDir =
-                $this->getUploadDir();
-
-
-            /*
-             * =====================================================
-             * SUPPRESSION PHOTO PRINCIPALE
-             * =====================================================
-             */
-
-            $mainImage =
-                $produit->getImage();
-
-
-            if ($mainImage) {
-
-                $imagePath =
-                    $uploadDir
-                    . DIRECTORY_SEPARATOR
-                    . $mainImage;
-
-
-                if (is_file($imagePath)) {
-                    unlink($imagePath);
-                }
-            }
-
-
-            /*
-             * =====================================================
-             * SUPPRESSION PHOTOS SUPPLÉMENTAIRES
-             * =====================================================
-             */
-
-            foreach ($produit->getImages() as $produitImage) {
-
-                $filename =
-                    $produitImage->getFilename();
-
-
-                if (!$filename) {
-                    continue;
-                }
-
-
-                $imagePath =
-                    $uploadDir
-                    . DIRECTORY_SEPARATOR
-                    . $filename;
-
-
-                if (is_file($imagePath)) {
-                    unlink($imagePath);
-                }
-            }
-
-
-            /*
-             * =====================================================
-             * SUPPRESSION DU PRODUIT
-             *
-             * orphanRemoval + cascade remove
-             * supprime également les ProduitImage en BDD.
-             * =====================================================
-             */
-
-            $entityManager->remove(
-                $produit
-            );
-
-            $entityManager->flush();
-
-
-            $this->addFlash(
-                'success',
-                'Le produit a été supprimé avec succès.'
-            );
-        }
-
-
-        return $this->redirectToRoute(
-            'app_produit_index'
-        );
+        return $this->redirectToRoute('app_produit_index');
     }
+
+    if ($produit->getImages()->count() > 0) {
+        // Les images seront supprimées uniquement si le produit
+        // peut réellement être supprimé de la base.
+    }
+
+    // Vérifier si le produit possède des entrées de stock.
+    $nombreEntrees = (int) $entityManager->getConnection()
+        ->fetchOne(
+            'SELECT COUNT(*) FROM entrees_stock WHERE produit_id = ?',
+            [$produit->getId()]
+        );
+
+    if ($nombreEntrees > 0) {
+        // Préserver le produit et son historique.
+        $produit->setActif(false);
+        $entityManager->flush();
+
+        $this->addFlash(
+            'warning',
+            'Ce produit possède un historique de stock. Il a été désactivé au lieu d’être supprimé.'
+        );
+
+        return $this->redirectToRoute('app_produit_index');
+    }
+
+    // Le produit n'a aucune entrée de stock : suppression définitive.
+    $uploadDir = $this->getUploadDir();
+
+    $filenames = [];
+
+    if ($produit->getImage()) {
+        $filenames[] = $produit->getImage();
+    }
+
+    foreach ($produit->getImages() as $image) {
+        if ($image->getFilename()) {
+            $filenames[] = $image->getFilename();
+        }
+    }
+
+    $entityManager->remove($produit);
+    $entityManager->flush();
+
+    // Ne supprimer les fichiers qu'après la réussite de la suppression SQL.
+    foreach (array_unique($filenames) as $filename) {
+        $imagePath = $uploadDir . DIRECTORY_SEPARATOR . $filename;
+
+        if (is_file($imagePath)) {
+            unlink($imagePath);
+        }
+    }
+
+    $this->addFlash('success', 'Le produit a été supprimé avec succès.');
+
+    return $this->redirectToRoute('app_produit_index');
+}
 
 
     /*
