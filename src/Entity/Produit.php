@@ -20,6 +20,9 @@ class Produit
     #[ORM\Column(length: 100, unique: true)]
     private ?string $reference = null;
 
+    #[ORM\Column(name: 'code_barres', length: 30, unique: true, nullable: true)]
+    private ?string $codeBarres = null;
+
 
     #[ORM\Column(length: 150)]
     private ?string $nom = null;
@@ -64,6 +67,10 @@ class Produit
     #[ORM\JoinColumn(name: 'categorie_id', nullable: false)]
     private ?Categorie $categorie = null;
 
+    #[ORM\ManyToOne(inversedBy: 'produits')]
+#[ORM\JoinColumn(name: 'famille_id', nullable: true)]
+private ?Famille $famille = null;
+
 
     #[ORM\Column(name: 'created_at')]
     private ?\DateTimeImmutable $createdAt = null;
@@ -103,7 +110,7 @@ class Produit
     {
         return $this->reference;
     }
-
+    
 
     public function setReference(string $reference): static
     {
@@ -112,6 +119,17 @@ class Produit
         return $this;
     }
 
+    public function getCodeBarres(): ?string
+{
+    return $this->codeBarres;
+}
+
+public function setCodeBarres(?string $codeBarres): static
+{
+    $this->codeBarres = $codeBarres;
+
+    return $this;
+}
 
     public function getNom(): ?string
     {
@@ -318,5 +336,16 @@ class Produit
 
         return $this;
     }
+    public function getFamille(): ?Famille
+{
+    return $this->famille;
+}
+
+public function setFamille(?Famille $famille): static
+{
+    $this->famille = $famille;
+
+    return $this;
+}
 }
 

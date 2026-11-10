@@ -1,0 +1,727 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'inventaire{% endblock %}
+{% block header_title %}Détails de l'inventaire{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .inventory-page {
+            color: #e5e7eb;
+        }
+
+        .inventory-hero {
+            background: linear-gradient(135deg, #111c35, #172b4d);
+            border: 1px solid rgba(34, 211, 238, .18);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 22px;
+        }
+
+        .inventory-hero h2 {
+            color: #fff;
+            font-weight: 750;
+            margin-bottom: 8px;
+        }
+
+        .inventory-muted {
+            color: #94a3b8;
+            font-size: .88rem;
+        }
+
+        .inventory-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 25px;
+            margin-top: 20px;
+        }
+
+        .inventory-meta-item {
+            color: #cbd5e1;
+            font-size: .9rem;
+        }
+
+        .inventory-meta-item i {
+            color: #22d3ee;
+            margin-right: 7px;
+        }
+
+        .inventory-card {
+            background: #101a2d;
+            border: 1px solid rgba(148, 163, 184, .13);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .inventory-card-title {
+            color: #f8fafc;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .inventory-stat {
+            background: #101a2d;
+            border: 1px solid rgba(148, 163, 184, .13);
+            border-radius: 15px;
+            padding: 18px;
+            height: 100%;
+        }
+
+        .inventory-stat-label {
+            color: #94a3b8;
+            font-size: .82rem;
+            margin-bottom: 8px;
+        }
+
+        .inventory-stat-value {
+            color: #fff;
+            font-size: 1.65rem;
+            font-weight: 750;
+        }
+
+        .inventory-stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .stat-blue {
+            background: rgba(59, 130, 246, .14);
+            color: #60a5fa;
+        }
+
+        .stat-green {
+            background: rgba(34, 197, 94, .13);
+            color: #4ade80;
+        }
+
+        .stat-orange {
+            background: rgba(245, 158, 11, .13);
+            color: #fbbf24;
+        }
+
+        .stat-purple {
+            background: rgba(139, 92, 246, .14);
+            color: #c4b5fd;
+        }
+
+        .inventory-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .inventory-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .inventory-table thead th {
+            background: #17243b;
+            color: #9fb2cc;
+            font-size: .76rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, .15);
+            white-space: nowrap;
+        }
+
+        .inventory-table tbody td {
+            padding: 14px 12px;
+            color: #dbe4f0;
+            border-bottom: 1px solid rgba(148, 163, 184, .09);
+            vertical-align: middle;
+        }
+
+        .inventory-table tbody tr:hover {
+            background: rgba(59, 130, 246, .06);
+        }
+
+        .product-name {
+            color: #f8fafc;
+            font-weight: 650;
+        }
+
+        .product-reference {
+            color: #8293ad;
+            font-size: .78rem;
+            margin-top: 3px;
+        }
+
+        .quantity-value {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 55px;
+            padding: 7px 12px;
+            background: rgba(59, 130, 246, .12);
+            color: #93c5fd;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .quantity-missing {
+            color: #fbbf24;
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        .delta {
+            display: inline-block;
+            min-width: 65px;
+            text-align: center;
+            padding: 6px 9px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .delta-positive {
+            background: rgba(34, 197, 94, .12);
+            color: #4ade80;
+        }
+
+        .delta-negative {
+            background: rgba(239, 68, 68, .12);
+            color: #f87171;
+        }
+
+        .delta-zero {
+            background: rgba(148, 163, 184, .10);
+            color: #cbd5e1;
+        }
+
+        .observation-text {
+            color: #94a3b8;
+            font-size: .83rem;
+            max-width: 220px;
+            white-space: normal;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 30px;
+            font-size: .78rem;
+            font-weight: 700;
+        }
+
+        .status-progress {
+            background: rgba(245, 158, 11, .14);
+            color: #fbbf24;
+        }
+
+        .status-validated {
+            background: rgba(34, 197, 94, .14);
+            color: #4ade80;
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, .13);
+            color: #f87171;
+        }
+
+        .inventory-notice {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 14px 16px;
+            background: rgba(34, 211, 238, .07);
+            border: 1px solid rgba(34, 211, 238, .18);
+            border-radius: 12px;
+            color: #b9d9e5;
+            font-size: .88rem;
+            margin-bottom: 20px;
+        }
+
+        .inventory-notice i {
+            color: #22d3ee;
+            font-size: 1.15rem;
+        }
+
+        .inventory-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-inventory-primary {
+            background: linear-gradient(135deg, #0891b2, #2563eb);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 17px;
+            font-weight: 650;
+        }
+
+        .btn-inventory-primary:hover {
+            color: #fff;
+            opacity: .9;
+        }
+
+        .btn-inventory-success {
+            background: linear-gradient(135deg, #059669, #16a34a);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 17px;
+            font-weight: 650;
+        }
+
+        .btn-inventory-success:hover {
+            color: #fff;
+            opacity: .9;
+        }
+
+        .btn-inventory-danger {
+            background: rgba(239, 68, 68, .10);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, .3);
+            border-radius: 10px;
+            padding: 10px 17px;
+        }
+
+        .btn-inventory-danger:hover {
+            background: rgba(239, 68, 68, .2);
+            color: #fff;
+        }
+
+        .btn-inventory-secondary {
+            background: #24334d;
+            color: #dbeafe;
+            border: 1px solid #3b4c68;
+            border-radius: 10px;
+            padding: 10px 17px;
+        }
+
+        .btn-inventory-secondary:hover {
+            background: #30435f;
+            color: #fff;
+        }
+
+        .progress-track {
+            height: 9px;
+            background: #26354d;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-bar-inventory {
+            height: 100%;
+            background: linear-gradient(90deg, #0891b2, #22d3ee);
+            border-radius: 20px;
+            transition: width .3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .inventory-hero {
+                padding: 18px;
+            }
+
+            .inventory-card {
+                padding: 14px;
+            }
+
+            .inventory-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .inventory-actions > div,
+            .inventory-actions button,
+            .inventory-actions a {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="inventory-page">
+
+    {# En-tête #}
+    <div class="inventory-hero">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+                <div class="inventory-muted mb-2">
+                    INVENTAIRE #{{ "%04d"|format(inventaire.id) }}
+                </div>
+
+                <h2>
+                    <i class="bi bi-clipboard2-data me-2"></i>
+                    Détails de l'inventaire
+                </h2>
+
+                <p class="inventory-muted mb-0">
+                    Récapitulatif des quantités théoriques et physiques du magasin.
+                </p>
+            </div>
+
+            <div>
+                {% if inventaire.statut == 'EN_COURS' %}
+                    <span class="status-badge status-progress">
+                        <i class="bi bi-hourglass-split"></i>
+                        En cours
+                    </span>
+                {% elseif inventaire.statut == 'VALIDE' %}
+                    <span class="status-badge status-validated">
+                        <i class="bi bi-check-circle"></i>
+                        Validé
+                    </span>
+                {% elseif inventaire.statut == 'ANNULE' %}
+                    <span class="status-badge status-cancelled">
+                        <i class="bi bi-x-circle"></i>
+                        Annulé
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="inventory-meta">
+            <div class="inventory-meta-item">
+                <i class="bi bi-shop"></i>
+                <strong>Magasin :</strong>
+                {{ inventaire.magasin.nom }}
+            </div>
+
+            <div class="inventory-meta-item">
+                <i class="bi bi-calendar3"></i>
+                <strong>Date :</strong>
+                {{ inventaire.dateInventaire|date('d/m/Y H:i') }}
+            </div>
+
+            <div class="inventory-meta-item">
+                <i class="bi bi-person"></i>
+                <strong>Responsable :</strong>
+                {% if inventaire.utilisateur %}
+                    {{ inventaire.utilisateur.prenom }} {{ inventaire.utilisateur.nom }}
+                {% else %}
+                    Non renseigné
+                {% endif %}
+            </div>
+
+            <div class="inventory-meta-item">
+                <i class="bi bi-clock-history"></i>
+                <strong>Créé le :</strong>
+                {{ inventaire.createdAt|date('d/m/Y H:i') }}
+            </div>
+        </div>
+
+        {% if inventaire.commentaire %}
+            <div class="mt-3 pt-3 border-top border-secondary">
+                <div class="inventory-muted mb-1">Commentaire</div>
+                <div class="text-light">{{ inventaire.commentaire|nl2br }}</div>
+            </div>
+        {% endif %}
+    </div>
+
+    {# Statistiques #}
+    {% set totalLignes = lignes|length %}
+    {% set progression = totalLignes > 0 ? (nombreComptes / totalLignes * 100)|round : 0 %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="inventory-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="inventory-stat-label">Total produits</div>
+                        <div class="inventory-stat-value">{{ totalLignes }}</div>
+                    </div>
+                    <div class="inventory-stat-icon stat-blue">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="inventory-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="inventory-stat-label">Produits comptés</div>
+                        <div class="inventory-stat-value">{{ nombreComptes }}</div>
+                    </div>
+                    <div class="inventory-stat-icon stat-green">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="inventory-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="inventory-stat-label">Restant à compter</div>
+                        <div class="inventory-stat-value">{{ nombreNonComptes }}</div>
+                    </div>
+                    <div class="inventory-stat-icon stat-orange">
+                        <i class="bi bi-hourglass"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="inventory-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="inventory-stat-label">Écart net</div>
+                        <div class="inventory-stat-value">
+                            {% if totalEcart > 0 %}+{% endif %}{{ totalEcart }}
+                        </div>
+                    </div>
+                    <div class="inventory-stat-icon stat-purple">
+                        <i class="bi bi-bar-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Progression #}
+    <div class="inventory-card">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+            <div>
+                <div class="inventory-card-title">Progression du comptage</div>
+                <div class="inventory-muted">
+                    {{ nombreComptes }} produit(s) compté(s) sur {{ totalLignes }}
+                </div>
+            </div>
+
+            <strong class="text-info">{{ progression }} %</strong>
+        </div>
+
+        <div class="progress-track">
+            <div
+                class="progress-bar-inventory"
+                style="width: {{ progression }}%;"
+            ></div>
+        </div>
+    </div>
+
+    {# Information selon le statut #}
+    {% if inventaire.statut == 'EN_COURS' %}
+        <div class="inventory-notice">
+            <i class="bi bi-info-circle-fill"></i>
+            <div>
+                <strong>Inventaire non encore validé :</strong>
+                les quantités physiques sont enregistrées, mais le stock réel du magasin
+                n'a pas encore été modifié. Terminez le comptage de tous les produits
+                avant de valider.
+            </div>
+        </div>
+    {% elseif inventaire.statut == 'VALIDE' %}
+        <div class="inventory-notice">
+            <i class="bi bi-check-circle-fill"></i>
+            <div>
+                <strong>Inventaire validé :</strong>
+                les quantités physiques ont été appliquées au stock du magasin.
+                Cet inventaire est conservé comme historique.
+            </div>
+        </div>
+    {% elseif inventaire.statut == 'ANNULE' %}
+        <div class="inventory-notice">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <div>
+                <strong>Inventaire annulé :</strong>
+                aucune modification de stock n'a été effectuée par cet inventaire.
+            </div>
+        </div>
+    {% endif %}
+
+    {# Tableau des produits #}
+    <div class="inventory-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <div class="inventory-card-title">Détail des produits</div>
+                <div class="inventory-muted">
+                    Comparaison entre le stock théorique et le comptage physique.
+                </div>
+            </div>
+
+            <span class="badge bg-secondary">
+                {{ totalLignes }} ligne(s)
+            </span>
+        </div>
+
+        {% if lignes is not empty %}
+            <div class="inventory-table-wrapper">
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Unité</th>
+                            <th>Stock théorique</th>
+                            <th>Quantité physique</th>
+                            <th>Écart</th>
+                            <th>Observation</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for ligne in lignes %}
+                            <tr>
+                                <td>
+                                    <div class="product-name">
+                                        {{ ligne.produit.nom }}
+                                    </div>
+                                    <div class="product-reference">
+                                        Réf. : {{ ligne.produit.reference }}
+                                    </div>
+                                </td>
+
+                                <td>{{ ligne.produit.unite }}</td>
+
+                                <td>
+                                    <span class="quantity-value">
+                                        {{ ligne.stockTheorique }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {% if ligne.quantitePhysique is not null %}
+                                        <strong class="text-light">
+                                            {{ ligne.quantitePhysique }}
+                                        </strong>
+                                    {% else %}
+                                        <span class="quantity-missing">
+                                            <i class="bi bi-hourglass-split me-1"></i>
+                                            Non compté
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if ligne.ecart is not null %}
+                                        {% if ligne.ecart > 0 %}
+                                            <span class="delta delta-positive">
+                                                +{{ ligne.ecart }}
+                                            </span>
+                                        {% elseif ligne.ecart < 0 %}
+                                            <span class="delta delta-negative">
+                                                {{ ligne.ecart }}
+                                            </span>
+                                        {% else %}
+                                            <span class="delta delta-zero">
+                                                0
+                                            </span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="inventory-muted">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if ligne.observation %}
+                                        <div class="observation-text">
+                                            {{ ligne.observation }}
+                                        </div>
+                                    {% else %}
+                                        <span class="inventory-muted">Aucune</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4 inventory-muted">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                Aucune ligne dans cet inventaire.
+            </div>
+        {% endif %}
+    </div>
+
+    {# Actions #}
+    <div class="inventory-card">
+        <div class="inventory-actions">
+            <a
+                href="{{ path('admin_inventaire_index') }}"
+                class="btn btn-inventory-secondary"
+            >
+                <i class="bi bi-arrow-left me-1"></i>
+                Retour à la liste
+            </a>
+            <a
+    href="{{ path('admin_inventaire_rapport', {id: inventaire.id}) }}"
+    class="btn btn-inventory-secondary"
+    target="_blank"
+>
+    <i class="bi bi-file-earmark-pdf me-1"></i>
+    Voir le rapport
+</a>
+
+            {% if inventaire.statut == 'EN_COURS' %}
+                <div class="d-flex flex-wrap gap-2">
+                    <a
+                        href="{{ path('admin_inventaire_comptage', {id: inventaire.id}) }}"
+                        class="btn btn-inventory-primary"
+                    >
+                        <i class="bi bi-pencil-square me-1"></i>
+                        Continuer le comptage
+                    </a>
+
+                    {% if nombreNonComptes == 0 %}
+                        <form
+                            method="post"
+                            action="{{ path('admin_inventaire_valider', {id: inventaire.id}) }}"
+                            onsubmit="return confirm('Confirmer la validation définitive de cet inventaire ? Les stocks du magasin seront mis à jour.');"
+                        >
+                            <input
+                                type="hidden"
+                                name="_token"
+                                value="{{ csrf_token('inventaire_valider_' ~ inventaire.id) }}"
+                            >
+
+                            <button type="submit" class="btn btn-inventory-success">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Valider l'inventaire
+                            </button>
+                        </form>
+                    {% else %}
+                        <button
+                            type="button"
+                            class="btn btn-inventory-success"
+                            disabled
+                            title="Tous les produits doivent être comptés avant validation."
+                        >
+                            <i class="bi bi-lock me-1"></i>
+                            Validation impossible
+                        </button>
+                    {% endif %}
+
+                    <form
+                        method="post"
+                        action="{{ path('admin_inventaire_annuler', {id: inventaire.id}) }}"
+                        onsubmit="return confirm('Voulez-vous vraiment annuler cet inventaire ?');"
+                    >
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token('inventaire_annuler_' ~ inventaire.id) }}"
+                        >
+
+                        <button type="submit" class="btn btn-inventory-danger">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Annuler l'inventaire
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -30,6 +30,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 100)]
     private ?string $prenom = null;
+    #[ORM\Column(length: 255, nullable: true)]
+private ?string $photoProfil = null;
 
     #[ORM\Column]
     private bool $actif = true;
@@ -208,5 +210,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getPhotoProfil(): ?string
+{
+    return $this->photoProfil;
+}
+
+public function setPhotoProfil(?string $photoProfil): static
+{
+    $this->photoProfil = $photoProfil;
+
+    return $this;
+}
 }
 

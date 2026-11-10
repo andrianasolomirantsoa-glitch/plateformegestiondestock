@@ -658,7 +658,95 @@
         flex-shrink: 0;
         border-radius: 11px;
     }
+   /* =========================================================
+   ILLUSTRATIONS DES CARTES STATISTIQUES
+========================================================= */
 
+.kpi-card {
+    position: relative;
+    isolation: isolate;
+}
+
+.kpi-illustration {
+    position: absolute;
+    z-index: 1;
+    right: 15px;
+    top: 105px;
+    width: 125px;
+    height: 125px;
+    object-fit: contain;
+    pointer-events: none;
+    opacity: .95;
+    transition: transform .3s ease, opacity .3s ease;
+}
+
+.kpi-card:hover .kpi-illustration {
+    transform: translateY(-5px) scale(1.05);
+    opacity: 1;
+}
+
+/* Le contenu reste au-dessus du fond décoratif */
+.kpi-top,
+.kpi-title,
+.kpi-value,
+.kpi-description,
+.kpi-bottom {
+    position: relative;
+    z-index: 2;
+}
+
+/* Laisser de la place à l'illustration */
+.kpi-title,
+.kpi-value,
+.kpi-description {
+    max-width: 70%;
+}
+
+.kpi-value {
+    font-size: 38px;
+}
+
+/* Mode sombre */
+body.dashboard-dark .kpi-illustration {
+    opacity: .9;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .kpi-illustration {
+        width: 105px;
+        height: 105px;
+        right: 12px;
+        top: 110px;
+    }
+
+    .kpi-title,
+    .kpi-value,
+    .kpi-description {
+        max-width: 72%;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-card {
+        padding: 20px;
+    }
+
+    .kpi-illustration {
+        width: 85px;
+        height: 85px;
+        right: 8px;
+        top: 115px;
+    }
+
+    .kpi-value {
+        font-size: 32px;
+    }
+
+    .kpi-bottom {
+        gap: 10px;
+    }
+}
     .quick-action-content {
         min-width: 0;
         flex: 1;
@@ -827,195 +915,166 @@
 
 <div class="container-fluid modern-dashboard">
 
+ 
     <!-- =====================================================
-         KPI
-    ====================================================== -->
+     KPI : STATISTIQUES PRINCIPALES
+====================================================== -->
 
-    <div class="row g-4">
+<div class="row g-4">
 
-        <!-- COMMANDES -->
-        <div class="col-xl-4 col-md-6">
+    {# COMMANDES #}
+    <div class="col-xl-4 col-md-6">
+        <div class="kpi-card warning">
 
-            <div class="kpi-card warning">
+            <div class="kpi-top">
+                <div class="kpi-icon warning">
+                    <i class="bi bi-cart-check"></i>
+                </div>
 
-                <div class="kpi-top">
+                <span class="kpi-tag">COMMANDES</span>
+            </div>
 
-                    <div class="kpi-icon warning">
-                        <i class="bi bi-cart-check"></i>
-                    </div>
+            <img
+                src="{{ asset('images/dashboard/commandes.png') }}"
+                alt="Illustration des commandes"
+                class="kpi-illustration"
+                loading="lazy"
+                onerror="this.style.display='none'"
+            >
 
-                    <span class="kpi-tag">
-                        COMMANDES
+            <div class="kpi-title">Commandes en attente</div>
+
+            <div
+                class="kpi-value counter"
+                data-target="{{ commandesEnAttente }}"
+            >0</div>
+
+            <div class="kpi-description">
+                Commandes nécessitant une vérification.
+            </div>
+
+            <div class="kpi-bottom">
+                <div class="mini-stat">
+                    <span class="mini-stat-label">Confirmées</span>
+                    <span class="mini-stat-value text-success">
+                        {{ commandesConfirmees }}
                     </span>
-
                 </div>
 
-                <div class="kpi-title">
-                    Commandes en attente
+                <div class="mini-stat text-end">
+                    <span class="mini-stat-label">Annulées</span>
+                    <span class="mini-stat-value text-danger">
+                        {{ commandesAnnulees }}
+                    </span>
                 </div>
-
-                <div
-                    class="kpi-value counter"
-                    data-target="{{ commandesEnAttente }}"
-                >
-                    0
-                </div>
-
-                <div class="kpi-description">
-                    Commandes nécessitant une vérification.
-                </div>
-
-                <div class="kpi-bottom">
-
-                    <div class="mini-stat">
-                        <span class="mini-stat-label">
-                            Confirmées
-                        </span>
-
-                        <span class="mini-stat-value text-success">
-                            {{ commandesConfirmees }}
-                        </span>
-                    </div>
-
-                    <div class="mini-stat text-end">
-                        <span class="mini-stat-label">
-                            Annulées
-                        </span>
-
-                        <span class="mini-stat-value text-danger">
-                            {{ commandesAnnulees }}
-                        </span>
-                    </div>
-
-                </div>
-
             </div>
 
         </div>
-
-
-        <!-- PAIEMENTS -->
-        <div class="col-xl-4 col-md-6">
-
-            <div class="kpi-card primary">
-
-                <div class="kpi-top">
-
-                    <div class="kpi-icon primary">
-                        <i class="bi bi-credit-card-2-front"></i>
-                    </div>
-
-                    <span class="kpi-tag">
-                        PAIEMENTS
-                    </span>
-
-                </div>
-
-                <div class="kpi-title">
-                    Paiements à valider
-                </div>
-
-                <div
-                    class="kpi-value counter"
-                    data-target="{{ paiementsEnAttente }}"
-                >
-                    0
-                </div>
-
-                <div class="kpi-description">
-                    Paiements déclarés par les clients.
-                </div>
-
-                <div class="kpi-bottom">
-
-                    <div class="mini-stat">
-                        <span class="mini-stat-label">
-                            Payés
-                        </span>
-
-                        <span class="mini-stat-value text-success">
-                            {{ paiementsPayes }}
-                        </span>
-                    </div>
-
-                    <div class="mini-stat text-end">
-                        <span class="mini-stat-label">
-                            Refusés
-                        </span>
-
-                        <span class="mini-stat-value text-danger">
-                            {{ paiementsRefuses }}
-                        </span>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- LIVRAISONS -->
-        <div class="col-xl-4 col-md-12">
-
-            <div class="kpi-card info">
-
-                <div class="kpi-top">
-
-                    <div class="kpi-icon info">
-                        <i class="bi bi-truck"></i>
-                    </div>
-
-                    <span class="kpi-tag">
-                        LIVRAISONS
-                    </span>
-
-                </div>
-
-                <div class="kpi-title">
-                    Livraisons en cours
-                </div>
-
-                <div
-                    class="kpi-value counter"
-                    data-target="{{ livraisonsEnCours }}"
-                >
-                    0
-                </div>
-
-                <div class="kpi-description">
-                    Commandes actuellement en livraison.
-                </div>
-
-                <div class="kpi-bottom">
-
-                    <div class="mini-stat">
-                        <span class="mini-stat-label">
-                            En attente
-                        </span>
-
-                        <span class="mini-stat-value text-warning">
-                            {{ livraisonsEnAttente }}
-                        </span>
-                    </div>
-
-                    <div class="mini-stat text-end">
-                        <span class="mini-stat-label">
-                            Livrées
-                        </span>
-
-                        <span class="mini-stat-value text-success">
-                            {{ livraisonsLivrees }}
-                        </span>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
     </div>
+
+
+    {# PAIEMENTS #}
+    <div class="col-xl-4 col-md-6">
+        <div class="kpi-card primary">
+
+            <div class="kpi-top">
+                <div class="kpi-icon primary">
+                    <i class="bi bi-credit-card-2-front"></i>
+                </div>
+
+                <span class="kpi-tag">PAIEMENTS</span>
+            </div>
+
+            <img
+                src="{{ asset('images/dashboard/paiements.png') }}"
+                alt="Illustration des paiements"
+                class="kpi-illustration"
+                loading="lazy"
+                onerror="this.style.display='none'"
+            >
+
+            <div class="kpi-title">Paiements à valider</div>
+
+            <div
+                class="kpi-value counter"
+                data-target="{{ paiementsEnAttente }}"
+            >0</div>
+
+            <div class="kpi-description">
+                Paiements déclarés par les clients.
+            </div>
+
+            <div class="kpi-bottom">
+                <div class="mini-stat">
+                    <span class="mini-stat-label">Payés</span>
+                    <span class="mini-stat-value text-success">
+                        {{ paiementsPayes }}
+                    </span>
+                </div>
+
+                <div class="mini-stat text-end">
+                    <span class="mini-stat-label">Refusés</span>
+                    <span class="mini-stat-value text-danger">
+                        {{ paiementsRefuses }}
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    {# LIVRAISONS #}
+    <div class="col-xl-4 col-md-12">
+        <div class="kpi-card info">
+
+            <div class="kpi-top">
+                <div class="kpi-icon info">
+                    <i class="bi bi-truck"></i>
+                </div>
+
+                <span class="kpi-tag">LIVRAISONS</span>
+            </div>
+
+            <img
+                src="{{ asset('images/dashboard/livraisons.png') }}"
+                alt="Illustration des livraisons"
+                class="kpi-illustration"
+                loading="lazy"
+                onerror="this.style.display='none'"
+            >
+
+            <div class="kpi-title">Livraisons en cours</div>
+
+            <div
+                class="kpi-value counter"
+                data-target="{{ livraisonsEnCours }}"
+            >0</div>
+
+            <div class="kpi-description">
+                Commandes actuellement en livraison.
+            </div>
+
+            <div class="kpi-bottom">
+                <div class="mini-stat">
+                    <span class="mini-stat-label">En attente</span>
+                    <span class="mini-stat-value text-warning">
+                        {{ livraisonsEnAttente }}
+                    </span>
+                </div>
+
+                <div class="mini-stat text-end">
+                    <span class="mini-stat-label">Livrées</span>
+                    <span class="mini-stat-value text-success">
+                        {{ livraisonsLivrees }}
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
 
 
     <!-- =====================================================

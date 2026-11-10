@@ -8,7 +8,47 @@
     /* =========================================================
        IMAGE DU PRODUIT
        ========================================================= */
+/* =========================================================
+   CODE-BARRES EAN-13
+   ========================================================= */
 
+.product-barcode-card {
+    border: 1px solid #e5e9f0;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.product-barcode-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 125px;
+    padding: 15px;
+    background: #fff;
+}
+
+.product-barcode-image {
+    display: block;
+    width: 320px;
+    max-width: 100%;
+    height: 100px;
+    object-fit: contain;
+}
+
+.product-barcode-number {
+    text-align: center;
+    font-family: monospace;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: #172033;
+}
+
+.product-barcode-help {
+    color: #748094;
+    font-size: 12px;
+    text-align: center;
+}
     .product-detail-image-wrapper {
         width: 100%;
         min-height: 360px;
@@ -250,27 +290,41 @@
                         </div>
 
 
-                        <div class="col-md-6">
+{# CATÉGORIE #}
+<div class="col-md-6">
+    <div class="text-muted small mb-1">
+        <i class="bi bi-folder2 me-1"></i>
+        Catégorie
+    </div>
 
-                            <div class="text-muted small mb-1">
-                                Catégorie
-                            </div>
+    <div class="fw-semibold">
+        {% if produit.categorie %}
+            {{ produit.categorie.nom }}
+        {% else %}
+            <span class="text-muted">Non définie</span>
+        {% endif %}
+    </div>
+</div>
 
-                            <div class="fw-semibold">
+{# FAMILLE #}
+<div class="col-md-6">
+    <div class="text-muted small mb-1">
+        <i class="bi bi-diagram-3 me-1"></i>
+        Famille
+    </div>
 
-                                {% if produit.categorie %}
-
-                                    {{ produit.categorie.nom }}
-
-                                {% else %}
-
-                                    —
-
-                                {% endif %}
-
-                            </div>
-
-                        </div>
+    <div class="fw-semibold">
+        {% if produit.famille %}
+            <span class="badge rounded-pill px-3 py-2"
+                  style="background:#eef3ff; color:#315fba;">
+                <i class="bi bi-collection me-1"></i>
+                {{ produit.famille.nom }}
+            </span>
+        {% else %}
+            <span class="text-muted">Non définie</span>
+        {% endif %}
+    </div>
+</div>
 
 
                         <div class="col-md-6">
@@ -578,6 +632,62 @@
                             </strong>
 
                         </div>
+                        {# =========================================================
+   CODE-BARRES EAN-13
+   ========================================================= #}
+
+<div class="col-12">
+
+    <div class="card border-0 shadow-sm product-barcode-card">
+
+        <div class="card-header bg-white py-3">
+
+            <h5 class="mb-0">
+                <i class="bi bi-upc-scan me-2"></i>
+                Code-barres du produit
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if produit.codeBarres %}
+
+                <div class="product-barcode-image-wrapper">
+
+                    <img
+                        src="{{ path('app_client_produit_barcode', {
+                            id: produit.id
+                        }) }}"
+                        alt="Code-barres EAN-13 {{ produit.codeBarres }}"
+                        class="product-barcode-image"
+                    >
+
+                </div>
+
+                <div class="product-barcode-number">
+                    {{ produit.codeBarres }}
+                </div>
+
+                <p class="product-barcode-help mt-2 mb-0">
+                    Code EAN-13 enregistré pour ce produit.
+                </p>
+
+            {% else %}
+
+                <div class="alert alert-warning mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Aucun code-barres enregistré pour ce produit.
+                    Vous pouvez en ajouter depuis la modification du produit.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
 
 
                         <div class="col-md-6">

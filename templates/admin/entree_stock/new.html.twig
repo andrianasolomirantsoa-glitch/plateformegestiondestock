@@ -573,72 +573,106 @@
 
 
                 <div class="entry-fields-grid">
+                    {# =================================================
+   MAGASIN
+   ================================================= #}
+
+<div class="entry-field entry-field-full">
+
+    <label for="magasin_id">
+        Magasin de destination
+        <span class="entry-required">*</span>
+    </label>
+
+    <select
+        id="magasin_id"
+        name="magasin_id"
+        required
+    >
+        <option value="">
+            -- Sélectionner un magasin --
+        </option>
+
+        {% for magasin in magasins %}
+
+            <option
+                value="{{ magasin.id }}"
+                {% if entree.magasin and entree.magasin.id == magasin.id %}
+                    selected
+                {% endif %}
+            >
+                {{ magasin.nom }} — {{ magasin.ville }}
+            </option>
+
+        {% endfor %}
+    </select>
+
+    <small>
+        Le stock reçu sera ajouté uniquement dans ce magasin.
+    </small>
+
+</div>
 
 
                     {# =================================================
                        PRODUIT
                        ================================================= #}
 
-                    <div class="entry-field entry-field-full">
+                    {# =================================================
+   PRODUIT
+   ================================================= #}
 
-                        <label for="produit_id">
+<div class="entry-field entry-field-full">
 
-                            Produit
+    <label for="produit_id">
+        Produit
+        <span class="entry-required">*</span>
+    </label>
 
-                            <span class="entry-required">
-                                *
-                            </span>
+    <select
+        id="produit_id"
+        name="produit_id"
+        required
+    >
 
-                        </label>
+        <option value="">
+            -- Sélectionner un produit --
+        </option>
 
-                        <select
-                            id="produit_id"
-                            name="produit_id"
-                            required
-                        >
+        {% for produit in produits %}
 
-                            <option value="">
-                                -- Sélectionner un produit --
-                            </option>
+            <option
+                value="{{ produit.id }}"
+                data-unite="{{ produit.unite }}"
+                {% if entree.produit and entree.produit.id == produit.id %}
+                    selected
+                {% endif %}
+            >
+                {{ produit.nom }} — {{ produit.reference }}
+            </option>
 
-                            {% for produit in produits %}
+        {% endfor %}
 
-                                <option
-                                    value="{{ produit.id }}"
-                                    data-stock="{{ produit.quantiteStock }}"
-                                    data-unite="{{ produit.unite }}"
-                                    {% if entree.produit and entree.produit.id == produit.id %}
-                                        selected
-                                    {% endif %}
-                                >
+    </select>
 
-                                    {{ produit.nom }}
-                                    — {{ produit.reference }}
+    <div
+        class="entry-current-stock"
+        id="current-stock-box"
+    >
 
-                                </option>
+        <i class="bi bi-box-seam"></i>
 
-                            {% endfor %}
+        <span>
+            Stock actuel dans ce magasin :
+        </span>
 
-                        </select>
+        <strong id="current-stock">
+            Sélectionnez un magasin et un produit
+        </strong>
 
-                        <div
-                            class="entry-current-stock"
-                            id="current-stock-box"
-                        >
+    </div>
 
-                            <i class="bi bi-box-seam"></i>
-
-                            <span>
-                                Stock actuel :
-                            </span>
-
-                            <strong id="current-stock">
-                                Sélectionnez un produit
-                            </strong>
-
-                        </div>
-
-                    </div>
+</div>
 
 
                     {# =================================================
@@ -981,61 +1015,61 @@
 
 {% block javascripts %}
 
-<script>
+    {{ parent() }}
 
-    document.addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
-        const produitSelect =
-            document.getElementById('produit_id');
+            const magasinSelect = document.getElementById('magasin_id');
+            const produitSelect = document.getElementById('produit_id');
+            const currentStock = document.getElementById('current-stock');
 
-        const currentStock =
-            document.getElementById('current-stock');
+            // Quantités réelles par couple produit-magasin
+            const stocksParProduitMagasin = {{ stocksParProduitMagasin|json_encode|raw }};
 
+            function updateStock() {
 
-        function updateStock() {
+                const magasinId = magasinSelect.value;
+                const produitId = produitSelect.value;
 
-            const selectedOption =
-                produitSelect.options[
-                    produitSelect.selectedIndex
-                ];
+                if (!magasinId || !produitId) {
+                    currentStock.textContent =
+                        'Sélectionnez un magasin et un produit';
+                    return;
+                }
 
+                const cle = produitId + '-' + magasinId;
 
-            if (
-                !selectedOption
-                || !selectedOption.value
-            ) {
+                // Si le couple n'existe pas encore, le stock initial est 0.
+                const stockExiste = Object.prototype.hasOwnProperty.call(
+                    stocksParProduitMagasin,
+                    cle
+                );
 
-                currentStock.textContent =
-                    'Sélectionnez un produit';
+                const stock = stockExiste
+                    ? stocksParProduitMagasin[cle]
+                    : 0;
 
-                return;
+                const selectedOption =
+                    produitSelect.options[produitSelect.selectedIndex];
+
+                const unite = selectedOption.dataset.unite || 'unité';
+
+                if (stockExiste) {
+                    currentStock.textContent = stock + ' ' + unite;
+                } else {
+                    currentStock.textContent =
+                        '0 ' + unite + ' — nouveau stock pour ce magasin';
+                }
             }
 
+            magasinSelect.addEventListener('change', updateStock);
+            produitSelect.addEventListener('change', updateStock);
 
-            const stock =
-                selectedOption.dataset.stock || '0';
+            updateStock();
 
-            const unite =
-                selectedOption.dataset.unite || 'piece';
-
-
-            currentStock.textContent =
-                stock + ' ' + unite;
-
-        }
-
-
-        produitSelect.addEventListener(
-            'change',
-            updateStock
-        );
-
-
-        updateStock();
-
-    });
-
-</script>
+        });
+    </script>
 
 {% endblock %}
 

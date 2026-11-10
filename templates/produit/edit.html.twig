@@ -1,72 +1,406 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier {{ produit.nom }}{% endblock %}
+{% block title %}Modifier {{ produit.nom }} | NEXA{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .edit-page {
+            --nexa-primary: #1f2551;
+            --nexa-accent: #4385f5;
+            --nexa-cyan: #16b8c8;
+            --nexa-muted: #778198;
+            --nexa-border: #e8ecf3;
+            color: #26314b;
+        }
+
+        .edit-header {
+            background: linear-gradient(120deg, #1f2551, #303c78);
+            border-radius: 18px;
+            padding: 25px 28px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .edit-header::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            right: -65px;
+            top: -105px;
+            border: 35px solid rgba(255,255,255,.06);
+            border-radius: 50%;
+        }
+
+        .edit-header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-button {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            color: white;
+            border: 1px solid rgba(255,255,255,.25);
+            background: rgba(255,255,255,.1);
+            text-decoration: none;
+            transition: .2s;
+        }
+
+        .back-button:hover {
+            color: white;
+            background: rgba(255,255,255,.2);
+        }
+
+        .product-reference {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 11px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.12);
+            color: #e4eaff;
+            font-size: .8rem;
+            margin-top: 10px;
+        }
+
+        .edit-card {
+            background: white;
+            border: 1px solid var(--nexa-border);
+            border-radius: 16px;
+            box-shadow: 0 5px 22px rgba(31,37,81,.045);
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+
+        .section-heading {
+            padding: 19px 23px;
+            border-bottom: 1px solid var(--nexa-border);
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef3ff;
+            color: var(--nexa-accent);
+            font-size: 1.1rem;
+        }
+
+        .section-heading h5 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--nexa-primary);
+            margin: 0;
+        }
+
+        .section-heading p {
+            color: var(--nexa-muted);
+            font-size: .82rem;
+            margin: 3px 0 0;
+        }
+
+        .section-body {
+            padding: 24px;
+        }
+
+        .edit-page .form-label {
+            font-size: .87rem;
+            font-weight: 600;
+            color: #34405b;
+            margin-bottom: 8px;
+        }
+
+        .edit-page .form-control,
+        .edit-page .form-select {
+            border: 1px solid #dfe5ef;
+            border-radius: 10px;
+            padding: 11px 13px;
+            min-height: 45px;
+            font-size: .9rem;
+            transition: .2s;
+        }
+
+        .edit-page textarea.form-control {
+            min-height: 105px;
+        }
+
+        .edit-page .form-control:focus,
+        .edit-page .form-select:focus {
+            border-color: var(--nexa-accent);
+            box-shadow: 0 0 0 3px rgba(67,133,245,.11);
+        }
+
+        .edit-page .form-text {
+            font-size: .77rem;
+            color: var(--nexa-muted);
+            margin-top: 6px;
+        }
+
+        .edit-page .form-check {
+            padding: 14px 15px 14px 42px;
+            background: #f7f9fd;
+            border: 1px solid var(--nexa-border);
+            border-radius: 10px;
+        }
+
+        .edit-page .form-check-input {
+            margin-top: .2rem;
+        }
+
+        .edit-page .form-check-input:checked {
+            background-color: var(--nexa-accent);
+            border-color: var(--nexa-accent);
+        }
+
+        .form-actions {
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
+            background: rgba(255,255,255,.96);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--nexa-border);
+            border-radius: 14px;
+            padding: 15px 18px;
+            box-shadow: 0 5px 20px rgba(31,37,81,.07);
+        }
+
+        .btn-nexa {
+            background: linear-gradient(120deg, #2867dc, #4385f5);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 11px 19px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .btn-nexa:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 13px rgba(67,133,245,.25);
+        }
+
+        .btn-soft {
+            background: #f3f5fa;
+            border: 1px solid #e5e9f1;
+            color: #46516b;
+            border-radius: 10px;
+            padding: 10px 17px;
+            font-weight: 600;
+        }
+
+        .btn-soft:hover {
+            background: #e9edf5;
+            color: var(--nexa-primary);
+        }
+
+        .danger-card {
+            border: 1px solid #f3d9dc;
+            border-radius: 14px;
+            background: #fffafa;
+            padding: 20px;
+        }
+
+        .danger-card h6 {
+            color: #b42332;
+            font-weight: 700;
+        }
+
+        .danger-card p {
+            color: #7e6970;
+            font-size: .85rem;
+            margin-bottom: 0;
+        }
+
+        .danger-card .btn {
+            border-radius: 9px;
+            font-weight: 600;
+            padding: 9px 14px;
+        }
+
+        .alert {
+            border-radius: 11px;
+        }
+
+        @media (max-width: 767px) {
+            .edit-header {
+                padding: 20px;
+            }
+
+            .section-body {
+                padding: 17px;
+            }
+
+            .form-actions {
+                position: static;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 edit-page">
 
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <a href="{{ path('app_produit_index') }}"
-           class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i>
-        </a>
+    {# EN-TÊTE #}
+    <div class="edit-header mb-4">
+        <div class="edit-header-content">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ path('app_produit_index') }}"
+                   class="back-button"
+                   title="Retour à la liste des produits">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
 
-        <div>
-            <h1 class="fw-bold mb-1">Modifier le produit</h1>
-            <p class="text-muted mb-0">
-                Modification de « {{ produit.nom }} »
-            </p>
+                <div>
+                    <div class="small text-white-50 mb-1">
+                        GESTION DU STOCK / PRODUITS
+                    </div>
+                    <h2 class="fw-bold mb-1">Modifier le produit</h2>
+                    <p class="mb-0 text-white-50">
+                        Mettez à jour les informations de votre produit.
+                    </p>
+                </div>
+            </div>
+
+            <div class="product-reference">
+                <i class="bi bi-box-seam"></i>
+                {{ produit.nom }}
+                {% if produit.reference %}
+                    <span class="opacity-50">|</span>
+                    Réf. {{ produit.reference }}
+                {% endif %}
+            </div>
         </div>
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-12 col-xl-9">
+        <div class="col-12 col-xxl-10">
 
-            <div class="card border-0 shadow-sm">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
 
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0">
-                        <i class="bi bi-pencil-square me-2"></i>
-                        Informations du produit
-                    </h5>
+            {% for message in app.flashes('danger') %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% if form.vars.submitted and not form.vars.valid %}
+                <div class="alert alert-danger">
+                    <div class="fw-bold mb-2">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        La modification n'a pas pu être enregistrée.
+                    </div>
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+
+            {{ form_start(form, {
+                attr: {
+                    id: 'form-modifier-produit',
+                    novalidate: 'novalidate'
+                }
+            }) }}
+
+            {# IDENTIFICATION #}
+            <div class="edit-card">
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="bi bi-upc-scan"></i>
+                    </div>
+                    <div>
+                        <h5>Identification du produit</h5>
+                        <p>Référence, code-barres et nom du produit.</p>
+                    </div>
                 </div>
 
-                <div class="card-body p-4">
-
-                    {% if form.vars.submitted and not form.vars.valid %}
-                        <div class="alert alert-danger">
-                            <strong>La modification n’a pas pu être enregistrée.</strong>
-                            Veuillez corriger les erreurs suivantes.
-                            {{ form_errors(form) }}
-                        </div>
-                    {% endif %}
-
-                    {{ form_start(form, {
-                        'attr': {'id': 'form-modifier-produit'}
-                    }) }}
-
+                <div class="section-body">
                     <div class="row g-4">
-
                         <div class="col-md-6">
                             {{ form_row(form.reference) }}
                         </div>
 
                         <div class="col-md-6">
-                            {{ form_row(form.nom) }}
+                            {{ form_row(form.codeBarres, {
+                                label: 'Code-barres EAN-13',
+                                help: 'Modifiez le numéro si nécessaire. Laissez vide uniquement si vous souhaitez générer un nouveau code.'
+                            }) }}
                         </div>
 
+                        <div class="col-12">
+                            {{ form_row(form.nom) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# DESCRIPTION ET CLASSIFICATION #}
+            <div class="edit-card">
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <div>
+                        <h5>Description et classification</h5>
+                        <p>Organisez le produit dans la bonne famille.</p>
+                    </div>
+                </div>
+
+                <div class="section-body">
+                    <div class="row g-4">
                         <div class="col-12">
                             {{ form_row(form.description) }}
                         </div>
 
                         <div class="col-md-6">
-                            {{ form_row(form.categorie) }}
+                            {{ form_row(form.famille) }}
                         </div>
 
                         <div class="col-md-6">
                             {{ form_row(form.unite) }}
                         </div>
+                    </div>
+                </div>
+            </div>
 
+            {# PRIX ET STOCK #}
+            <div class="edit-card">
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="bi bi-currency-exchange"></i>
+                    </div>
+                    <div>
+                        <h5>Prix et gestion du stock</h5>
+                        <p>Définissez les prix et les quantités disponibles.</p>
+                    </div>
+                </div>
+
+                <div class="section-body">
+                    <div class="row g-4">
                         <div class="col-md-6">
                             {{ form_row(form.prixAchat) }}
                         </div>
@@ -82,56 +416,90 @@
                         <div class="col-md-6">
                             {{ form_row(form.seuilAlerte) }}
                         </div>
-
-                        <div class="col-12">
-                            {{ form_row(form.actif) }}
-                        </div>
-
                     </div>
+                </div>
+            </div>
 
-                    <hr class="my-4">
+            {# STATUT #}
+            <div class="edit-card">
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="bi bi-toggle-on"></i>
+                    </div>
+                    <div>
+                        <h5>Disponibilité du produit</h5>
+                        <p>Contrôlez la visibilité et l'utilisation du produit.</p>
+                    </div>
+                </div>
 
-                    <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
+                <div class="section-body">
+                    {{ form_row(form.actif) }}
+                </div>
+            </div>
 
+            {# BOUTONS #}
+            <div class="form-actions mb-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <span class="small text-muted">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Vérifiez les informations avant l'enregistrement.
+                    </span>
+
+                    <div class="d-flex gap-2 flex-wrap">
                         <a href="{{ path('app_produit_show', {
-                            'id': produit.id
-                        }) }}" class="btn btn-light border">
+                            id: produit.id
+                        }) }}" class="btn btn-soft">
                             <i class="bi bi-eye me-1"></i>
-                            Voir
+                            Voir le produit
                         </a>
 
-                        <button type="submit"
-                                form="form-modifier-produit"
-                                class="btn btn-primary">
-                            <i class="bi bi-check-lg me-1"></i>
+                        <a href="{{ path('app_produit_index') }}"
+                           class="btn btn-soft">
+                            Annuler
+                        </a>
+
+                        <button type="submit" class="btn btn-nexa">
+                            <i class="bi bi-check2-circle me-2"></i>
                             Enregistrer les modifications
                         </button>
-
                     </div>
+                </div>
+            </div>
 
-                    {{ form_end(form) }}
+            {{ form_end(form) }}
 
-                    <hr class="my-4">
+            {# ZONE DE SUPPRESSION #}
+            <div class="danger-card mb-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <h6 class="mb-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Zone de suppression
+                        </h6>
+                        <p>
+                            La suppression du produit est une action sensible.
+                            Vérifiez avant de continuer.
+                        </p>
+                    </div>
 
                     <form method="post"
                           action="{{ path('app_produit_delete', {
-                              'id': produit.id
+                              id: produit.id
                           }) }}"
-                          onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');">
+                          onsubmit="return confirm('Voulez-vous vraiment supprimer le produit {{ produit.nom|e('js') }} ? Cette action est irréversible.');">
 
                         <input type="hidden"
                                name="_token"
                                value="{{ csrf_token('delete' ~ produit.id) }}">
 
                         <button type="submit" class="btn btn-outline-danger">
-                            <i class="bi bi-trash me-1"></i>
-                            Supprimer le produit
+                            <i class="bi bi-trash3 me-2"></i>
+                            Supprimer ce produit
                         </button>
-
                     </form>
-
                 </div>
             </div>
+
         </div>
     </div>
 </div>

@@ -10,20 +10,15 @@
    ========================================================= */
 
 .client-dashboard {
-    --red: #d71920;
-    --red-dark: #b5121b;
-    --yellow: #ffdc36;
+    --red: #153B70;
+    --red-dark: #102D55;
+    --yellow: #FFDC36;
     --navy: #172554;
     --text: #202b40;
     --muted: #778197;
     --border: #e9edf3;
     --surface: #ffffff;
     --background: #f5f7fb;
-
-    max-width: 1500px;
-    margin: 0 auto;
-    padding-bottom: 40px;
-    color: var(--text);
 }
 
 .client-dashboard *,
@@ -170,60 +165,47 @@
 
 .client-welcome {
     position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    min-height: 260px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 25px;
-    overflow: hidden;
-    padding: 34px;
-    margin-bottom: 24px;
-    color: #fff;
-    background: linear-gradient(120deg, #b5121b 0%, #e5232b 70%, #ed363d 100%);
+
+    padding: 35px;
     border-radius: 18px;
-    box-shadow: 0 10px 28px rgba(215,25,32,.12);
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(16, 45, 85, 0.96) 0%,
+            rgba(21, 59, 112, 0.84) 50%,
+            rgba(21, 59, 112, 0.30) 100%
+        ),
+        url('/images/dashboard/client/welcome-bg.jpg')
+        center / cover no-repeat;
+
+    box-shadow: 0 10px 28px rgba(16, 45, 85, 0.16);
 }
 
-.client-welcome::after {
-    content: "";
-    position: absolute;
-    width: 250px;
-    height: 250px;
-    right: 10%;
-    top: -140px;
-    border: 35px solid rgba(255,255,255,.06);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.client-welcome-text {
+.client-welcome h1,
+.client-welcome h2 {
     position: relative;
     z-index: 1;
-    min-width: 0;
-}
-
-.welcome-small {
-    display: inline-block;
-    margin-bottom: 10px;
-    color: var(--yellow);
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-}
-
-.client-welcome h1 {
-    margin: 0;
-    font-size: clamp(23px, 3vw, 34px);
-    font-weight: 900;
-    letter-spacing: -.7px;
+    color: #ffffff;
 }
 
 .client-welcome p {
-    max-width: 620px;
-    margin: 10px 0 0;
-    color: #ffe4e5;
-    font-size: 13px;
-    line-height: 1.8;
+    position: relative;
+    z-index: 1;
+    color: #e8eef8;
+}
+
+.client-welcome .welcome-small {
+    position: relative;
+    z-index: 1;
+    color: #ffdc36;
 }
 
 .welcome-action {
@@ -283,7 +265,74 @@
     justify-content: space-between;
     gap: 10px;
 }
+/* =========================================================
+   ILLUSTRATIONS DES CARTES STATISTIQUES CLIENT
+   ========================================================= */
 
+.client-stat-card {
+    position: relative;
+    min-height: 175px;
+    overflow: hidden;
+    padding: 21px;
+}
+
+.stat-card-top,
+.stat-card-value,
+.stat-card-info {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-card-illustration {
+    position: absolute;
+    right: 8px;
+    bottom: 5px;
+    width: 105px;
+    height: 90px;
+    object-fit: contain;
+    opacity: .88;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform .3s ease;
+}
+
+.client-stat-card:hover .stat-card-illustration {
+    transform: scale(1.08) translateY(-3px);
+}
+
+.stat-card-value {
+    position: relative;
+    z-index: 2;
+    max-width: 75%;
+}
+
+.stat-card-info {
+    position: relative;
+    z-index: 2;
+    max-width: 75%;
+}
+
+@media (max-width: 600px) {
+    .stat-card-illustration {
+        width: 90px;
+        height: 80px;
+        right: 5px;
+        bottom: 4px;
+    }
+
+    .stat-card-value,
+    .stat-card-info {
+        max-width: 70%;
+    }
+}
+@media (max-width: 600px) {
+    .client-welcome {
+        min-height: 230px;
+        padding: 24px 18px;
+
+        background-position: 60% center;
+    }
+}
 .stat-card-title {
     color: var(--muted);
     font-size: 10px;
@@ -1310,81 +1359,123 @@
 
     <section class="client-stats">
 
-        <div class="client-stat-card">
+        
+    {# CARTE 1 : COMMANDES #}
+    <div class="client-stat-card">
 
-            <div class="stat-card-top">
-                <span class="stat-card-title">Commandes</span>
-                <div class="stat-card-icon">
-                    <i class="bi bi-receipt"></i>
-                </div>
+        <div class="stat-card-top">
+            <span class="stat-card-title">Commandes</span>
+
+            <div class="stat-card-icon">
+                <i class="bi bi-receipt"></i>
             </div>
-
-            <div class="stat-card-value">
-                {{ nombreCommandes }}
-            </div>
-
-            <div class="stat-card-info">
-                Commandes passées
-            </div>
-
         </div>
 
-        <div class="client-stat-card">
-
-            <div class="stat-card-top">
-                <span class="stat-card-title">En attente</span>
-                <div class="stat-card-icon">
-                    <i class="bi bi-hourglass-split"></i>
-                </div>
-            </div>
-
-            <div class="stat-card-value">
-                {{ commandesEnAttente }}
-            </div>
-
-            <div class="stat-card-info">
-                Commandes en attente
-            </div>
-
+        <div class="stat-card-value">
+            {{ nombreCommandes }}
         </div>
 
-        <div class="client-stat-card">
-
-            <div class="stat-card-top">
-                <span class="stat-card-title">Confirmées</span>
-                <div class="stat-card-icon">
-                    <i class="bi bi-check-circle"></i>
-                </div>
-            </div>
-
-            <div class="stat-card-value">
-                {{ commandesConfirmees }}
-            </div>
-
-            <div class="stat-card-info">
-                Commandes validées
-            </div>
-
+        <div class="stat-card-info">
+            Commandes passées
         </div>
 
-        <div class="client-stat-card">
+        <img
+            src="{{ asset('images/dashboard/client/commandes.png') }}"
+            alt=""
+            class="stat-card-illustration"
+            loading="lazy"
+        >
 
-            <div class="stat-card-top">
-                <span class="stat-card-title">Mes dépenses</span>
-                <div class="stat-card-icon">
-                    <i class="bi bi-wallet2"></i>
-                </div>
+    </div>
+
+
+    {# CARTE 2 : EN ATTENTE #}
+    <div class="client-stat-card">
+
+        <div class="stat-card-top">
+            <span class="stat-card-title">En attente</span>
+
+            <div class="stat-card-icon">
+                <i class="bi bi-hourglass-split"></i>
             </div>
-
-            <div class="stat-card-value" style="font-size:21px;">
-                {{ totalCommandes|number_format(0, ',', ' ') }} Ar
-            </div>
-
-            <div class="stat-card-info">
-                Montant cumulé des commandes
-            </div>
-
         </div>
+
+        <div class="stat-card-value">
+            {{ commandesEnAttente }}
+        </div>
+
+        <div class="stat-card-info">
+            Commandes en attente
+        </div>
+
+        <img
+            src="{{ asset('images/dashboard/client/attente.png') }}"
+            alt=""
+            class="stat-card-illustration"
+            loading="lazy"
+        >
+
+    </div>
+
+
+    {# CARTE 3 : CONFIRMEES #}
+    <div class="client-stat-card">
+
+        <div class="stat-card-top">
+            <span class="stat-card-title">Confirmées</span>
+
+            <div class="stat-card-icon">
+                <i class="bi bi-check-circle"></i>
+            </div>
+        </div>
+
+        <div class="stat-card-value">
+            {{ commandesConfirmees }}
+        </div>
+
+        <div class="stat-card-info">
+            Commandes validées
+        </div>
+
+        <img
+            src="{{ asset('images/dashboard/client/confirmees.png') }}"
+            alt=""
+            class="stat-card-illustration"
+            loading="lazy"
+        >
+
+    </div>
+
+
+    {# CARTE 4 : DEPENSES #}
+    <div class="client-stat-card">
+
+        <div class="stat-card-top">
+            <span class="stat-card-title">Mes dépenses</span>
+
+            <div class="stat-card-icon">
+                <i class="bi bi-wallet2"></i>
+            </div>
+        </div>
+
+        <div class="stat-card-value" style="font-size:21px;">
+            {{ totalCommandes|number_format(0, ',', ' ') }} Ar
+        </div>
+
+        <div class="stat-card-info">
+            Montant cumulé des commandes
+        </div>
+
+        <img
+            src="{{ asset('images/dashboard/client/depenses.png') }}"
+            alt=""
+            class="stat-card-illustration"
+            loading="lazy"
+        >
+
+    </div>
+
+
 
     </section>
 

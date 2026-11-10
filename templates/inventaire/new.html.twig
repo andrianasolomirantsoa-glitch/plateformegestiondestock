@@ -1,0 +1,564 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel inventaire | Jumbo Score{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .inv-page-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 25px;
+    }
+
+    .inv-back {
+        width: 43px;
+        height: 43px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: #475569;
+        background: #fff;
+        border: 1px solid #e5eaf2;
+        font-size: 1.1rem;
+        transition: .2s;
+    }
+
+    .inv-back:hover {
+        color: #0891b2;
+        background: #ecfeff;
+        border-color: #a5f3fc;
+    }
+
+    .inv-title {
+        color: #172033;
+        font-size: 1.55rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .inv-subtitle {
+        color: #64748b;
+        font-size: .88rem;
+        margin: 0;
+    }
+
+    .inv-form-card {
+        background: #fff;
+        border: 1px solid #e8edf5;
+        border-radius: 17px;
+        box-shadow: 0 6px 22px rgba(15,23,42,.045);
+        overflow: hidden;
+    }
+
+    .inv-card-header {
+        padding: 21px 24px;
+        border-bottom: 1px solid #edf0f5;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .inv-card-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: #0891b2;
+        background: #ecfeff;
+        font-size: 1.2rem;
+    }
+
+    .inv-card-heading {
+        color: #172033;
+        font-size: 1rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .inv-card-description {
+        color: #64748b;
+        font-size: .8rem;
+        margin: 3px 0 0;
+    }
+
+    .inv-card-body {
+        padding: 25px;
+    }
+
+    .inv-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: .85rem;
+        font-weight: 750;
+    }
+
+    .inv-label .required {
+        color: #ef4444;
+    }
+
+    .inv-control {
+        min-height: 47px;
+        border: 1px solid #dfe5ee;
+        border-radius: 11px;
+        color: #172033;
+        font-size: .9rem;
+        box-shadow: none !important;
+        transition: .2s;
+    }
+
+    .inv-control:focus {
+        border-color: #22b8cf;
+        box-shadow: 0 0 0 3px rgba(34,211,238,.12) !important;
+    }
+
+    textarea.inv-control {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .inv-help {
+        display: block;
+        margin-top: 7px;
+        color: #94a3b8;
+        font-size: .77rem;
+    }
+
+    .inv-info-box {
+        display: flex;
+        gap: 13px;
+        padding: 16px;
+        background: linear-gradient(135deg, #ecfeff, #f5f3ff);
+        border: 1px solid #dbeafe;
+        border-radius: 13px;
+    }
+
+    .inv-info-icon {
+        color: #0891b2;
+        font-size: 1.25rem;
+    }
+
+    .inv-info-title {
+        color: #164e63;
+        font-size: .86rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .inv-info-text {
+        color: #475569;
+        font-size: .8rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .inv-warning {
+        display: flex;
+        gap: 11px;
+        padding: 14px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+        color: #92400e;
+        font-size: .82rem;
+        line-height: 1.5;
+    }
+
+    .inv-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 20px 25px;
+        border-top: 1px solid #edf0f5;
+        background: #fafbfe;
+    }
+
+    .inv-btn {
+        min-height: 43px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 17px;
+        border-radius: 10px;
+        font-size: .87rem;
+        font-weight: 750;
+        transition: .2s;
+    }
+
+    .inv-btn-cancel {
+        color: #475569;
+        background: #fff;
+        border: 1px solid #dfe5ee;
+    }
+
+    .inv-btn-cancel:hover {
+        color: #172033;
+        background: #f1f5f9;
+    }
+
+    .inv-btn-submit {
+        color: #fff;
+        border: none;
+        background: linear-gradient(135deg, #0891b2, #6366f1);
+        box-shadow: 0 5px 14px rgba(59,130,246,.17);
+    }
+
+    .inv-btn-submit:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(59,130,246,.25);
+    }
+
+    .inv-empty-stores {
+        padding: 25px;
+        text-align: center;
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+    }
+
+    @media (max-width: 575px) {
+        .inv-card-body {
+            padding: 18px;
+        }
+
+        .inv-actions {
+            padding: 17px;
+        }
+
+        .inv-actions .inv-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="inv-page-header">
+
+    <a
+        href="{{ path('admin_inventaire_index') }}"
+        class="inv-back"
+        title="Retour aux inventaires"
+    >
+        <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <div>
+        <h1 class="inv-title">
+            Nouvel inventaire
+        </h1>
+
+        <p class="inv-subtitle">
+            Prépare un nouveau comptage physique pour un magasin.
+        </p>
+    </div>
+
+</div>
+
+{% if magasins is empty %}
+
+    <div class="inv-form-card">
+        <div class="inv-card-body">
+
+            <div class="inv-empty-stores">
+
+                <i class="bi bi-shop fs-1 d-block mb-3"></i>
+
+                <h5 class="fw-bold text-dark">
+                    Aucun magasin disponible
+                </h5>
+
+                <p class="mb-3">
+                    Il n'existe actuellement aucun magasin actif pouvant faire l'objet d'un inventaire.
+                </p>
+
+                <a
+                    href="{{ path('admin_inventaire_index') }}"
+                    class="inv-btn inv-btn-cancel"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Retour aux inventaires
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+{% else %}
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <form
+                method="post"
+                action="{{ path('admin_inventaire_new') }}"
+            >
+
+                <div class="inv-form-card">
+
+                    <div class="inv-card-header">
+
+                        <span class="inv-card-icon">
+                            <i class="bi bi-clipboard2-plus"></i>
+                        </span>
+
+                        <div>
+                            <h2 class="inv-card-heading">
+                                Informations de l'inventaire
+                            </h2>
+
+                            <p class="inv-card-description">
+                                Renseigne les informations nécessaires à sa création.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="inv-card-body">
+
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token('inventaire_new') }}"
+                        >
+
+                        {# MAGASIN #}
+
+                        <div class="mb-4">
+
+                            <label for="magasin_id" class="inv-label">
+                                Magasin concerné
+                                <span class="required">*</span>
+                            </label>
+
+                            <select
+                                name="magasin_id"
+                                id="magasin_id"
+                                class="form-select inv-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Sélectionner un magasin
+                                </option>
+
+                                {% for magasin in magasins %}
+
+                                    <option value="{{ magasin.id }}">
+                                        {{ magasin.nom }}
+                                        {% if magasin.ville %}
+                                            — {{ magasin.ville }}
+                                        {% endif %}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                            <small class="inv-help">
+                                Sélectionne le magasin dans lequel le comptage physique sera réalisé.
+                            </small>
+
+                        </div>
+
+                        {# DATE #}
+
+                        <div class="mb-4">
+
+                            <label for="date_inventaire" class="inv-label">
+                                Date de l'inventaire
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="datetime-local"
+                                name="date_inventaire"
+                                id="date_inventaire"
+                                class="form-control inv-control"
+                                value="{{ 'now'|date('Y-m-d\\TH:i') }}"
+                                required
+                            >
+
+                            <small class="inv-help">
+                                Date et heure de référence de cet inventaire.
+                            </small>
+
+                        </div>
+
+                        {# COMMENTAIRE #}
+
+                        <div class="mb-3">
+
+                            <label for="commentaire" class="inv-label">
+                                Commentaire
+                                <span class="text-muted fw-normal">(facultatif)</span>
+                            </label>
+
+                            <textarea
+                                name="commentaire"
+                                id="commentaire"
+                                class="form-control inv-control"
+                                rows="4"
+                                maxlength="5000"
+                                placeholder="Exemple : Inventaire mensuel du magasin, vérification des quantités physiques..."
+                            ></textarea>
+
+                            <small class="inv-help">
+                                Tu peux ajouter une remarque ou préciser le contexte de l'inventaire.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="inv-actions">
+
+                        <a
+                            href="{{ path('admin_inventaire_index') }}"
+                            class="inv-btn inv-btn-cancel"
+                        >
+                            <i class="bi bi-x-lg"></i>
+                            Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="inv-btn inv-btn-submit"
+                        >
+                            <i class="bi bi-check-circle"></i>
+                            Créer l'inventaire
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        {# INFORMATIONS COMPLEMENTAIRES #}
+
+        <div class="col-lg-4">
+
+            <div class="inv-info-box mb-3">
+
+                <i class="bi bi-info-circle-fill inv-info-icon"></i>
+
+                <div>
+
+                    <div class="inv-info-title">
+                        Comment fonctionne l'inventaire ?
+                    </div>
+
+                    <p class="inv-info-text">
+                        Après la création, le système récupère automatiquement les produits et leurs quantités théoriques enregistrées dans le magasin sélectionné.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="inv-form-card mb-3">
+
+                <div class="inv-card-header">
+
+                    <span class="inv-card-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </span>
+
+                    <div>
+                        <h2 class="inv-card-heading">
+                            Protection des stocks
+                        </h2>
+
+                        <p class="inv-card-description">
+                            Les quantités restent sécurisées.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="inv-card-body">
+
+                    <div class="d-flex gap-3 mb-3">
+
+                        <i class="bi bi-lock-fill text-success fs-5"></i>
+
+                        <div>
+                            <div class="fw-bold small text-dark">
+                                Aucun changement immédiat
+                            </div>
+
+                            <p class="text-muted small mb-0">
+                                La création de l'inventaire ne modifie pas les stocks.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex gap-3 mb-3">
+
+                        <i class="bi bi-pencil-square text-primary fs-5"></i>
+
+                        <div>
+                            <div class="fw-bold small text-dark">
+                                Comptage physique
+                            </div>
+
+                            <p class="text-muted small mb-0">
+                                Tu pourras saisir les quantités réellement présentes dans le magasin.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex gap-3">
+
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+
+                        <div>
+                            <div class="fw-bold small text-dark">
+                                Validation finale
+                            </div>
+
+                            <p class="text-muted small mb-0">
+                                Les stocks seront régularisés uniquement après validation de l'inventaire.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="inv-warning">
+
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+
+                <div>
+                    <strong>Important :</strong>
+                    un seul inventaire peut être en cours pour un même magasin. Termine ou annule l'inventaire existant avant d'en créer un autre.
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

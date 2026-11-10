@@ -1,0 +1,733 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des familles | Jumbo Score{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .famille-page {
+        --famille-navy: #10182b;
+        --famille-cyan: #22d3ee;
+        --famille-violet: #8b5cf6;
+        --famille-muted: #718096;
+        color: #172033;
+    }
+
+    .famille-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .famille-title {
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -.5px;
+        color: var(--famille-navy);
+        margin-bottom: 5px;
+    }
+
+    .famille-subtitle {
+        color: var(--famille-muted);
+        font-size: .92rem;
+        margin: 0;
+    }
+
+    .famille-add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 11px 18px;
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 700;
+        background: linear-gradient(120deg, #0891b2, #6366f1);
+        box-shadow: 0 7px 18px rgba(59,130,246,.20);
+        transition: .2s ease;
+    }
+
+    .famille-add-btn:hover {
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(59,130,246,.28);
+    }
+
+    .famille-stat-card {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        padding: 19px;
+        border: 1px solid #e9edf5;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 5px 18px rgba(15,23,42,.035);
+    }
+
+    .famille-stat-card::after {
+        content: "";
+        position: absolute;
+        width: 85px;
+        height: 85px;
+        border-radius: 50%;
+        right: -25px;
+        top: -30px;
+        background: var(--stat-bg, rgba(34,211,238,.08));
+    }
+
+    .famille-stat-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        color: var(--stat-color, #0891b2);
+        background: var(--stat-bg, #ecfeff);
+        font-size: 1.2rem;
+        margin-bottom: 14px;
+    }
+
+    .famille-stat-label {
+        color: var(--famille-muted);
+        font-size: .82rem;
+        font-weight: 600;
+    }
+
+    .famille-stat-value {
+        display: block;
+        margin-top: 3px;
+        color: var(--famille-navy);
+        font-size: 1.65rem;
+        font-weight: 800;
+    }
+
+    .famille-panel {
+        overflow: hidden;
+        border: 1px solid #e9edf5;
+        border-radius: 17px;
+        background: #fff;
+        box-shadow: 0 7px 25px rgba(15,23,42,.045);
+    }
+
+    .famille-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 19px 22px;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .famille-panel-title {
+        color: var(--famille-navy);
+        font-size: 1rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .famille-panel-description {
+        color: var(--famille-muted);
+        font-size: .8rem;
+        margin: 4px 0 0;
+    }
+
+    .famille-tools {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 17px 22px;
+        background: #fbfcfe;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .famille-search {
+        position: relative;
+        flex: 1;
+        min-width: 210px;
+    }
+
+    .famille-search i {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .famille-search input {
+        width: 100%;
+        height: 42px;
+        padding: 0 13px 0 39px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        outline: none;
+        background: #fff;
+        font-size: .87rem;
+    }
+
+    .famille-search input:focus,
+    .famille-filter:focus {
+        border-color: #22d3ee;
+        box-shadow: 0 0 0 3px rgba(34,211,238,.10);
+    }
+
+    .famille-filter {
+        min-width: 170px;
+        height: 42px;
+        padding: 0 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #fff;
+        color: #475569;
+        font-size: .86rem;
+        outline: none;
+    }
+
+    .famille-table {
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .famille-table thead th {
+        padding: 14px 17px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: .72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .55px;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .famille-table tbody td {
+        padding: 15px 17px;
+        vertical-align: middle;
+        border-color: #f0f2f6;
+        font-size: .87rem;
+        color: #475569;
+    }
+
+    .famille-table tbody tr {
+        transition: .18s ease;
+    }
+
+    .famille-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .famille-name {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: #172033;
+        font-weight: 750;
+    }
+
+    .famille-name-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        color: #0891b2;
+        background: #ecfeff;
+        font-size: 1rem;
+    }
+
+    .famille-category {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: .78rem;
+        font-weight: 650;
+    }
+
+    .famille-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 30px;
+        font-size: .75rem;
+        font-weight: 750;
+    }
+
+    .famille-status.active {
+        color: #15803d;
+        background: #dcfce7;
+    }
+
+    .famille-status.inactive {
+        color: #64748b;
+        background: #f1f5f9;
+    }
+
+    .famille-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+
+    .famille-action {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        background: #fff;
+        color: #64748b;
+        transition: .18s ease;
+    }
+
+    .famille-action:hover {
+        transform: translateY(-2px);
+    }
+
+    .famille-action.view:hover {
+        color: #0891b2;
+        border-color: #a5f3fc;
+        background: #ecfeff;
+    }
+
+    .famille-action.edit:hover {
+        color: #4f46e5;
+        border-color: #c7d2fe;
+        background: #eef2ff;
+    }
+
+    .famille-action.toggle:hover {
+        color: #d97706;
+        border-color: #fde68a;
+        background: #fffbeb;
+    }
+
+    .famille-action.delete:hover {
+        color: #dc2626;
+        border-color: #fecaca;
+        background: #fef2f2;
+    }
+
+    .famille-empty {
+        padding: 55px 20px;
+        text-align: center;
+    }
+
+    .famille-empty-icon {
+        width: 68px;
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 17px;
+        border-radius: 20px;
+        background: #ecfeff;
+        color: #0891b2;
+        font-size: 1.8rem;
+    }
+
+    .famille-count {
+        padding: 5px 10px;
+        border-radius: 30px;
+        color: #475569;
+        background: #f1f5f9;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+
+    .famille-no-result {
+        display: none;
+        padding: 30px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    @media(max-width: 575px) {
+        .famille-title {
+            font-size: 1.35rem;
+        }
+
+        .famille-add-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .famille-tools {
+            padding: 14px;
+        }
+
+        .famille-filter {
+            width: 100%;
+        }
+
+        .famille-panel-header {
+            padding: 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="famille-page">
+
+    {# EN-TÊTE #}
+    <div class="famille-heading">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge rounded-pill text-bg-info bg-opacity-10 text-info">
+                    <i class="bi bi-diagram-3-fill me-1"></i> Organisation du stock
+                </span>
+            </div>
+
+            <h1 class="famille-title">Gestion des familles</h1>
+            <p class="famille-subtitle">
+                Organisez vos produits par catégories et familles.
+            </p>
+        </div>
+
+        <a href="{{ path('app_famille_new') }}" class="famille-add-btn">
+            <i class="bi bi-plus-lg"></i>
+            Nouvelle famille
+        </a>
+    </div>
+
+    {# STATISTIQUES #}
+    {% set total_familles = familles|length %}
+    {% set total_actives = 0 %}
+    {% set total_inactives = 0 %}
+
+    {% for famille in familles %}
+        {% if famille.actif %}
+            {% set total_actives = total_actives + 1 %}
+        {% else %}
+            {% set total_inactives = total_inactives + 1 %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="famille-stat-card">
+                <div class="famille-stat-icon">
+                    <i class="bi bi-diagram-3-fill"></i>
+                </div>
+                <span class="famille-stat-label">Total des familles</span>
+                <strong class="famille-stat-value">{{ total_familles }}</strong>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="famille-stat-card"
+                 style="--stat-color:#16a34a;--stat-bg:#dcfce7">
+                <div class="famille-stat-icon">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <span class="famille-stat-label">Familles actives</span>
+                <strong class="famille-stat-value">{{ total_actives }}</strong>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="famille-stat-card"
+                 style="--stat-color:#64748b;--stat-bg:#f1f5f9">
+                <div class="famille-stat-icon">
+                    <i class="bi bi-pause-circle-fill"></i>
+                </div>
+                <span class="famille-stat-label">Familles inactives</span>
+                <strong class="famille-stat-value">{{ total_inactives }}</strong>
+            </div>
+        </div>
+    </div>
+
+    {# MESSAGES FLASH #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {# TABLEAU PRINCIPAL #}
+    <div class="famille-panel">
+
+        <div class="famille-panel-header">
+            <div>
+                <h5 class="famille-panel-title">
+                    <i class="bi bi-list-ul me-2 text-info"></i>
+                    Répertoire des familles
+                </h5>
+                <p class="famille-panel-description">
+                    Consultez et gérez les familles enregistrées.
+                </p>
+            </div>
+
+            <span class="famille-count">
+                {{ total_familles }} famille(s)
+            </span>
+        </div>
+
+        {% if familles is not empty %}
+
+            {# RECHERCHE ET FILTRES #}
+            <div class="famille-tools">
+                <div class="famille-search">
+                    <i class="bi bi-search"></i>
+                    <input
+                        type="search"
+                        id="familleSearch"
+                        placeholder="Rechercher une famille, catégorie..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <select id="familleStatus" class="famille-filter">
+                    <option value="">Tous les statuts</option>
+                    <option value="active">Actives</option>
+                    <option value="inactive">Inactives</option>
+                </select>
+            </div>
+
+            {# TABLEAU #}
+            <div class="table-responsive">
+                <table class="table famille-table">
+                    <thead>
+                        <tr>
+                            <th>Famille</th>
+                            <th>Catégorie associée</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="familleTableBody">
+                        {% for famille in familles %}
+                            <tr
+                                class="famille-row"
+                                data-search="{{ (famille.nom ~ ' ' ~ famille.categorie.nom ~ ' ' ~ (famille.description ?? ''))|lower }}"
+                                data-status="{{ famille.actif ? 'active' : 'inactive' }}"
+                            >
+                                <td>
+                                    <div class="famille-name">
+                                        <span class="famille-name-icon">
+                                            <i class="bi bi-boxes"></i>
+                                        </span>
+                                        <span>{{ famille.nom }}</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="famille-category">
+                                        <i class="bi bi-tag-fill"></i>
+                                        {{ famille.categorie.nom }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span title="{{ famille.description }}">
+                                        {% if famille.description %}
+                                            {{ famille.description|length > 55
+                                                ? famille.description|slice(0, 55) ~ '...'
+                                                : famille.description }}
+                                        {% else %}
+                                            <span class="text-muted">Aucune description</span>
+                                        {% endif %}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {% if famille.actif %}
+                                        <span class="famille-status active">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Active
+                                        </span>
+                                    {% else %}
+                                        <span class="famille-status inactive">
+                                            <i class="bi bi-pause-circle-fill"></i>
+                                            Inactive
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div class="famille-actions">
+
+                                        <a
+                                            href="{{ path('app_famille_show', {id: famille.id}) }}"
+                                            class="famille-action view"
+                                            title="Voir les détails"
+                                            aria-label="Voir les détails"
+                                        >
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+
+                                        <a
+                                            href="{{ path('app_famille_edit', {id: famille.id}) }}"
+                                            class="famille-action edit"
+                                            title="Modifier"
+                                            aria-label="Modifier"
+                                        >
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <form
+                                            method="post"
+                                            action="{{ path('app_famille_toggle', {id: famille.id}) }}"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Voulez-vous changer le statut de cette famille ?');"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="_token"
+                                                value="{{ csrf_token('toggle' ~ famille.id) }}"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="famille-action toggle"
+                                                title="Changer le statut"
+                                                aria-label="Changer le statut"
+                                            >
+                                                <i class="bi bi-power"></i>
+                                            </button>
+                                        </form>
+
+                                        <form
+                                            method="post"
+                                            action="{{ path('app_famille_delete', {id: famille.id}) }}"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Voulez-vous vraiment supprimer cette famille ?');"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="_token"
+                                                value="{{ csrf_token('delete' ~ famille.id) }}"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="famille-action delete"
+                                                title="Supprimer"
+                                                aria-label="Supprimer"
+                                            >
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="familleNoResult" class="famille-no-result">
+                <i class="bi bi-search fs-3 d-block mb-2"></i>
+                Aucune famille ne correspond à votre recherche.
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 py-3 border-top">
+                <small class="text-muted" id="familleResultCount">
+                    {{ total_familles }} famille(s) affichée(s)
+                </small>
+                <small class="text-muted">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Gestion du catalogue
+                </small>
+            </div>
+
+        {% else %}
+
+            <div class="famille-empty">
+                <div class="famille-empty-icon">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+
+                <h5 class="fw-bold mb-2">Aucune famille enregistrée</h5>
+
+                <p class="text-muted mb-4">
+                    Créez votre première famille pour mieux organiser vos produits.
+                </p>
+
+                <a href="{{ path('app_famille_new') }}" class="famille-add-btn">
+                    <i class="bi bi-plus-lg"></i>
+                    Ajouter une famille
+                </a>
+            </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('familleSearch');
+    const statusFilter = document.getElementById('familleStatus');
+    const rows = document.querySelectorAll('.famille-row');
+    const noResult = document.getElementById('familleNoResult');
+    const resultCount = document.getElementById('familleResultCount');
+
+    if (!searchInput || !statusFilter) {
+        return;
+    }
+
+    function filterFamilles() {
+        const search = searchInput.value
+            .trim()
+            .toLocaleLowerCase('fr');
+
+        const status = statusFilter.value;
+        let visible = 0;
+
+        rows.forEach(function (row) {
+            const text = (row.dataset.search || '').toLocaleLowerCase('fr');
+            const rowStatus = row.dataset.status;
+
+            const matchesSearch = text.includes(search);
+            const matchesStatus = !status || rowStatus === status;
+
+            const show = matchesSearch && matchesStatus;
+
+            row.style.display = show ? '' : 'none';
+
+            if (show) {
+                visible++;
+            }
+        });
+
+        if (noResult) {
+            noResult.style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        if (resultCount) {
+            resultCount.textContent =
+                visible + ' famille(s) affichée(s)';
+        }
+    }
+
+    searchInput.addEventListener('input', filterFamilles);
+    statusFilter.addEventListener('change', filterFamilles);
+});
+</script>
+{% endblock %}

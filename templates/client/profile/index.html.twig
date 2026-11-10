@@ -129,6 +129,8 @@
         padding: 0 24px 25px;
     }
 
+    /* PHOTO DE PROFIL */
+
     .profile-avatar {
         width: 88px;
         height: 88px;
@@ -138,12 +140,38 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
         border: 5px solid #fff;
         border-radius: 50%;
         background: #eef2ff;
         color: var(--profile-primary);
         font-size: 37px;
         box-shadow: 0 4px 14px rgba(15,23,42,.10);
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .profile-photo-preview {
+        display: none;
+        width: 100px;
+        height: 100px;
+        margin-top: 12px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #e0e7ff;
+        box-shadow: 0 3px 12px rgba(15,23,42,.10);
+    }
+
+    .profile-photo-help {
+        margin-top: 7px;
+        color: #94a3b8;
+        font-size: 11px;
+        line-height: 1.6;
     }
 
     .profile-client-name {
@@ -553,7 +581,7 @@
         </a>
     </div>
 
-    {# Notifications #}
+    {# NOTIFICATIONS #}
     {% for message in app.flashes('success') %}
         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -587,8 +615,16 @@
 
             <div class="profile-summary">
 
+                {# PHOTO DE PROFIL #}
                 <div class="profile-avatar">
-                    <i class="bi bi-person-fill"></i>
+                    {% if user.photoProfil %}
+                        <img
+                            src="{{ asset('uploads/profils/' ~ user.photoProfil) }}"
+                            alt="Photo de profil de {{ user.prenom }} {{ user.nom }}"
+                        >
+                    {% else %}
+                        <i class="bi bi-person-fill"></i>
+                    {% endif %}
                 </div>
 
                 <h2 class="profile-client-name">
@@ -725,12 +761,18 @@
                     </div>
                     <div>
                         <h2>Modifier mon profil</h2>
-                        <p>Mettez à jour votre nom et votre prénom.</p>
+                        <p>Mettez à jour votre nom, votre prénom et votre photo.</p>
                     </div>
                 </div>
 
                 <div class="profile-form">
-                    <form method="post" action="{{ path('app_client_profile') }}">
+
+                    <form
+                        method="post"
+                        action="{{ path('app_client_profile') }}"
+                        enctype="multipart/form-data"
+                        id="profileForm"
+                    >
 
                         <input
                             type="hidden"
@@ -774,6 +816,37 @@
                                 >
                             </div>
 
+                            {# SÉLECTION DE LA PHOTO #}
+                            <div class="col-12">
+
+                                <label for="photo" class="form-label">
+                                    <i class="bi bi-camera me-1"></i>
+                                    Photo de profil
+                                </label>
+
+                                <input
+                                    type="file"
+                                    id="photo"
+                                    name="photo"
+                                    class="form-control"
+                                    accept="image/jpeg,image/png,image/webp"
+                                >
+
+                                <div class="profile-photo-help">
+                                    Formats acceptés : JPG, PNG et WEBP.
+                                    Taille maximale : 2 Mo.
+                                    Laissez ce champ vide pour conserver votre photo actuelle.
+                                </div>
+
+                                {# APERÇU DE LA NOUVELLE PHOTO #}
+                                <img
+                                    id="photoPreview"
+                                    class="profile-photo-preview"
+                                    alt="Aperçu de la nouvelle photo"
+                                >
+
+                            </div>
+
                         </div>
 
                         <div class="profile-form-hint">
@@ -789,6 +862,7 @@
                         </div>
 
                     </form>
+
                 </div>
             </section>
 
@@ -880,5 +954,58 @@
         </main>
     </div>
 </div>
+
+{# APERÇU INSTANTANÉ DE LA PHOTO #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const photoInput = document.getElementById('photo');
+    const photoPreview = document.getElementById('photoPreview');
+
+    if (!photoInput || !photoPreview) {
+        return;
+    }
+
+    photoInput.addEventListener('change', function () {
+        const file = this.files[0];
+
+        if (!file) {
+            photoPreview.removeAttribute('src');
+            photoPreview.style.display = 'none';
+            return;
+        }
+
+        const allowedTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert('Format invalide. Choisissez une image JPG, PNG ou WEBP.');
+            this.value = '';
+            photoPreview.removeAttribute('src');
+            photoPreview.style.display = 'none';
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert('La photo ne doit pas dépasser 2 Mo.');
+            this.value = '';
+            photoPreview.removeAttribute('src');
+            photoPreview.style.display = 'none';
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            photoPreview.src = event.target.result;
+            photoPreview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(file);
+    });
+});
+</script>
 
 {% endblock %}

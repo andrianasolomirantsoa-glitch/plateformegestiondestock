@@ -11,7 +11,7 @@
     >
 
     <title>
-        {% block title %}NEXA{% endblock %}
+        {% block title %}Jumbo Score{% endblock %}
     </title>
 
     <meta
@@ -877,7 +877,7 @@
                 </span>
 
                 <span class="nex-logo-text">
-                    NEXA
+                    Jumbo Score
                 </span>
 
             </a>
@@ -894,7 +894,7 @@
                 </span>
 
                 <span class="nex-logo-text">
-                    NEXA
+                    Jumbo Score
                 </span>
 
             </a>
@@ -970,6 +970,7 @@
                             class="nav-link dropdown-toggle
                             {% if current_route starts with 'app_produit_'
                                 or current_route starts with 'app_categorie_'
+                                or current_route starts with 'app_famille_'
                                 or current_route starts with 'app_entree_stock_'
                                 or current_route starts with 'app_sortie_stock_'
                                 or current_route starts with 'app_fournisseur_'
@@ -1029,6 +1030,17 @@
                                 </a>
 
                             </li>
+                            {# FAMILLES #}
+
+<li>
+    <a
+        href="{{ path('app_famille_index') }}"
+        class="dropdown-item"
+    >
+        <i class="bi bi-diagram-3-fill"></i>
+        <span>Familles</span>
+    </a>
+</li>
 
 
                             <li>
@@ -1102,6 +1114,17 @@
 
                             </li>
 
+<li>
+    <a
+        href="{{ path('admin_inventaire_index') }}"
+        class="dropdown-item"
+    >
+        <i class="bi bi-clipboard2-check"></i>
+        <span>Inventaires</span>
+    </a>
+</li>
+
+
 
                             <li>
 
@@ -1144,6 +1167,7 @@
                             class="nav-link dropdown-toggle
                             {% if current_route starts with 'app_admin_commande_'
                                 or current_route starts with 'app_admin_client_'
+                                or current_route starts with 'admin_inventaire_'
                             %}
                                 nex-active
                             {% endif %}"

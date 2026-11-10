@@ -18,6 +18,11 @@ class EntreeStock
     #[ORM\JoinColumn(name: 'produit_id', nullable: false)]
     private ?Produit $produit = null;
 
+    // Magasin dans lequel l'entrée de stock est effectuée
+    #[ORM\ManyToOne(targetEntity: Magasin::class)]
+    #[ORM\JoinColumn(name: 'magasin_id', nullable: false, onDelete: 'RESTRICT')]
+    private ?Magasin $magasin = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'fournisseur_id', nullable: true)]
     private ?Fournisseur $fournisseur = null;
@@ -59,6 +64,18 @@ class EntreeStock
     public function setProduit(?Produit $produit): static
     {
         $this->produit = $produit;
+
+        return $this;
+    }
+
+    public function getMagasin(): ?Magasin
+    {
+        return $this->magasin;
+    }
+
+    public function setMagasin(?Magasin $magasin): static
+    {
+        $this->magasin = $magasin;
 
         return $this;
     }
@@ -147,4 +164,3 @@ class EntreeStock
         return $this;
     }
 }
-

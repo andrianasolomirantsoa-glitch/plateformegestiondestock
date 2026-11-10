@@ -1,0 +1,672 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapport d'inventaire{% endblock %}
+{% block header_title %}Rapport d'inventaire{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        .report-page {
+            color: #e5e7eb;
+        }
+
+        .report-toolbar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .report-button {
+            border: 0;
+            border-radius: 9px;
+            padding: 10px 17px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-print {
+            background: linear-gradient(135deg, #0891b2, #2563eb);
+            color: white;
+        }
+
+        .report-print:hover {
+            color: white;
+            opacity: .9;
+        }
+
+        .report-back {
+            background: #24334d;
+            color: #dbeafe;
+            border: 1px solid #3b4c68;
+        }
+
+        .report-back:hover {
+            color: white;
+            background: #30435f;
+        }
+
+        .report-sheet {
+            background: #fff;
+            color: #172033;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .2);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1f2551;
+        }
+
+        .report-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1f2551;
+            letter-spacing: 1px;
+        }
+
+        .report-brand-subtitle {
+            color: #64748b;
+            font-size: .8rem;
+            margin-top: 3px;
+        }
+
+        .report-number {
+            text-align: right;
+            font-size: .85rem;
+            color: #475569;
+        }
+
+        .report-title {
+            text-align: center;
+            margin: 28px 0;
+        }
+
+        .report-title h2 {
+            color: #1f2551;
+            font-size: 1.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .report-title p {
+            color: #64748b;
+            margin: 0;
+        }
+
+        .report-section-title {
+            font-size: 1rem;
+            color: #1f2551;
+            font-weight: 800;
+            border-left: 4px solid #2563eb;
+            padding-left: 10px;
+            margin: 25px 0 13px;
+        }
+
+        .report-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .report-info {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            padding: 12px;
+        }
+
+        .report-info-label {
+            display: block;
+            color: #64748b;
+            font-size: .75rem;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .report-info-value {
+            color: #172033;
+            font-weight: 700;
+        }
+
+        .report-status {
+            display: inline-block;
+            border-radius: 20px;
+            padding: 5px 11px;
+            font-size: .78rem;
+            font-weight: 800;
+        }
+
+        .report-status-progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .report-status-validated {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .report-status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .82rem;
+        }
+
+        .report-table thead th {
+            background: #1f2551;
+            color: #fff;
+            padding: 11px 8px;
+            text-align: left;
+            border: 1px solid #1f2551;
+        }
+
+        .report-table tbody td {
+            padding: 9px 8px;
+            border: 1px solid #cbd5e1;
+            color: #263247;
+        }
+
+        .report-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .report-table tfoot td {
+            background: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            padding: 11px 8px;
+            font-weight: 800;
+        }
+
+        .report-positive {
+            color: #15803d !important;
+            font-weight: 800;
+        }
+
+        .report-negative {
+            color: #dc2626 !important;
+            font-weight: 800;
+        }
+
+        .report-zero {
+            color: #475569 !important;
+            font-weight: 700;
+        }
+
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .report-summary-item {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 13px;
+            border-radius: 7px;
+        }
+
+        .report-summary-label {
+            color: #64748b;
+            font-size: .73rem;
+            text-transform: uppercase;
+        }
+
+        .report-summary-value {
+            color: #1f2551;
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-top: 5px;
+        }
+
+        .report-comment {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            padding: 13px;
+            color: #334155;
+            white-space: pre-wrap;
+        }
+
+        .report-warning {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            padding: 12px;
+            border-radius: 7px;
+            font-size: .85rem;
+            margin-top: 15px;
+        }
+
+        .report-signatures {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px;
+            margin-top: 55px;
+            page-break-inside: avoid;
+        }
+
+        .report-signature {
+            text-align: center;
+            min-height: 145px;
+        }
+
+        .report-signature-title {
+            color: #1f2551;
+            font-weight: 800;
+        }
+
+        .report-signature-line {
+            border-bottom: 1px solid #64748b;
+            margin: 85px 15px 8px;
+        }
+
+        .report-signature-note {
+            color: #64748b;
+            font-size: .75rem;
+        }
+
+        .report-footer {
+            border-top: 1px solid #cbd5e1;
+            padding-top: 12px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: #64748b;
+            font-size: .72rem;
+        }
+
+        @media (max-width: 768px) {
+            .report-sheet {
+                padding: 18px;
+            }
+
+            .report-info-grid,
+            .report-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .report-signatures {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 12mm;
+        }
+
+        @media print {
+            body {
+                background: #fff !important;
+            }
+
+            nav,
+            aside,
+            header,
+            footer,
+            .report-toolbar,
+            .nex-alert-zone {
+                display: none !important;
+            }
+
+            main,
+            .container,
+            .container-fluid,
+            .report-page {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .report-sheet {
+                padding: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+
+            .report-table {
+                font-size: 9px;
+            }
+
+            .report-table thead {
+                display: table-header-group;
+            }
+
+            .report-table tr {
+                page-break-inside: avoid;
+            }
+
+            .report-section-title {
+                page-break-after: avoid;
+            }
+
+            .report-info,
+            .report-summary-item,
+            .report-table thead th,
+            .report-table tfoot td {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .report-signatures {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="report-page">
+
+    <div class="report-toolbar">
+        <a
+            href="{{ path('admin_inventaire_show', {id: inventaire.id}) }}"
+            class="report-button report-back"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Retour aux détails
+        </a>
+
+        <button
+            type="button"
+            class="report-button report-print"
+            onclick="window.print()"
+        >
+            <i class="bi bi-printer"></i>
+            Imprimer / Exporter en PDF
+        </button>
+    </div>
+
+    <div class="report-sheet">
+
+        {# En-tête du document #}
+        <div class="report-header">
+            <div>
+                <div class="report-brand">RAPPORT DE STOCK</div>
+                <div class="report-brand-subtitle">
+                    Gestion et contrôle des stocks
+                </div>
+            </div>
+
+            <div class="report-number">
+                <strong>Document N° :</strong>
+                INV-{{ "%04d"|format(inventaire.id) }}
+                <br>
+                <strong>Édité le :</strong>
+                {{ 'now'|date('d/m/Y H:i') }}
+            </div>
+        </div>
+
+        <div class="report-title">
+            <h2>Rapport d'inventaire physique</h2>
+            <p>État détaillé des stocks du magasin</p>
+        </div>
+
+        {# Informations générales #}
+        <h3 class="report-section-title">1. Informations générales</h3>
+
+        <div class="report-info-grid">
+            <div class="report-info">
+                <span class="report-info-label">Numéro d'inventaire</span>
+                <span class="report-info-value">
+                    INV-{{ "%04d"|format(inventaire.id) }}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Magasin</span>
+                <span class="report-info-value">
+                    {{ inventaire.magasin.nom }}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Date de l'inventaire</span>
+                <span class="report-info-value">
+                    {{ inventaire.dateInventaire|date('d/m/Y H:i') }}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Responsable de l'inventaire</span>
+                <span class="report-info-value">
+                    {% if inventaire.utilisateur %}
+                        {{ inventaire.utilisateur.prenom }}
+                        {{ inventaire.utilisateur.nom }}
+                    {% else %}
+                        Non renseigné
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Date de création</span>
+                <span class="report-info-value">
+                    {{ inventaire.createdAt|date('d/m/Y H:i') }}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Statut</span>
+                <span class="report-info-value">
+                    {% if inventaire.statut == 'EN_COURS' %}
+                        <span class="report-status report-status-progress">EN COURS</span>
+                    {% elseif inventaire.statut == 'VALIDE' %}
+                        <span class="report-status report-status-validated">VALIDÉ</span>
+                    {% else %}
+                        <span class="report-status report-status-cancelled">ANNULÉ</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        {# Résumé #}
+        <h3 class="report-section-title">2. Synthèse de l'inventaire</h3>
+
+        <div class="report-summary">
+            <div class="report-summary-item">
+                <div class="report-summary-label">Produits</div>
+                <div class="report-summary-value">{{ lignes|length }}</div>
+            </div>
+
+            <div class="report-summary-item">
+                <div class="report-summary-label">Comptés</div>
+                <div class="report-summary-value">{{ nombreComptes }}</div>
+            </div>
+
+            <div class="report-summary-item">
+                <div class="report-summary-label">Non comptés</div>
+                <div class="report-summary-value">{{ nombreNonComptes }}</div>
+            </div>
+
+            <div class="report-summary-item">
+                <div class="report-summary-label">Écart net</div>
+                <div class="report-summary-value">
+                    {% if totalEcart > 0 %}+{% endif %}{{ totalEcart }}
+                </div>
+            </div>
+        </div>
+
+        {# Tableau détaillé #}
+        <h3 class="report-section-title">3. Détail des produits</h3>
+
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%">N°</th>
+                    <th style="width: 24%">Désignation</th>
+                    <th style="width: 13%">Référence</th>
+                    <th style="width: 9%">Unité</th>
+                    <th style="width: 12%">Stock théorique</th>
+                    <th style="width: 12%">Stock physique</th>
+                    <th style="width: 9%">Écart</th>
+                    <th style="width: 16%">Observation</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for ligne in lignes %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ ligne.produit.nom }}</td>
+                        <td>{{ ligne.produit.reference }}</td>
+                        <td>{{ ligne.produit.unite }}</td>
+                        <td>{{ ligne.stockTheorique }}</td>
+
+                        <td>
+                            {% if ligne.quantitePhysique is not null %}
+                                {{ ligne.quantitePhysique }}
+                            {% else %}
+                                Non compté
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if ligne.ecart is not null %}
+                                {% if ligne.ecart > 0 %}
+                                    <span class="report-positive">+{{ ligne.ecart }}</span>
+                                {% elseif ligne.ecart < 0 %}
+                                    <span class="report-negative">{{ ligne.ecart }}</span>
+                                {% else %}
+                                    <span class="report-zero">0</span>
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>{{ ligne.observation ?: '—' }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" style="text-align:center;">
+                            Aucun produit dans cet inventaire.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="4">TOTAUX</td>
+                    <td>{{ totalTheorique }}</td>
+                    <td>{{ totalPhysique }}</td>
+                    <td>
+                        {% if totalEcart > 0 %}+{% endif %}{{ totalEcart }}
+                    </td>
+                    <td>—</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        {% if nombreNonComptes > 0 %}
+            <div class="report-warning">
+                <strong>Attention :</strong>
+                {{ nombreNonComptes }} produit(s) ne sont pas encore comptés.
+                Les totaux physiques et les écarts sont donc partiels.
+                Ce rapport ne représente pas un inventaire entièrement terminé.
+            </div>
+        {% endif %}
+
+        {# Analyse des écarts #}
+        <h3 class="report-section-title">4. Analyse des écarts</h3>
+
+        <div class="report-info-grid">
+            <div class="report-info">
+                <span class="report-info-label">Produits avec surplus</span>
+                <span class="report-info-value report-positive">
+                    {{ nombreEcartsPositifs }}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Produits avec manque</span>
+                <span class="report-info-value report-negative">
+                    {{ nombreEcartsNegatifs }}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Produits sans écart</span>
+                <span class="report-info-value">
+                    {{ nombreEcartsNuls }}
+                </span>
+            </div>
+
+            <div class="report-info">
+                <span class="report-info-label">Écart net total</span>
+                <span class="report-info-value">
+                    {% if totalEcart > 0 %}+{% endif %}{{ totalEcart }}
+                </span>
+            </div>
+        </div>
+
+        {# Commentaire #}
+        {% if inventaire.commentaire %}
+            <h3 class="report-section-title">5. Commentaire général</h3>
+
+            <div class="report-comment">{{ inventaire.commentaire }}</div>
+        {% endif %}
+
+        {# Signatures #}
+        <h3 class="report-section-title">
+            {% if inventaire.commentaire %}
+                6. Validation et signatures
+            {% else %}
+                5. Validation et signatures
+            {% endif %}
+        </h3>
+
+        <div class="report-signatures">
+            <div class="report-signature">
+                <div class="report-signature-title">
+                    Responsable du comptage
+                </div>
+
+                <div class="report-signature-line"></div>
+
+                <div class="report-signature-note">
+                    Nom, date et signature
+                </div>
+            </div>
+
+            <div class="report-signature">
+                <div class="report-signature-title">
+                    Responsable de validation
+                </div>
+
+                <div class="report-signature-line"></div>
+
+                <div class="report-signature-note">
+                    Nom, date et signature
+                </div>
+            </div>
+        </div>
+
+        <div class="report-footer">
+            <span>Rapport d'inventaire INV-{{ "%04d"|format(inventaire.id) }}</span>
+            <span>Document généré par la plateforme de gestion de stock</span>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

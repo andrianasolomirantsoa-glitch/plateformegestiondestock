@@ -3,11 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\EntreeStock;
+use App\Entity\Magasin;
 use App\Entity\Produit;
+use App\Entity\StockMagasin;
 use App\Entity\User;
 use App\Repository\EntreeStockRepository;
 use App\Repository\FournisseurRepository;
+use App\Repository\MagasinRepository;
 use App\Repository\ProduitRepository;
+use App\Repository\StockMagasinRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,17 +61,21 @@ class EntreeStockController extends AbstractController
                             $entree->getReferenceDocument() ?? ''
                         );
 
+                        $magasinNom = mb_strtolower(
+                            $entree->getMagasin()?->getNom() ?? ''
+                        );
+
                         return str_contains($produitNom, $needle)
                             || str_contains($produitReference, $needle)
                             || str_contains($fournisseurNom, $needle)
-                            || str_contains($referenceDocument, $needle);
+                            || str_contains($referenceDocument, $needle)
+                            || str_contains($magasinNom, $needle);
                     }
                 )
             );
         }
 
         $totalEntrees = count($entrees);
-
         $quantiteTotale = 0;
         $valeurTotale = 0.0;
 
@@ -88,7 +96,6 @@ class EntreeStockController extends AbstractController
         ]);
     }
 
-
     /**
      * Nouvelle entrée de stock
      */
@@ -97,7 +104,9 @@ class EntreeStockController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         ProduitRepository $produitRepository,
-        FournisseurRepository $fournisseurRepository
+        FournisseurRepository $fournisseurRepository,
+        MagasinRepository $magasinRepository,
+        StockMagasinRepository $stockMagasinRepository
     ): Response {
         $entree = new EntreeStock();
 
@@ -111,8 +120,16 @@ class EntreeStockController extends AbstractController
             ['nom' => 'ASC']
         );
 
-        if ($request->isMethod('POST')) {
+        $magasins = $magasinRepository->findBy(
+            ['actif' => true],
+            ['nom' => 'ASC']
+        );
 
+        $stocksParProduitMagasin = $this->construireCarteDesStocks(
+            $stockMagasinRepository
+        );
+
+        if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid(
                 'creer_entree_stock',
                 $request->request->get('_token')
@@ -122,116 +139,71 @@ class EntreeStockController extends AbstractController
                 );
             }
 
-
-            /* =====================================================
-               PRODUIT
-               ===================================================== */
-
+            // PRODUIT
             $produitId = (int) $request->request->get('produit_id');
-
-            if ($produitId <= 0) {
-
-                $this->addFlash(
-                    'danger',
-                    'Veuillez sélectionner un produit.'
-                );
-
-                return $this->render('admin/entree_stock/new.html.twig', [
-                    'entree' => $entree,
-                    'produits' => $produits,
-                    'fournisseurs' => $fournisseurs,
-                ]);
-            }
-
             $produit = $produitRepository->find($produitId);
 
-            if (!$produit instanceof Produit) {
-
+            if (!$produit instanceof Produit || !$produit->isActif()) {
                 $this->addFlash(
                     'danger',
-                    'Le produit sélectionné est introuvable.'
+                    'Veuillez sélectionner un produit actif valide.'
                 );
 
                 return $this->render('admin/entree_stock/new.html.twig', [
                     'entree' => $entree,
                     'produits' => $produits,
                     'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
                 ]);
             }
 
-            if (!$produit->isActif()) {
+            // MAGASIN
+            $magasinId = (int) $request->request->get('magasin_id');
+            $magasin = $magasinRepository->find($magasinId);
 
+            if (!$magasin instanceof Magasin || !$magasin->isActif()) {
                 $this->addFlash(
                     'danger',
-                    'Le produit sélectionné est inactif.'
+                    'Veuillez sélectionner un magasin actif valide.'
                 );
 
                 return $this->render('admin/entree_stock/new.html.twig', [
                     'entree' => $entree,
                     'produits' => $produits,
                     'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
                 ]);
             }
 
-
-            /* =====================================================
-               FOURNISSEUR
-               ===================================================== */
-
+            // FOURNISSEUR
             $fournisseur = null;
-
             $fournisseurId = (int) $request->request->get('fournisseur_id');
 
             if ($fournisseurId > 0) {
+                $fournisseur = $fournisseurRepository->find($fournisseurId);
 
-                $fournisseur = $fournisseurRepository->find(
-                    $fournisseurId
-                );
-
-                if (!$fournisseur) {
-
+                if (!$fournisseur || !$fournisseur->isActif()) {
                     $this->addFlash(
                         'danger',
-                        'Le fournisseur sélectionné est introuvable.'
+                        'Le fournisseur sélectionné est introuvable ou inactif.'
                     );
 
-                    return $this->render(
-                        'admin/entree_stock/new.html.twig',
-                        [
-                            'entree' => $entree,
-                            'produits' => $produits,
-                            'fournisseurs' => $fournisseurs,
-                        ]
-                    );
-                }
-
-                if (!$fournisseur->isActif()) {
-
-                    $this->addFlash(
-                        'danger',
-                        'Le fournisseur sélectionné est inactif.'
-                    );
-
-                    return $this->render(
-                        'admin/entree_stock/new.html.twig',
-                        [
-                            'entree' => $entree,
-                            'produits' => $produits,
-                            'fournisseurs' => $fournisseurs,
-                        ]
-                    );
+                    return $this->render('admin/entree_stock/new.html.twig', [
+                        'entree' => $entree,
+                        'produits' => $produits,
+                        'fournisseurs' => $fournisseurs,
+                        'magasins' => $magasins,
+                        'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                    ]);
                 }
             }
 
-
-            /* =====================================================
-               QUANTITE
-               ===================================================== */
-
+            // QUANTITÉ
             $quantite = (int) $request->request->get('quantite');
 
             if ($quantite <= 0) {
-
                 $this->addFlash(
                     'danger',
                     'La quantité doit être supérieure à zéro.'
@@ -241,14 +213,12 @@ class EntreeStockController extends AbstractController
                     'entree' => $entree,
                     'produits' => $produits,
                     'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
                 ]);
             }
 
-
-            /* =====================================================
-               PRIX UNITAIRE
-               ===================================================== */
-
+            // PRIX UNITAIRE
             $prixUnitaireInput = str_replace(
                 ',',
                 '.',
@@ -260,7 +230,6 @@ class EntreeStockController extends AbstractController
                 || !is_numeric($prixUnitaireInput)
                 || (float) $prixUnitaireInput < 0
             ) {
-
                 $this->addFlash(
                     'danger',
                     'Le prix unitaire doit être un montant valide.'
@@ -270,6 +239,8 @@ class EntreeStockController extends AbstractController
                     'entree' => $entree,
                     'produits' => $produits,
                     'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
                 ]);
             }
 
@@ -280,26 +251,19 @@ class EntreeStockController extends AbstractController
                 ''
             );
 
-
-            /* =====================================================
-               DATE
-               ===================================================== */
-
+            // DATE
             $dateEntree = new \DateTimeImmutable();
-
             $dateInput = trim(
                 (string) $request->request->get('date_entree')
             );
 
             if ($dateInput !== '') {
-
                 $date = \DateTimeImmutable::createFromFormat(
                     'Y-m-d\TH:i',
                     $dateInput
                 );
 
                 if ($date === false) {
-
                     $date = \DateTimeImmutable::createFromFormat(
                         'Y-m-d',
                         $dateInput
@@ -307,30 +271,24 @@ class EntreeStockController extends AbstractController
                 }
 
                 if ($date === false) {
-
                     $this->addFlash(
                         'danger',
                         'La date d’entrée n’est pas valide.'
                     );
 
-                    return $this->render(
-                        'admin/entree_stock/new.html.twig',
-                        [
-                            'entree' => $entree,
-                            'produits' => $produits,
-                            'fournisseurs' => $fournisseurs,
-                        ]
-                    );
+                    return $this->render('admin/entree_stock/new.html.twig', [
+                        'entree' => $entree,
+                        'produits' => $produits,
+                        'fournisseurs' => $fournisseurs,
+                        'magasins' => $magasins,
+                        'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                    ]);
                 }
 
                 $dateEntree = $date;
             }
 
-
-            /* =====================================================
-               AUTRES INFORMATIONS
-               ===================================================== */
-
+            // AUTRES INFORMATIONS
             $referenceDocument = trim(
                 (string) $request->request->get('reference_document')
             );
@@ -339,76 +297,77 @@ class EntreeStockController extends AbstractController
                 (string) $request->request->get('commentaire')
             );
 
-
-            /* =====================================================
-               UTILISATEUR CONNECTE
-               ===================================================== */
-
+            // UTILISATEUR CONNECTÉ
             $user = $this->getUser();
 
-            if ($user instanceof User) {
-                $entree->setUtilisateur($user);
+            // STOCK DU MAGASIN
+            $stock = $stockMagasinRepository->findOneByProduitEtMagasin(
+                $produit,
+                $magasin
+            );
+
+            // Une entrée peut initialiser le stock du couple produit-magasin.
+            if (!$stock instanceof StockMagasin) {
+                $stock = new StockMagasin();
+                $stock->setProduit($produit);
+                $stock->setMagasin($magasin);
+                $stock->setQuantite(0);
+
+                $entityManager->persist($stock);
             }
 
-
-            /* =====================================================
-               CREATION
-               ===================================================== */
-
+            // CRÉATION DE L'ENTRÉE
             $entree->setProduit($produit);
+            $entree->setMagasin($magasin);
             $entree->setFournisseur($fournisseur);
             $entree->setQuantite($quantite);
             $entree->setPrixUnitaire($prixUnitaire);
             $entree->setDateEntree($dateEntree);
             $entree->setReferenceDocument(
-                $referenceDocument !== ''
-                    ? $referenceDocument
-                    : null
+                $referenceDocument !== '' ? $referenceDocument : null
             );
             $entree->setCommentaire(
-                $commentaire !== ''
-                    ? $commentaire
-                    : null
+                $commentaire !== '' ? $commentaire : null
             );
 
+            if ($user instanceof User) {
+                $entree->setUtilisateur($user);
+            }
 
-            /* =====================================================
-               MISE A JOUR AUTOMATIQUE DU STOCK
-               ===================================================== */
+            // AUGMENTATION DU STOCK DU MAGASIN
+            $connection = $entityManager->getConnection();
+            $connection->beginTransaction();
 
-            $stockActuel = $produit->getQuantiteStock();
+            try {
+                $stock->setQuantite(
+                    $stock->getQuantite() + $quantite
+                );
 
-            $produit->setQuantiteStock(
-                $stockActuel + $quantite
-            );
+                $entityManager->persist($entree);
+                $entityManager->flush();
 
-
-            $entityManager->persist($entree);
-
-            $entityManager->flush();
-
+                $connection->commit();
+            } catch (\Throwable $exception) {
+                $connection->rollBack();
+                throw $exception;
+            }
 
             $this->addFlash(
                 'success',
-                'L’entrée de stock a été enregistrée et le stock du produit a été mis à jour.'
+                'L’entrée a été enregistrée et le stock du magasin a été augmenté.'
             );
 
-            return $this->redirectToRoute(
-                'app_entree_stock_index'
-            );
+            return $this->redirectToRoute('app_entree_stock_index');
         }
 
-
-        return $this->render(
-            'admin/entree_stock/new.html.twig',
-            [
-                'entree' => $entree,
-                'produits' => $produits,
-                'fournisseurs' => $fournisseurs,
-            ]
-        );
+        return $this->render('admin/entree_stock/new.html.twig', [
+            'entree' => $entree,
+            'produits' => $produits,
+            'fournisseurs' => $fournisseurs,
+            'magasins' => $magasins,
+            'stocksParProduitMagasin' => $stocksParProduitMagasin,
+        ]);
     }
-
 
     /**
      * Modifier une entrée de stock
@@ -423,23 +382,40 @@ class EntreeStockController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         ProduitRepository $produitRepository,
-        FournisseurRepository $fournisseurRepository
+        FournisseurRepository $fournisseurRepository,
+        MagasinRepository $magasinRepository,
+        StockMagasinRepository $stockMagasinRepository
     ): Response {
-        $produits = $produitRepository->findBy(
+        // On conserve les anciens choix même s'ils sont devenus inactifs.
+        $produits = $produitRepository->findBy([], ['nom' => 'ASC']);
+
+        $fournisseurs = $fournisseurRepository->findBy(
+            [],
+            ['nom' => 'ASC']
+        );
+
+        $magasins = $magasinRepository->findBy(
             ['actif' => true],
             ['nom' => 'ASC']
         );
 
-        $fournisseurs = $fournisseurRepository->findBy(
-            ['actif' => true],
-            ['nom' => 'ASC']
+        $ancienMagasin = $entree->getMagasin();
+
+        if (
+            $ancienMagasin !== null
+            && !in_array($ancienMagasin, $magasins, true)
+        ) {
+            $magasins[] = $ancienMagasin;
+        }
+
+        $stocksParProduitMagasin = $this->construireCarteDesStocks(
+            $stockMagasinRepository
         );
 
         $ancienneQuantite = $entree->getQuantite();
         $ancienProduit = $entree->getProduit();
 
         if ($request->isMethod('POST')) {
-
             if (!$this->isCsrfTokenValid(
                 'modifier_entree_stock_' . $entree->getId(),
                 $request->request->get('_token')
@@ -449,94 +425,86 @@ class EntreeStockController extends AbstractController
                 );
             }
 
-
-            /* =====================================================
-               PRODUIT
-               ===================================================== */
-
+            // PRODUIT
             $produitId = (int) $request->request->get('produit_id');
-
             $produit = $produitRepository->find($produitId);
 
             if (!$produit instanceof Produit) {
-
                 $this->addFlash(
                     'danger',
                     'Le produit sélectionné est introuvable.'
                 );
 
-                return $this->render(
-                    'admin/entree_stock/edit.html.twig',
-                    [
-                        'entree' => $entree,
-                        'produits' => $produits,
-                        'fournisseurs' => $fournisseurs,
-                    ]
-                );
+                return $this->render('admin/entree_stock/edit.html.twig', [
+                    'entree' => $entree,
+                    'produits' => $produits,
+                    'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                ]);
             }
 
+            // MAGASIN
+            $magasinId = (int) $request->request->get('magasin_id');
+            $magasin = $magasinRepository->find($magasinId);
 
-            /* =====================================================
-               FOURNISSEUR
-               ===================================================== */
+            if (!$magasin instanceof Magasin) {
+                $this->addFlash(
+                    'danger',
+                    'Le magasin sélectionné est introuvable.'
+                );
 
+                return $this->render('admin/entree_stock/edit.html.twig', [
+                    'entree' => $entree,
+                    'produits' => $produits,
+                    'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                ]);
+            }
+
+            // FOURNISSEUR
             $fournisseur = null;
-
             $fournisseurId = (int) $request->request->get('fournisseur_id');
 
             if ($fournisseurId > 0) {
-
-                $fournisseur = $fournisseurRepository->find(
-                    $fournisseurId
-                );
+                $fournisseur = $fournisseurRepository->find($fournisseurId);
 
                 if (!$fournisseur) {
-
                     $this->addFlash(
                         'danger',
                         'Le fournisseur sélectionné est introuvable.'
                     );
 
-                    return $this->render(
-                        'admin/entree_stock/edit.html.twig',
-                        [
-                            'entree' => $entree,
-                            'produits' => $produits,
-                            'fournisseurs' => $fournisseurs,
-                        ]
-                    );
+                    return $this->render('admin/entree_stock/edit.html.twig', [
+                        'entree' => $entree,
+                        'produits' => $produits,
+                        'fournisseurs' => $fournisseurs,
+                        'magasins' => $magasins,
+                        'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                    ]);
                 }
             }
 
-
-            /* =====================================================
-               QUANTITE
-               ===================================================== */
-
+            // QUANTITÉ
             $quantite = (int) $request->request->get('quantite');
 
             if ($quantite <= 0) {
-
                 $this->addFlash(
                     'danger',
                     'La quantité doit être supérieure à zéro.'
                 );
 
-                return $this->render(
-                    'admin/entree_stock/edit.html.twig',
-                    [
-                        'entree' => $entree,
-                        'produits' => $produits,
-                        'fournisseurs' => $fournisseurs,
-                    ]
-                );
+                return $this->render('admin/entree_stock/edit.html.twig', [
+                    'entree' => $entree,
+                    'produits' => $produits,
+                    'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                ]);
             }
 
-
-            /* =====================================================
-               PRIX
-               ===================================================== */
-
+            // PRIX
             $prixUnitaireInput = str_replace(
                 ',',
                 '.',
@@ -548,20 +516,18 @@ class EntreeStockController extends AbstractController
                 || !is_numeric($prixUnitaireInput)
                 || (float) $prixUnitaireInput < 0
             ) {
-
                 $this->addFlash(
                     'danger',
                     'Le prix unitaire doit être un montant valide.'
                 );
 
-                return $this->render(
-                    'admin/entree_stock/edit.html.twig',
-                    [
-                        'entree' => $entree,
-                        'produits' => $produits,
-                        'fournisseurs' => $fournisseurs,
-                    ]
-                );
+                return $this->render('admin/entree_stock/edit.html.twig', [
+                    'entree' => $entree,
+                    'produits' => $produits,
+                    'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                ]);
             }
 
             $prixUnitaire = number_format(
@@ -571,11 +537,7 @@ class EntreeStockController extends AbstractController
                 ''
             );
 
-
-            /* =====================================================
-               DATE
-               ===================================================== */
-
+            // DATE
             $dateEntree = $entree->getDateEntree()
                 ?? new \DateTimeImmutable();
 
@@ -584,14 +546,12 @@ class EntreeStockController extends AbstractController
             );
 
             if ($dateInput !== '') {
-
                 $date = \DateTimeImmutable::createFromFormat(
                     'Y-m-d\TH:i',
                     $dateInput
                 );
 
                 if ($date === false) {
-
                     $date = \DateTimeImmutable::createFromFormat(
                         'Y-m-d',
                         $dateInput
@@ -599,30 +559,24 @@ class EntreeStockController extends AbstractController
                 }
 
                 if ($date === false) {
-
                     $this->addFlash(
                         'danger',
                         'La date d’entrée n’est pas valide.'
                     );
 
-                    return $this->render(
-                        'admin/entree_stock/edit.html.twig',
-                        [
-                            'entree' => $entree,
-                            'produits' => $produits,
-                            'fournisseurs' => $fournisseurs,
-                        ]
-                    );
+                    return $this->render('admin/entree_stock/edit.html.twig', [
+                        'entree' => $entree,
+                        'produits' => $produits,
+                        'fournisseurs' => $fournisseurs,
+                        'magasins' => $magasins,
+                        'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                    ]);
                 }
 
                 $dateEntree = $date;
             }
 
-
-            /* =====================================================
-               AUTRES INFORMATIONS
-               ===================================================== */
-
+            // AUTRES INFORMATIONS
             $referenceDocument = trim(
                 (string) $request->request->get('reference_document')
             );
@@ -631,135 +585,164 @@ class EntreeStockController extends AbstractController
                 (string) $request->request->get('commentaire')
             );
 
+            if ($ancienProduit === null || $ancienMagasin === null) {
+                throw $this->createNotFoundException(
+                    'Cette entrée ne possède pas de produit ou de magasin associé.'
+                );
+            }
 
-            /* =====================================================
-               CORRECTION DU STOCK
-               ===================================================== */
+            // RÉCUPÉRER L'ANCIEN STOCK
+            $ancienStock = $stockMagasinRepository->findOneByProduitEtMagasin(
+                $ancienProduit,
+                $ancienMagasin
+            );
 
-            if (
-                $ancienProduit !== null
-                && $ancienProduit->getId() === $produit->getId()
-            ) {
+            if (!$ancienStock instanceof StockMagasin) {
+                $this->addFlash(
+                    'danger',
+                    'Le stock d’origine est introuvable. La modification est impossible.'
+                );
 
-                /*
-                 * Exemple :
-                 * ancienne entrée = 10
-                 * nouvelle entrée = 15
-                 * différence = +5
-                 */
+                return $this->render('admin/entree_stock/edit.html.twig', [
+                    'entree' => $entree,
+                    'produits' => $produits,
+                    'fournisseurs' => $fournisseurs,
+                    'magasins' => $magasins,
+                    'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                ]);
+            }
 
-                $difference = $quantite - $ancienneQuantite;
+            // RÉCUPÉRER OU INITIALISER LE NOUVEAU STOCK
+            $nouveauStock = $stockMagasinRepository->findOneByProduitEtMagasin(
+                $produit,
+                $magasin
+            );
 
-                $nouveauStock =
-                    $ancienProduit->getQuantiteStock()
-                    + $difference;
+            $memeCouple =
+                $ancienProduit->getId() === $produit->getId()
+                && $ancienMagasin->getId() === $magasin->getId();
 
-                if ($nouveauStock < 0) {
+            if (!$memeCouple && !$nouveauStock instanceof StockMagasin) {
+                $nouveauStock = new StockMagasin();
+                $nouveauStock->setProduit($produit);
+                $nouveauStock->setMagasin($magasin);
+                $nouveauStock->setQuantite(0);
+                $entityManager->persist($nouveauStock);
+            }
 
+            // CALCULER LES STOCKS AVANT DE LES MODIFIER
+            if ($memeCouple) {
+                $stockCalcule = $ancienStock->getQuantite()
+                    - $ancienneQuantite
+                    + $quantite;
+
+                if ($stockCalcule < 0) {
                     $this->addFlash(
                         'danger',
                         'La modification entraînerait un stock négatif.'
                     );
 
-                    return $this->render(
-                        'admin/entree_stock/edit.html.twig',
-                        [
-                            'entree' => $entree,
-                            'produits' => $produits,
-                            'fournisseurs' => $fournisseurs,
-                        ]
-                    );
+                    return $this->render('admin/entree_stock/edit.html.twig', [
+                        'entree' => $entree,
+                        'produits' => $produits,
+                        'fournisseurs' => $fournisseurs,
+                        'magasins' => $magasins,
+                        'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                    ]);
                 }
-
-                $ancienProduit->setQuantiteStock(
-                    $nouveauStock
-                );
-
             } else {
+                $stockAncienCalcule = $ancienStock->getQuantite()
+                    - $ancienneQuantite;
 
-                /*
-                 * Le produit a changé.
-                 * On retire l'ancienne quantité de l'ancien produit
-                 * puis on ajoute la nouvelle quantité au nouveau produit.
-                 */
-
-                if ($ancienProduit !== null) {
-
-                    $ancienStock =
-                        $ancienProduit->getQuantiteStock()
-                        - $ancienneQuantite;
-
-                    if ($ancienStock < 0) {
-
-                        $this->addFlash(
-                            'danger',
-                            'Impossible de modifier cette entrée car le stock de l’ancien produit deviendrait négatif.'
-                        );
-
-                        return $this->render(
-                            'admin/entree_stock/edit.html.twig',
-                            [
-                                'entree' => $entree,
-                                'produits' => $produits,
-                                'fournisseurs' => $fournisseurs,
-                            ]
-                        );
-                    }
-
-                    $ancienProduit->setQuantiteStock(
-                        $ancienStock
+                if ($stockAncienCalcule < 0) {
+                    $this->addFlash(
+                        'danger',
+                        'Impossible de déplacer cette entrée : le stock d’origine deviendrait négatif.'
                     );
-                }
 
-                $produit->setQuantiteStock(
-                    $produit->getQuantiteStock()
-                    + $quantite
-                );
+                    return $this->render('admin/entree_stock/edit.html.twig', [
+                        'entree' => $entree,
+                        'produits' => $produits,
+                        'fournisseurs' => $fournisseurs,
+                        'magasins' => $magasins,
+                        'stocksParProduitMagasin' => $stocksParProduitMagasin,
+                    ]);
+                }
             }
 
+            // TRANSACTION : STOCKS + ENTRÉE
+            $connection = $entityManager->getConnection();
+            $connection->beginTransaction();
 
-            /* =====================================================
-               MISE A JOUR DE L'ENTREE
-               ===================================================== */
+            try {
+                if ($memeCouple) {
+                    $ancienStock->setQuantite($stockCalcule);
+                } else {
+                    $ancienStock->setQuantite($stockAncienCalcule);
 
-            $entree->setProduit($produit);
-            $entree->setFournisseur($fournisseur);
-            $entree->setQuantite($quantite);
-            $entree->setPrixUnitaire($prixUnitaire);
-            $entree->setDateEntree($dateEntree);
-            $entree->setReferenceDocument(
-                $referenceDocument !== ''
-                    ? $referenceDocument
-                    : null
-            );
-            $entree->setCommentaire(
-                $commentaire !== ''
-                    ? $commentaire
-                    : null
-            );
+                    $nouveauStock->setQuantite(
+                        $nouveauStock->getQuantite() + $quantite
+                    );
+                }
 
+                // MISE À JOUR DE L'ENTRÉE
+                $entree->setProduit($produit);
+                $entree->setMagasin($magasin);
+                $entree->setFournisseur($fournisseur);
+                $entree->setQuantite($quantite);
+                $entree->setPrixUnitaire($prixUnitaire);
+                $entree->setDateEntree($dateEntree);
+                $entree->setReferenceDocument(
+                    $referenceDocument !== '' ? $referenceDocument : null
+                );
+                $entree->setCommentaire(
+                    $commentaire !== '' ? $commentaire : null
+                );
 
-            $entityManager->flush();
-
+                $entityManager->flush();
+                $connection->commit();
+            } catch (\Throwable $exception) {
+                $connection->rollBack();
+                throw $exception;
+            }
 
             $this->addFlash(
                 'success',
-                'L’entrée de stock a été modifiée et le stock a été recalculé.'
+                'L’entrée a été modifiée et les stocks des magasins ont été recalculés.'
             );
 
-            return $this->redirectToRoute(
-                'app_entree_stock_index'
-            );
+            return $this->redirectToRoute('app_entree_stock_index');
         }
 
+        return $this->render('admin/entree_stock/edit.html.twig', [
+            'entree' => $entree,
+            'produits' => $produits,
+            'fournisseurs' => $fournisseurs,
+            'magasins' => $magasins,
+            'stocksParProduitMagasin' => $stocksParProduitMagasin,
+        ]);
+    }
 
-        return $this->render(
-            'admin/entree_stock/edit.html.twig',
-            [
-                'entree' => $entree,
-                'produits' => $produits,
-                'fournisseurs' => $fournisseurs,
-            ]
-        );
+    /**
+     * Construire une carte des quantités par produit et magasin.
+     *
+     * Format : "produitId-magasinId" => quantité
+     */
+    private function construireCarteDesStocks(
+        StockMagasinRepository $stockMagasinRepository
+    ): array {
+        $carte = [];
+
+        foreach ($stockMagasinRepository->findAll() as $stock) {
+            $produitId = $stock->getProduit()?->getId();
+            $magasinId = $stock->getMagasin()?->getId();
+
+            if ($produitId !== null && $magasinId !== null) {
+                $cle = $produitId . '-' . $magasinId;
+                $carte[$cle] = $stock->getQuantite();
+            }
+        }
+
+        return $carte;
     }
 }

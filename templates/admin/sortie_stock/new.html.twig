@@ -114,67 +114,78 @@
 
 
                         {# =================================================
-                           PRODUIT
-                           ================================================= #}
-                        <div class="form-section">
+   MAGASIN
+   ================================================= #}
+<div class="form-section">
 
-                            <div class="section-title">
+    <div class="section-title">
+        <i class="bi bi-shop"></i>
+        Magasin
+    </div>
 
-                                <i class="bi bi-box-seam"></i>
+    <label for="magasin" class="form-label">
+        Magasin
+        <span class="required">*</span>
+    </label>
 
-                                Produit
+    <select
+        id="magasin"
+        name="magasin"
+        class="form-select custom-select"
+        required
+    >
+        <option value="">-- Sélectionner un magasin --</option>
 
-                            </div>
+        {% for magasin in magasins %}
+            <option value="{{ magasin.id }}">
+                {{ magasin.nom }} — {{ magasin.ville }}
+            </option>
+        {% endfor %}
+    </select>
 
+    <div class="field-help">
+        <i class="bi bi-info-circle me-1"></i>
+        Sélectionnez le magasin concerné par cette sortie.
+    </div>
 
-                            <label
-                                for="produit"
-                                class="form-label"
-                            >
-                                Produit
-                                <span class="required">*</span>
-                            </label>
+</div>
 
+{# =================================================
+   PRODUIT
+   ================================================= #}
+<div class="form-section">
 
-                            <select
-                                id="produit"
-                                name="produit"
-                                class="form-select custom-select"
-                                required
-                            >
+    <div class="section-title">
+        <i class="bi bi-box-seam"></i>
+        Produit
+    </div>
 
-                                <option value="">
-                                    -- Sélectionner un produit --
-                                </option>
+    <label for="produit" class="form-label">
+        Produit
+        <span class="required">*</span>
+    </label>
 
+    <select
+        id="produit"
+        name="produit"
+        class="form-select custom-select"
+        required
+    >
+        <option value="">-- Sélectionner un produit --</option>
 
-                                {% for produit in produits %}
+        {% for produit in produits %}
+            <option value="{{ produit.id }}">
+                {{ produit.reference }} — {{ produit.nom }}
+            </option>
+        {% endfor %}
+    </select>
 
-                                    <option
-                                        value="{{ produit.id }}"
-                                        data-stock="{{ produit.quantiteStock }}"
-                                    >
+    <div class="field-help">
+        <i class="bi bi-info-circle me-1"></i>
+        Le stock disponible sera calculé selon le magasin et le produit sélectionnés.
+    </div>
 
-                                        {{ produit.reference }}
-                                        —
-                                        {{ produit.nom }}
-
-                                    </option>
-
-                                {% endfor %}
-
-                            </select>
-
-
-                            <div class="field-help">
-
-                                <i class="bi bi-info-circle me-1"></i>
-
-                                Le stock disponible sera affiché automatiquement.
-
-                            </div>
-
-                        </div>
+</div>
 
 
                         {# =================================================
@@ -1328,374 +1339,340 @@
    ============================================================= #}
 <script>
 
+
 document.addEventListener('DOMContentLoaded', function () {
 
-    const produitSelect =
-        document.getElementById('produit');
+    const produitSelect = document.getElementById('produit');
+    const magasinSelect = document.getElementById('magasin');
+    const quantiteInput = document.getElementById('quantite');
 
-    const quantiteInput =
-        document.getElementById('quantite');
+    const stockActuelElement = document.getElementById('stockActuel');
+    const quantiteSortieElement = document.getElementById('quantiteSortie');
+    const nouveauStockElement = document.getElementById('nouveauStock');
 
-    const stockActuelElement =
-        document.getElementById('stockActuel');
+    const formulaStock = document.getElementById('formulaStock');
+    const formulaResult = document.getElementById('formulaResult');
+    const exampleText = document.getElementById('exampleText');
 
-    const quantiteSortieElement =
-        document.getElementById('quantiteSortie');
+    const stockInfoMessage = document.getElementById('stockInfoMessage');
+    const stockAlert = document.getElementById('stockAlert');
+    const stockAlertText = document.getElementById('stockAlertText');
 
-    const nouveauStockElement =
-        document.getElementById('nouveauStock');
-
-    const formulaStock =
-        document.getElementById('formulaStock');
-
-    const formulaResult =
-        document.getElementById('formulaResult');
-
-    const exampleText =
-        document.getElementById('exampleText');
-
-    const stockInfoMessage =
-        document.getElementById('stockInfoMessage');
-
-    const stockAlert =
-        document.getElementById('stockAlert');
-
-    const stockAlertText =
-        document.getElementById('stockAlertText');
-
-    const quantityHelp =
-        document.getElementById('quantiteHelp');
-
-    const submitButton =
-        document.getElementById('submitButton');
-
+    const quantityHelp = document.getElementById('quantiteHelp');
+    const submitButton = document.getElementById('submitButton');
+    const form = document.querySelector('form');
 
     /*
-     * Récupérer le stock du produit sélectionné
+     * Stocks réels par couple produit-magasin.
+     * Les données proviennent du contrôleur Symfony.
      */
-    function getStockProduit() {
+    const stocksParProduitMagasin = {{ stocksParProduitMagasin|json_encode|raw }};
 
-        if (!produitSelect || !produitSelect.value) {
-            return 0;
+    /*
+     * Récupérer le stock du couple sélectionné.
+     *
+     * null signifie qu'aucun enregistrement
+     * StockMagasin n'existe pour ce couple.
+     */
+    function getStockProduitMagasin() {
+
+        const produitId = produitSelect.value;
+        const magasinId = magasinSelect.value;
+
+        if (!produitId || !magasinId) {
+            return null;
         }
 
-        const option =
-            produitSelect.options[
-                produitSelect.selectedIndex
-            ];
+        const key = `${produitId}-${magasinId}`;
 
-        if (!option) {
-            return 0;
+        if (
+            !Object.prototype.hasOwnProperty.call(
+                stocksParProduitMagasin,
+                key
+            )
+        ) {
+            return null;
         }
 
-        return parseInt(
-            option.dataset.stock || '0',
-            10
-        );
+        return Number(stocksParProduitMagasin[key]);
     }
 
+    /*
+     * Afficher un message dans la carte de stock.
+     */
+    function afficherMessage(type, message) {
+
+        let icon = 'bi-info-circle-fill';
+
+        if (type === 'warning') {
+            icon = 'bi-exclamation-triangle-fill';
+        } else if (type === 'good') {
+            icon = 'bi-check-circle-fill';
+        }
+
+        stockInfoMessage.className = `stock-message ${type}`;
+
+        stockInfoMessage.innerHTML = `
+            <i class="bi ${icon}"></i>
+            <span>${message}</span>
+        `;
+    }
 
     /*
-     * Mise à jour complète de l'aperçu
+     * Réinitialiser l'aperçu.
+     */
+    function reinitialiserApercu(message) {
+
+        stockActuelElement.textContent = '0';
+        quantiteSortieElement.textContent = '0';
+        nouveauStockElement.textContent = '0';
+
+        formulaStock.textContent = '0';
+        formulaResult.textContent = '0';
+
+        exampleText.innerHTML = `
+            <i class="bi bi-info-circle me-1"></i>
+            ${message}
+        `;
+
+        stockAlert.style.display = 'none';
+
+        quantityHelp.textContent = message;
+        quantityHelp.className = 'quantity-help';
+
+        afficherMessage('',
+            message
+        );
+
+        submitButton.disabled = true;
+    }
+
+    /*
+     * Mise à jour complète de l'aperçu.
      */
     function mettreAJourStock() {
 
-        const produitId =
-            produitSelect
-                ? produitSelect.value
-                : '';
+        const produitId = produitSelect.value;
+        const magasinId = magasinSelect.value;
 
-        let quantite =
-            quantiteInput
-                ? parseInt(
-                    quantiteInput.value || '0',
-                    10
-                )
-                : 0;
-
+        let quantite = parseInt(
+            quantiteInput.value || '0',
+            10
+        );
 
         if (isNaN(quantite) || quantite < 0) {
             quantite = 0;
         }
 
-
-        const stockActuel =
-            getStockProduit();
-
+        quantiteSortieElement.textContent = quantite;
 
         /*
-         * Mise à jour des nombres
+         * Il faut sélectionner un magasin et un produit.
          */
-        stockActuelElement.textContent =
-            stockActuel;
+        if (!magasinId || !produitId) {
 
-        quantiteSortieElement.textContent =
-            quantite;
-
-        formulaStock.textContent =
-            stockActuel;
-
-
-        /*
-         * Aucun produit sélectionné
-         */
-        if (!produitId) {
-
-            nouveauStockElement.textContent =
-                0;
-
-            formulaResult.textContent =
-                0;
-
-            quantityHelp.textContent =
-                'Sélectionnez d’abord un produit.';
-
-            quantityHelp.className =
-                'quantity-help';
-
-            stockInfoMessage.className =
-                'stock-message';
-
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-info-circle-fill"></i>
-                <span>
-                    Sélectionnez un produit pour voir
-                    son stock disponible.
-                </span>
-            `;
-
-            stockAlert.style.display =
-                'none';
-
-            submitButton.disabled =
-                false;
+            reinitialiserApercu(
+                'Sélectionnez un magasin et un produit pour consulter le stock.'
+            );
 
             return;
         }
 
+        /*
+         * Récupération du stock du couple.
+         */
+        const stockActuel = getStockProduitMagasin();
 
         /*
-         * Calcul du nouveau stock
+         * Aucun stock enregistré pour ce couple.
+         * On ne crée pas de stock automatiquement.
          */
-        const nouveauStock =
-            stockActuel - quantite;
+        if (stockActuel === null) {
 
+            stockActuelElement.textContent = '—';
+            quantiteSortieElement.textContent = quantite;
+            nouveauStockElement.textContent = '—';
 
-        nouveauStockElement.textContent =
-            nouveauStock;
-
-        formulaResult.textContent =
-            nouveauStock;
-
-
-        /*
-         * Quantité vide
-         */
-        if (quantite === 0) {
+            formulaStock.textContent = '—';
+            formulaResult.textContent = '—';
 
             quantityHelp.textContent =
-                'Saisissez une quantité à sortir.';
+                'Aucun stock enregistré pour ce produit dans ce magasin.';
 
-            quantityHelp.className =
-                'quantity-help';
+            quantityHelp.className = 'quantity-help danger';
 
-            stockInfoMessage.className =
-                'stock-message';
+            afficherMessage(
+                'warning',
+                'Aucun stock enregistré pour ce produit dans le magasin sélectionné. Cette sortie ne peut pas être enregistrée.'
+            );
 
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-info-circle-fill"></i>
-                <span>
-                    Le stock actuel est de
-                    <strong>${stockActuel} pièce(s)</strong>.
-                    Saisissez la quantité à sortir.
-                </span>
+            stockAlert.style.display = 'flex';
+
+            stockAlertText.textContent =
+                'Aucun enregistrement de stock disponible pour ce couple produit-magasin.';
+
+            exampleText.innerHTML = `
+                <i class="bi bi-exclamation-circle me-1"></i>
+                Stock non disponible pour ce couple.
             `;
 
-            stockAlert.style.display =
-                'none';
+            submitButton.disabled = true;
 
-            submitButton.disabled =
-                false;
+            return;
+        }
+
+        /*
+         * Affichage du stock actuel.
+         */
+        stockActuelElement.textContent = stockActuel;
+        formulaStock.textContent = stockActuel;
+
+        /*
+         * Calcul du stock après sortie.
+         */
+        const nouveauStock = stockActuel - quantite;
+
+        nouveauStockElement.textContent = nouveauStock;
+        formulaResult.textContent = nouveauStock;
+
+        /*
+         * Quantité non renseignée.
+         */
+        if (quantite <= 0) {
+
+            quantityHelp.textContent =
+                `Stock disponible : ${stockActuel} pièce(s). Saisissez une quantité à sortir.`;
+
+            quantityHelp.className = 'quantity-help';
+
+            afficherMessage(
+                '',
+                `Le stock actuel est de ${stockActuel} pièce(s). Saisissez la quantité à sortir.`
+            );
+
+            stockAlert.style.display = 'none';
+
+            submitButton.disabled = true;
 
         }
 
-
         /*
-         * STOCK INSUFFISANT
+         * Stock insuffisant.
          */
         else if (quantite > stockActuel) {
 
             quantityHelp.textContent =
                 `Stock insuffisant : seulement ${stockActuel} pièce(s) disponibles.`;
 
-            quantityHelp.className =
-                'quantity-help danger';
+            quantityHelp.className = 'quantity-help danger';
 
+            afficherMessage(
+                'warning',
+                `Vous demandez ${quantite} pièce(s), alors que le stock disponible est de ${stockActuel} pièce(s). La sortie ne peut pas être enregistrée.`
+            );
 
-            stockInfoMessage.className =
-                'stock-message warning';
-
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <span>
-                    Vous demandez
-                    <strong>${quantite} pièce(s)</strong>
-                    alors que le stock disponible est seulement de
-                    <strong>${stockActuel} pièce(s)</strong>.
-                    <br>
-                    La sortie ne peut pas être enregistrée.
-                </span>
-            `;
-
-
-            stockAlert.style.display =
-                'flex';
+            stockAlert.style.display = 'flex';
 
             stockAlertText.textContent =
                 `Quantité demandée : ${quantite} pièce(s). Stock disponible : ${stockActuel} pièce(s).`;
 
-
-            submitButton.disabled =
-                true;
+            submitButton.disabled = true;
 
         }
 
-
         /*
-         * STOCK VALIDE
+         * Quantité valide.
          */
         else {
 
             quantityHelp.textContent =
                 `Stock disponible : ${stockActuel} pièce(s).`;
 
-            quantityHelp.className =
-                'quantity-help success';
+            quantityHelp.className = 'quantity-help success';
 
+            afficherMessage(
+                'good',
+                `Calcul : ${stockActuel} − ${quantite} = ${nouveauStock} pièce(s). La quantité demandée est disponible.`
+            );
 
-            stockInfoMessage.className =
-                'stock-message good';
+            stockAlert.style.display = 'none';
 
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-check-circle-fill"></i>
-                <span>
-                    Calcul :
-                    <strong>
-                        ${stockActuel}
-                        − ${quantite}
-                        = ${nouveauStock} pièce(s)
-                    </strong>
-                    <br>
-                    La quantité demandée est disponible.
-                </span>
-            `;
-
-
-            stockAlert.style.display =
-                'none';
-
-
-            submitButton.disabled =
-                false;
+            submitButton.disabled = false;
 
         }
 
-
         /*
-         * Exemple dynamique
+         * Exemple dynamique.
          */
         exampleText.innerHTML = `
             <i class="bi bi-check-circle me-1"></i>
             ${stockActuel} − ${quantite} = ${nouveauStock} pièce(s)
         `;
-
     }
 
-
     /*
-     * Changement du produit
+     * Changement du magasin.
      */
-    if (produitSelect) {
-
-        produitSelect.addEventListener(
-            'change',
-            mettreAJourStock
-        );
-
-    }
-
+    magasinSelect.addEventListener(
+        'change',
+        mettreAJourStock
+    );
 
     /*
-     * Changement quantité
+     * Changement du produit.
      */
-    if (quantiteInput) {
-
-        quantiteInput.addEventListener(
-            'input',
-            mettreAJourStock
-        );
-
-        quantiteInput.addEventListener(
-            'change',
-            mettreAJourStock
-        );
-
-    }
-
+    produitSelect.addEventListener(
+        'change',
+        mettreAJourStock
+    );
 
     /*
-     * Vérification finale avant envoi
-     *
-     * Cette vérification est seulement une sécurité
-     * côté navigateur.
-     *
-     * Le contrôleur Symfony vérifie également
-     * le stock côté serveur.
+     * Changement de quantité.
      */
-    const form =
-        document.querySelector('form');
+    quantiteInput.addEventListener(
+        'input',
+        mettreAJourStock
+    );
 
-    if (form) {
-
-        form.addEventListener(
-            'submit',
-            function (event) {
-
-                const stock =
-                    getStockProduit();
-
-                const quantite =
-                    parseInt(
-                        quantiteInput.value || '0',
-                        10
-                    );
-
-
-                if (
-                    !produitSelect.value ||
-                    isNaN(quantite) ||
-                    quantite <= 0 ||
-                    quantite > stock
-                ) {
-
-                    event.preventDefault();
-
-                    mettreAJourStock();
-
-                }
-
-            }
-        );
-
-    }
-
+    quantiteInput.addEventListener(
+        'change',
+        mettreAJourStock
+    );
 
     /*
-     * Calcul initial
+     * Vérification finale avant soumission.
+     */
+    form.addEventListener('submit', function (event) {
+
+        const stock = getStockProduitMagasin();
+
+        const quantite = parseInt(
+            quantiteInput.value || '0',
+            10
+        );
+
+        if (
+            !magasinSelect.value ||
+            !produitSelect.value ||
+            stock === null ||
+            isNaN(quantite) ||
+            quantite <= 0 ||
+            quantite > stock
+        ) {
+
+            event.preventDefault();
+
+            mettreAJourStock();
+        }
+    });
+
+    /*
+     * Calcul initial.
      */
     mettreAJourStock();
 
 });
+
 
 </script>
 

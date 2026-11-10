@@ -1,0 +1,1296 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard | Jumbo Score{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="">
+
+    <style>
+        :root {
+            --jumbo-red: #e32636;
+            --jumbo-red-dark: #bd1e2d;
+            --jumbo-navy: #17233f;
+            --jumbo-muted: #8992a5;
+            --jumbo-border: #e9edf3;
+            --jumbo-green: #159b69;
+        }
+
+        .stats-container {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 25px 45px;
+            color: var(--jumbo-navy);
+        }
+
+        /* HEADER */
+        .stats-hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            padding: 32px 35px;
+            margin-bottom: 26px;
+            color: #fff;
+            border-radius: 20px;
+            background: linear-gradient(115deg, #17233f, #24375e 72%, #344a73);
+            box-shadow: 0 12px 30px rgba(23,35,63,.15);
+        }
+
+        .stats-hero::before {
+            content: "";
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border: 35px solid rgba(255,255,255,.045);
+            border-radius: 50%;
+            right: 12%;
+            top: -145px;
+        }
+
+        .stats-hero::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(227,38,54,.12);
+            right: -65px;
+            bottom: -110px;
+        }
+
+        .hero-content, .hero-actions {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffb9bf;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            margin-bottom: 12px;
+        }
+
+        .hero-eyebrow span, .live-label span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ff5968;
+        }
+
+        .stats-hero h1 {
+            color: #fff;
+            font-size: clamp(23px, 3vw, 32px);
+            font-weight: 850;
+            margin: 0 0 9px;
+        }
+
+        .stats-hero p {
+            color: #c5cede;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stats-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 12px 17px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 800;
+            transition: .25s;
+        }
+
+        .stats-btn:hover { transform: translateY(-3px); }
+
+        .btn-map {
+            background: var(--jumbo-red);
+            color: #fff;
+        }
+
+        .btn-map:hover {
+            background: var(--jumbo-red-dark);
+            color: #fff;
+        }
+
+        .btn-refresh {
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.22);
+            background: rgba(255,255,255,.08);
+        }
+
+        .btn-refresh:hover {
+            color: #fff;
+            background: rgba(255,255,255,.16);
+        }
+
+        /* TITRES */
+        .block-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 30px 0 16px;
+        }
+
+        .block-heading h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 850;
+        }
+
+        .block-heading p {
+            margin: 5px 0 0;
+            color: var(--jumbo-muted);
+            font-size: 12px;
+        }
+
+        .live-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border-radius: 30px;
+            color: #128356;
+            background: #e8f8f0;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .live-label span {
+            background: #18b878;
+        }
+
+        /* CARTES */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .stats-card {
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid var(--jumbo-border);
+            border-radius: 17px;
+            padding: 22px;
+            box-shadow: 0 5px 20px rgba(23,35,63,.035);
+            transition: .25s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px rgba(23,35,63,.09);
+        }
+
+        .stats-card::after {
+            content: "";
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            left: 0;
+            bottom: 0;
+            background: var(--card-accent);
+        }
+
+        .card-blue { --card-accent: #3975e8; }
+        .card-green { --card-accent: #159b69; }
+        .card-purple { --card-accent: #9065df; }
+        .card-orange { --card-accent: #ed9b36; }
+
+        .stats-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stats-label {
+            color: #7e899d;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .stats-icon {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            font-size: 18px;
+        }
+
+        .icon-blue { color: #3975e8; background: #edf3ff; }
+        .icon-green { color: #159b69; background: #e8f8f0; }
+        .icon-purple { color: #9065df; background: #f2edff; }
+        .icon-orange { color: #ed9b36; background: #fff4e6; }
+
+        .stats-number {
+            font-size: 35px;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .stats-description {
+            color: #a0a8b6;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+        .stats-progress {
+            width: 100%;
+            height: 5px;
+            background: #edf0f5;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 17px;
+        }
+
+        .stats-progress span {
+            display: block;
+            height: 100%;
+            border-radius: 20px;
+            background: var(--card-accent);
+            transition: width .3s;
+        }
+
+        /* PANNEAUX */
+        .stats-main-grid {
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            gap: 18px;
+        }
+
+        .stats-section, .map-section {
+            min-width: 0;
+            background: #fff;
+            border: 1px solid var(--jumbo-border);
+            border-radius: 17px;
+            padding: 23px;
+            box-shadow: 0 5px 20px rgba(23,35,63,.035);
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .panel-heading h2 {
+            font-size: 15px;
+            font-weight: 850;
+            margin: 0 0 6px;
+        }
+
+        .panel-heading p {
+            font-size: 11px;
+            color: var(--jumbo-muted);
+            margin: 0;
+        }
+
+        .panel-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 37px;
+            height: 37px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #fff0f1;
+            color: var(--jumbo-red);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* FILTRES */
+        .filter-panel {
+            margin: 25px 0;
+        }
+
+        .filter-panel .form-label {
+            color: #536078;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .filter-panel .form-select {
+            min-height: 44px;
+            border: 1px solid #e2e7ef;
+            border-radius: 10px;
+            color: #344054;
+            font-size: 13px;
+            box-shadow: none;
+        }
+
+        .filter-panel .form-select:focus {
+            border-color: var(--jumbo-red);
+            box-shadow: 0 0 0 3px rgba(227,38,54,.09);
+        }
+
+        .filter-reset {
+            min-height: 44px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--jumbo-navy);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            transition: .2s;
+        }
+
+        .filter-reset:hover {
+            background: #293b63;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        #filterResult {
+            color: #8992a5;
+            font-size: 11px;
+            margin-top: 14px;
+        }
+
+        /* CARTE */
+        .map-section { margin-top: 20px; }
+
+        .map-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 17px;
+        }
+
+        .map-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #788398;
+            font-size: 11px;
+        }
+
+        .map-info i { color: var(--jumbo-red); }
+
+        #statsMap {
+            width: 100%;
+            height: 510px;
+            border-radius: 13px;
+            z-index: 1;
+            border: 1px solid #e8edf3;
+        }
+
+        .leaflet-popup-content-wrapper { border-radius: 12px; }
+
+        .leaflet-popup-content {
+            font-family: inherit;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .leaflet-popup-content a {
+            display: inline-block;
+            margin-top: 7px;
+            color: var(--jumbo-red);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        /* TABLEAU */
+        .table-section { margin-top: 20px; }
+
+        .table-count {
+            padding: 7px 11px;
+            border-radius: 8px;
+            background: #fff0f1;
+            color: var(--jumbo-red);
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .stats-table-wrapper { overflow-x: auto; }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 12px;
+        }
+
+        .stats-table th {
+            padding: 14px 15px;
+            text-align: left;
+            white-space: nowrap;
+            color: #788398;
+            background: #f7f8fb;
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .stats-table th:first-child { border-radius: 9px 0 0 9px; }
+        .stats-table th:last-child { border-radius: 0 9px 9px 0; }
+
+        .stats-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eff1f5;
+            color: #536078;
+            vertical-align: middle;
+        }
+
+        .stats-table tbody tr { transition: .2s; }
+        .stats-table tbody tr:hover { background: #fafbfe; }
+        .stats-table tbody tr:last-child td { border-bottom: none; }
+
+        .store-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--jumbo-navy);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .store-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: #fff0f1;
+            color: var(--jumbo-red);
+        }
+
+        .city-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 7px;
+            background: #f0f4fb;
+            color: #52617c;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .gps-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .gps-ok { color: #128356; background: #e8f8f0; }
+        .gps-no { color: #b87920; background: #fff4e6; }
+
+        .stats-footer {
+            text-align: center;
+            color: #a0a8b6;
+            font-size: 11px;
+            margin-top: 25px;
+        }
+
+        .stats-footer i {
+            color: var(--jumbo-red);
+            margin-right: 5px;
+        }
+
+        @media (max-width: 1100px) {
+            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .stats-main-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 650px) {
+            .stats-container {
+                padding: 0 12px 30px;
+                margin-top: 18px;
+            }
+
+            .stats-hero {
+                padding: 25px 20px;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .hero-actions { width: 100%; }
+            .stats-btn { flex: 1; padding: 11px; }
+            .stats-grid { gap: 10px; }
+            .stats-card { padding: 15px; }
+            .stats-number { font-size: 28px; }
+            .stats-icon { width: 38px; height: 38px; font-size: 15px; }
+            .stats-label { font-size: 10px; }
+            .stats-description { font-size: 10px; line-height: 1.5; }
+
+            .stats-section, .map-section { padding: 16px; }
+            .chart-wrapper { height: 270px; }
+            #statsMap { height: 390px; }
+            .block-heading { align-items: flex-start; }
+        }
+
+        @media (max-width: 380px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="stats-container">
+
+    {# HEADER #}
+    <header class="stats-hero">
+        <div class="hero-content">
+            <div class="hero-eyebrow">
+                <span></span>
+                JUMBO SCORE · MADAGASCAR
+            </div>
+
+            <h1>Tableau de bord des magasins</h1>
+            <p>Suivez et visualisez la répartition du réseau Jumbo Score à Madagascar.</p>
+        </div>
+
+        <div class="hero-actions">
+            <a href="{{ path('app_magasins') }}" class="stats-btn btn-map">
+                <i class="fas fa-map-marked-alt"></i>
+                Voir le localisateur
+            </a>
+
+            <a href="{{ path('app_magasins_statistiques') }}" class="stats-btn btn-refresh">
+                <i class="fas fa-sync-alt"></i>
+                Actualiser
+            </a>
+        </div>
+    </header>
+
+    {# STATISTIQUES #}
+    <div class="block-heading">
+        <div>
+            <h2>Vue d'ensemble</h2>
+            <p>Les indicateurs principaux de votre réseau de magasins.</p>
+        </div>
+
+        <span class="live-label">
+            <span></span>
+            DONNÉES ACTUELLES
+        </span>
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stats-card card-blue">
+            <div class="stats-card-top">
+                <span class="stats-label">Magasins actifs</span>
+                <div class="stats-icon icon-blue"><i class="fas fa-store"></i></div>
+            </div>
+            <div class="stats-number" id="statTotal">{{ totalMagasins }}</div>
+            <div class="stats-description">Magasins enregistrés et actifs</div>
+            <div class="stats-progress"><span style="width:100%"></span></div>
+        </div>
+
+        <div class="stats-card card-green">
+            <div class="stats-card-top">
+                <span class="stats-label">Magasins géolocalisés</span>
+                <div class="stats-icon icon-green"><i class="fas fa-map-marker-alt"></i></div>
+            </div>
+            <div class="stats-number" id="statGps">{{ magasinsGeolocalises }}</div>
+            <div class="stats-description">Magasins avec coordonnées GPS</div>
+            <div class="stats-progress"><span id="gpsProgress" style="width:{{ totalMagasins > 0 ? (magasinsGeolocalises / totalMagasins * 100) : 0 }}%"></span></div>
+        </div>
+
+        <div class="stats-card card-purple">
+            <div class="stats-card-top">
+                <span class="stats-label">Villes couvertes</span>
+                <div class="stats-icon icon-purple"><i class="fas fa-city"></i></div>
+            </div>
+            <div class="stats-number" id="statCities">{{ totalVilles }}</div>
+            <div class="stats-description">Villes représentées dans le réseau</div>
+            <div class="stats-progress"><span style="width:75%"></span></div>
+        </div>
+
+        <div class="stats-card card-orange">
+            <div class="stats-card-top">
+                <span class="stats-label">Régions représentées</span>
+                <div class="stats-icon icon-orange"><i class="fas fa-globe-africa"></i></div>
+            </div>
+            <div class="stats-number" id="statRegions">{{ totalRegions }}</div>
+            <div class="stats-description">Régions renseignées</div>
+            <div class="stats-progress"><span style="width:60%"></span></div>
+        </div>
+
+    </div>
+
+    {# FILTRES #}
+    <section class="stats-section filter-panel">
+        <div class="panel-heading">
+            <div>
+                <h2><i class="fas fa-filter" style="color:#e32636;margin-right:7px;"></i> Filtrer les magasins</h2>
+                <p>Sélectionnez une ville ou une région pour affiner les statistiques.</p>
+            </div>
+        </div>
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="filterCity" class="form-label">Ville</label>
+                <select id="filterCity" class="form-select">
+                    <option value="">Toutes les villes</option>
+                    {% for item in parVille %}
+                        <option value="{{ item.nom }}">{{ item.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-5">
+                <label for="filterRegion" class="form-label">Région</label>
+                <select id="filterRegion" class="form-select">
+                    <option value="">Toutes les régions</option>
+                    {% for item in parRegion %}
+                        {% if item.nom %}
+                            <option value="{{ item.nom }}">{{ item.nom }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" id="resetFilters" class="btn filter-reset w-100">
+                    <i class="fas fa-undo me-1"></i> Réinitialiser
+                </button>
+            </div>
+        </div>
+
+        <div id="filterResult" aria-live="polite">
+            Affichage de tous les magasins.
+        </div>
+    </section>
+
+    {# GRAPHIQUES #}
+    <div class="block-heading">
+        <div>
+            <h2>Analyse de la répartition</h2>
+            <p>Visualisation du nombre de magasins par zone géographique.</p>
+        </div>
+    </div>
+
+    <div class="stats-main-grid">
+
+        <section class="stats-section">
+            <div class="panel-heading">
+                <div>
+                    <h2>Répartition par ville</h2>
+                    <p>Nombre de magasins actifs dans chaque ville.</p>
+                </div>
+                <div class="panel-icon"><i class="fas fa-chart-bar"></i></div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="cityChart"></canvas>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="panel-heading">
+                <div>
+                    <h2>Répartition par région</h2>
+                    <p>Distribution géographique du réseau.</p>
+                </div>
+                <div class="panel-icon"><i class="fas fa-chart-pie"></i></div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="regionChart"></canvas>
+            </div>
+        </section>
+
+    </div>
+
+    {# CARTE #}
+    <section class="map-section">
+        <div class="panel-heading">
+            <div>
+                <h2>Implantation géographique</h2>
+                <p>Localisation des magasins Jumbo Score sur le territoire malgache.</p>
+            </div>
+            <div class="panel-icon"><i class="fas fa-map-marked-alt"></i></div>
+        </div>
+
+        <div class="map-toolbar">
+            <div class="map-info">
+                <i class="fas fa-info-circle"></i>
+                Cliquez sur un marqueur pour afficher les informations du magasin.
+            </div>
+
+            <span class="live-label">
+                <span></span>
+                <span id="mapGpsCount">{{ magasinsGeolocalises }}</span> POINTS GPS
+            </span>
+        </div>
+
+        <div id="statsMap"></div>
+    </section>
+
+    {# TABLEAU #}
+    <section class="stats-section table-section">
+        <div class="panel-heading">
+            <div>
+                <h2>Répertoire des magasins</h2>
+                <p>Liste détaillée des établissements actifs enregistrés.</p>
+            </div>
+
+            <span class="table-count">
+                <span id="tableCount">{{ totalMagasins }}</span> MAGASINS
+            </span>
+        </div>
+
+        <div class="stats-table-wrapper">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Magasin</th>
+                        <th>Ville</th>
+                        <th>Région</th>
+                        <th>Géolocalisation</th>
+                    </tr>
+                </thead>
+
+                <tbody id="storesTableBody">
+                    {% for magasin in magasins %}
+                        <tr>
+                            <td>
+                                <div class="store-name">
+                                    <div class="store-avatar"><i class="fas fa-store"></i></div>
+                                    {{ magasin.nom }}
+                                </div>
+                            </td>
+                            <td><span class="city-badge">{{ magasin.ville }}</span></td>
+                            <td>{{ magasin.region ?: 'Non renseignée' }}</td>
+                            <td>
+                                {% if magasin.latitude is not null and magasin.longitude is not null %}
+                                    <span class="gps-status gps-ok">
+                                        <i class="fas fa-check-circle"></i> Disponible
+                                    </span>
+                                {% else %}
+                                    <span class="gps-status gps-no">
+                                        <i class="fas fa-exclamation-circle"></i> Non disponible
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align:center;padding:30px;">
+                                Aucun magasin actif enregistré.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="stats-footer">
+        <i class="fas fa-heart"></i>
+        Tableau de bord public Jumbo Score · Données issues de la base de données.
+    </footer>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // =================================================
+            // 1. DONNEES DES MAGASINS
+            // =================================================
+
+            const stores = {{ magasins|map(m => {
+                'nom': m.nom,
+                'ville': m.ville,
+                'region': m.region,
+                'adresse': m.adresse,
+                'latitude': m.latitude,
+                'longitude': m.longitude
+            })|json_encode|raw }};
+
+            const cityFilter = document.getElementById('filterCity');
+            const regionFilter = document.getElementById('filterRegion');
+            const resetButton = document.getElementById('resetFilters');
+            const tableBody = document.getElementById('storesTableBody');
+
+            // Comparaison sans tenir compte des espaces superflus.
+            function normalize(value) {
+                return String(value ?? '').trim();
+            }
+
+            // =================================================
+            // 2. CONFIGURATION DES GRAPHIQUES
+            // =================================================
+
+            Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+            Chart.defaults.color = '#8992a5';
+
+            const cityChart = new Chart(
+                document.getElementById('cityChart'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Nombre de magasins',
+                            data: [],
+                            backgroundColor: '#e32636',
+                            hoverBackgroundColor: '#bd1e2d',
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            maxBarThickness: 42
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 500 },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#17233f',
+                                padding: 12,
+                                cornerRadius: 9,
+                                displayColors: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: {
+                                    maxRotation: 35,
+                                    minRotation: 0
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0,
+                                    stepSize: 1
+                                },
+                                grid: { color: '#f0f2f6' },
+                                border: { display: false }
+                            }
+                        }
+                    }
+                }
+            );
+
+            const regionChart = new Chart(
+                document.getElementById('regionChart'),
+                {
+                    type: 'doughnut',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            data: [],
+                            backgroundColor: [
+                                '#e32636',
+                                '#263d68',
+                                '#159b69',
+                                '#9065df',
+                                '#ed9b36',
+                                '#269ac1',
+                                '#718096',
+                                '#df6797'
+                            ],
+                            hoverOffset: 9,
+                            borderWidth: 4,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '68%',
+                        animation: { duration: 500 },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    padding: 18,
+                                    boxWidth: 8,
+                                    font: { size: 11, weight: '600' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#17233f',
+                                padding: 12,
+                                cornerRadius: 9
+                            }
+                        }
+                    }
+                }
+            );
+
+            // =================================================
+            // 3. CARTE LEAFLET
+            // =================================================
+
+            const map = L.map('statsMap', {
+                scrollWheelZoom: true
+            }).setView([-18.7669, 46.8691], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            const markerLayer = L.layerGroup().addTo(map);
+
+            function hasValidGps(store) {
+                const lat = Number(store.latitude);
+                const lng = Number(store.longitude);
+
+                return store.latitude !== null &&
+                    store.latitude !== '' &&
+                    store.longitude !== null &&
+                    store.longitude !== '' &&
+                    Number.isFinite(lat) &&
+                    Number.isFinite(lng) &&
+                    lat >= -26 && lat <= -11 &&
+                    lng >= 43 && lng <= 51;
+            }
+
+            function displayMap(filteredStores) {
+
+                markerLayer.clearLayers();
+
+                const bounds = [];
+                let gpsCount = 0;
+
+                filteredStores.forEach(function (store) {
+
+                    if (!hasValidGps(store)) {
+                        return;
+                    }
+
+                    const lat = Number(store.latitude);
+                    const lng = Number(store.longitude);
+
+                    const marker = L.marker([lat, lng]);
+
+                    // Construction sécurisée du popup.
+                    const popup = document.createElement('div');
+
+                    const name = document.createElement('strong');
+                    name.textContent = store.nom;
+
+                    const city = document.createElement('div');
+                    city.textContent = store.ville;
+
+                    popup.appendChild(name);
+                    popup.appendChild(city);
+
+                    if (store.adresse) {
+                        const address = document.createElement('div');
+                        address.textContent = store.adresse;
+                        popup.appendChild(address);
+                    }
+
+                    if (store.region) {
+                        const region = document.createElement('div');
+                        region.textContent = 'Région : ' + store.region;
+                        popup.appendChild(region);
+                    }
+
+                    const link = document.createElement('a');
+                    link.href =
+                        'https://www.google.com/maps/dir/?api=1&destination='
+                        + encodeURIComponent(lat + ',' + lng);
+
+                    link.textContent = 'Voir l’itinéraire';
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+
+                    popup.appendChild(link);
+
+                    marker.bindPopup(popup);
+                    marker.addTo(markerLayer);
+
+                    bounds.push([lat, lng]);
+                    gpsCount++;
+                });
+
+                document.getElementById('mapGpsCount').textContent = gpsCount;
+
+                if (bounds.length > 0) {
+                    map.fitBounds(bounds, {
+                        padding: [35, 35],
+                        maxZoom: 9
+                    });
+                } else {
+                    map.setView([-18.7669, 46.8691], 6);
+                }
+
+                setTimeout(function () {
+                    map.invalidateSize();
+                }, 150);
+            }
+
+            // =================================================
+            // 4. MISE A JOUR DU TABLEAU
+            // =================================================
+
+            function displayTable(filteredStores) {
+
+                tableBody.innerHTML = '';
+
+                if (filteredStores.length === 0) {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+
+                    cell.colSpan = 4;
+                    cell.style.textAlign = 'center';
+                    cell.style.padding = '30px';
+                    cell.textContent = 'Aucun magasin ne correspond aux filtres.';
+
+                    row.appendChild(cell);
+                    tableBody.appendChild(row);
+
+                    return;
+                }
+
+                filteredStores.forEach(function (store) {
+
+                    const row = document.createElement('tr');
+
+                    // Nom du magasin.
+                    const nameCell = document.createElement('td');
+                    const nameWrapper = document.createElement('div');
+                    nameWrapper.className = 'store-name';
+
+                    const avatar = document.createElement('div');
+                    avatar.className = 'store-avatar';
+
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-store';
+
+                    avatar.appendChild(icon);
+
+                    const name = document.createElement('span');
+                    name.textContent = store.nom;
+
+                    nameWrapper.appendChild(avatar);
+                    nameWrapper.appendChild(name);
+                    nameCell.appendChild(nameWrapper);
+
+                    // Ville.
+                    const cityCell = document.createElement('td');
+                    const cityBadge = document.createElement('span');
+
+                    cityBadge.className = 'city-badge';
+                    cityBadge.textContent = store.ville || 'Non renseignée';
+
+                    cityCell.appendChild(cityBadge);
+
+                    // Région.
+                    const regionCell = document.createElement('td');
+                    regionCell.textContent = store.region || 'Non renseignée';
+
+                    // GPS.
+                    const gpsCell = document.createElement('td');
+                    const status = document.createElement('span');
+                    const statusIcon = document.createElement('i');
+
+                    const gpsAvailable =
+                        store.latitude !== null &&
+                        store.latitude !== '' &&
+                        store.longitude !== null &&
+                        store.longitude !== '';
+
+                    status.className = gpsAvailable
+                        ? 'gps-status gps-ok'
+                        : 'gps-status gps-no';
+
+                    statusIcon.className = gpsAvailable
+                        ? 'fas fa-check-circle'
+                        : 'fas fa-exclamation-circle';
+
+                    status.appendChild(statusIcon);
+
+                    status.appendChild(document.createTextNode(
+                        gpsAvailable ? ' Disponible' : ' Non disponible'
+                    ));
+
+                    gpsCell.appendChild(status);
+
+                    row.appendChild(nameCell);
+                    row.appendChild(cityCell);
+                    row.appendChild(regionCell);
+                    row.appendChild(gpsCell);
+
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // =================================================
+            // 5. MISE A JOUR DES STATISTIQUES
+            // =================================================
+
+            function updateStatistics(filteredStores) {
+
+                const total = filteredStores.length;
+
+                const gps = filteredStores.filter(hasValidGps).length;
+
+                const cities = new Set(
+                    filteredStores
+                        .map(store => normalize(store.ville))
+                        .filter(Boolean)
+                );
+
+                const regions = new Set(
+                    filteredStores
+                        .map(store => normalize(store.region))
+                        .filter(Boolean)
+                );
+
+                document.getElementById('statTotal').textContent = total;
+                document.getElementById('statGps').textContent = gps;
+                document.getElementById('statCities').textContent = cities.size;
+                document.getElementById('statRegions').textContent = regions.size;
+
+                const gpsPercentage = total > 0
+                    ? (gps / total) * 100
+                    : 0;
+
+                document.getElementById('gpsProgress').style.width =
+                    gpsPercentage + '%';
+
+                document.getElementById('tableCount').textContent = total;
+            }
+
+            // =================================================
+            // 6. MISE A JOUR DES GRAPHIQUES
+            // =================================================
+
+            function updateCharts(filteredStores) {
+
+                const cityCounts = {};
+                const regionCounts = {};
+
+                filteredStores.forEach(function (store) {
+
+                    const city = normalize(store.ville) || 'Non renseignée';
+                    const region = normalize(store.region) || 'Non renseignée';
+
+                    cityCounts[city] = (cityCounts[city] || 0) + 1;
+                    regionCounts[region] = (regionCounts[region] || 0) + 1;
+                });
+
+                const sortedCities = Object.entries(cityCounts)
+                    .sort((a, b) => b[1] - a[1]);
+
+                cityChart.data.labels = sortedCities.map(item => item[0]);
+                cityChart.data.datasets[0].data = sortedCities.map(item => item[1]);
+                cityChart.update();
+
+                const sortedRegions = Object.entries(regionCounts)
+                    .sort((a, b) => b[1] - a[1]);
+
+                regionChart.data.labels = sortedRegions.map(item => item[0]);
+                regionChart.data.datasets[0].data = sortedRegions.map(item => item[1]);
+                regionChart.update();
+            }
+
+            // =================================================
+            // 7. APPLICATION DES FILTRES
+            // =================================================
+
+            function applyFilters() {
+
+                const selectedCity = normalize(cityFilter.value);
+                const selectedRegion = normalize(regionFilter.value);
+
+                const filteredStores = stores.filter(function (store) {
+
+                    const matchesCity =
+                        !selectedCity ||
+                        normalize(store.ville) === selectedCity;
+
+                    const matchesRegion =
+                        !selectedRegion ||
+                        normalize(store.region) === selectedRegion;
+
+                    return matchesCity && matchesRegion;
+                });
+
+                updateStatistics(filteredStores);
+                updateCharts(filteredStores);
+                displayMap(filteredStores);
+                displayTable(filteredStores);
+
+                document.getElementById('filterResult').textContent =
+                    filteredStores.length + ' magasin(s) affiché(s) sur '
+                    + stores.length + '.';
+            }
+
+            // =================================================
+            // 8. EVENEMENTS
+            // =================================================
+
+            cityFilter.addEventListener('change', applyFilters);
+            regionFilter.addEventListener('change', applyFilters);
+
+            resetButton.addEventListener('click', function () {
+                cityFilter.value = '';
+                regionFilter.value = '';
+                applyFilters();
+            });
+
+            // Affichage initial.
+            applyFilters();
+
+        });
+    </script>
+{% endblock %}

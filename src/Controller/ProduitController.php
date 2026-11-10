@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\Ean13Generator;
+use Picqer\Barcode\Types\TypeEan13;
+use Picqer\Barcode\Renderers\SvgRenderer;
 
 #[Route('/produits')]
 class ProduitController extends AbstractController
@@ -32,7 +35,9 @@ class ProduitController extends AbstractController
     #[Route('/nouveau', name: 'app_produit_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ProduitRepository $produitRepository,
+        Ean13Generator $ean13Generator
     ): Response {
         $produit = new Produit();
 
@@ -45,6 +50,29 @@ class ProduitController extends AbstractController
 
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Une famille est obligatoire pour tout nouveau produit.
+if ($produit->getFamille() === null) {
+    $this->addFlash(
+        'danger',
+        'Veuillez sélectionner une famille pour ce produit.'
+    );
+
+    return $this->render('produit/new.html.twig', [
+        'produit' => $produit,
+        'form' => $form,
+    ]);
+}
+
+// Récupérer automatiquement la catégorie de la famille.
+$produit->setCategorie(
+    $produit->getFamille()->getCategorie()
+);
+            // Générer automatiquement un EAN-13 si le champ est vide.
+if (!$produit->getCodeBarres()) {
+    $produit->setCodeBarres(
+        $ean13Generator->generate($produitRepository)
+    );
+}
 
             /*
              * =====================================================
@@ -117,15 +145,12 @@ class ProduitController extends AbstractController
             }
 
 
-            /*
-             * =====================================================
-             * ENREGISTREMENT
-             * =====================================================
-             */
-
             $entityManager->persist($produit);
-
             $entityManager->flush();
+             
+             
+             
+             //
 
 
             $this->addFlash(
@@ -148,7 +173,41 @@ class ProduitController extends AbstractController
             ]
         );
     }
-
+    #[Route(
+        '/{id}/code-barres',
+        name: 'app_client_produit_barcode',
+        methods: ['GET']
+    )]
+    public function barcode(
+        Produit $produit
+    ): Response {
+        $code = $produit->getCodeBarres();
+    
+        if (
+            !$code ||
+            !\App\Service\Ean13Generator::isValid($code)
+        ) {
+            throw $this->createNotFoundException(
+                'Code-barres EAN-13 invalide ou introuvable.'
+            );
+        }
+    
+        $barcode = (new \Picqer\Barcode\Types\TypeEan13())
+            ->getBarcode($code);
+    
+        $renderer = new \Picqer\Barcode\Renderers\SvgRenderer();
+    
+        $svg = $renderer->render(
+            $barcode,
+            $barcode->getWidth() * 2,
+            80
+        );
+    
+        return new Response($svg, Response::HTTP_OK, [
+            'Content-Type' => 'image/svg+xml',
+            'Cache-Control' => 'no-cache',
+        ]);
+    }
 
     #[Route('/{id}', name: 'app_produit_show', methods: ['GET'])]
     public function show(
@@ -167,7 +226,9 @@ class ProduitController extends AbstractController
     public function edit(
         Request $request,
         Produit $produit,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ProduitRepository $produitRepository,
+        Ean13Generator $ean13Generator
     ): Response {
         $form = $this->createForm(
             ProduitType::class,
@@ -178,6 +239,18 @@ class ProduitController extends AbstractController
 
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Si une famille est sélectionnée, synchroniser la catégorie.
+if ($produit->getFamille() !== null) {
+    $produit->setCategorie(
+        $produit->getFamille()->getCategorie()
+    );
+}
+            // Si le code a été effacé, en générer un nouveau.
+if (!$produit->getCodeBarres()) {
+    $produit->setCodeBarres(
+        $ean13Generator->generate($produitRepository)
+    );
+}
 
             /*
              * =====================================================

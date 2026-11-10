@@ -1,0 +1,523 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comptage de l'inventaire{% endblock %}
+{% block header_title %}Comptage de l'inventaire{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .inventory-page {
+            color: #e5e7eb;
+        }
+
+        .inventory-header {
+            background: linear-gradient(135deg, #111c35, #172b4d);
+            border: 1px solid rgba(34, 211, 238, .18);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 22px;
+        }
+
+        .inventory-header h2 {
+            color: #fff;
+            font-weight: 750;
+            margin-bottom: 8px;
+        }
+
+        .inventory-header p {
+            color: #a8b5cc;
+            margin-bottom: 0;
+        }
+
+        .inventory-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 25px;
+            margin-top: 20px;
+        }
+
+        .inventory-meta-item {
+            color: #cbd5e1;
+            font-size: .9rem;
+        }
+
+        .inventory-meta-item i {
+            color: #22d3ee;
+            margin-right: 7px;
+        }
+
+        .inventory-card {
+            background: #101a2d;
+            border: 1px solid rgba(148, 163, 184, .13);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .inventory-card-title {
+            color: #f8fafc;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .inventory-muted {
+            color: #94a3b8;
+            font-size: .88rem;
+        }
+
+        .inventory-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .inventory-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .inventory-table thead th {
+            background: #17243b;
+            color: #9fb2cc;
+            font-size: .76rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, .15);
+            white-space: nowrap;
+        }
+
+        .inventory-table tbody td {
+            padding: 13px 12px;
+            color: #dbe4f0;
+            border-bottom: 1px solid rgba(148, 163, 184, .09);
+            vertical-align: middle;
+        }
+
+        .inventory-table tbody tr:hover {
+            background: rgba(59, 130, 246, .06);
+        }
+
+        .product-name {
+            color: #f8fafc;
+            font-weight: 650;
+        }
+
+        .product-reference {
+            color: #8293ad;
+            font-size: .78rem;
+            margin-top: 3px;
+        }
+
+        .theoretical-value {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 55px;
+            padding: 7px 12px;
+            background: rgba(59, 130, 246, .12);
+            color: #93c5fd;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .physical-input {
+            max-width: 125px;
+            background: #0b1425 !important;
+            border: 1px solid #34445f !important;
+            color: #fff !important;
+            border-radius: 9px !important;
+            padding: 9px 11px !important;
+        }
+
+        .physical-input:focus,
+        .observation-input:focus {
+            border-color: #22d3ee !important;
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, .10) !important;
+        }
+
+        .observation-input {
+            min-width: 180px;
+            background: #0b1425 !important;
+            border: 1px solid #34445f !important;
+            color: #fff !important;
+            border-radius: 9px !important;
+            font-size: .85rem !important;
+        }
+
+        .delta-preview {
+            display: inline-block;
+            min-width: 65px;
+            text-align: center;
+            padding: 6px 9px;
+            border-radius: 8px;
+            background: rgba(148, 163, 184, .10);
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        .delta-positive {
+            background: rgba(34, 197, 94, .12);
+            color: #4ade80;
+        }
+
+        .delta-negative {
+            background: rgba(239, 68, 68, .12);
+            color: #f87171;
+        }
+
+        .inventory-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-inventory-primary {
+            background: linear-gradient(135deg, #0891b2, #2563eb);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 20px;
+            font-weight: 650;
+        }
+
+        .btn-inventory-primary:hover {
+            color: #fff;
+            opacity: .9;
+        }
+
+        .btn-inventory-secondary {
+            background: #24334d;
+            color: #dbeafe;
+            border: 1px solid #3b4c68;
+            border-radius: 10px;
+            padding: 10px 17px;
+        }
+
+        .btn-inventory-secondary:hover {
+            background: #30435f;
+            color: #fff;
+        }
+
+        .inventory-notice {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 14px 16px;
+            background: rgba(34, 211, 238, .07);
+            border: 1px solid rgba(34, 211, 238, .18);
+            border-radius: 12px;
+            color: #b9d9e5;
+            font-size: .88rem;
+            margin-bottom: 20px;
+        }
+
+        .inventory-notice i {
+            color: #22d3ee;
+            font-size: 1.15rem;
+        }
+
+        .inventory-search {
+            max-width: 320px;
+            background: #0b1425 !important;
+            border: 1px solid #34445f !important;
+            color: #fff !important;
+            border-radius: 10px !important;
+        }
+
+        .inventory-search::placeholder,
+        .physical-input::placeholder,
+        .observation-input::placeholder {
+            color: #71819b;
+        }
+
+        .inventory-empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #94a3b8;
+        }
+
+        .inventory-empty i {
+            font-size: 2rem;
+            color: #64748b;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .inventory-header {
+                padding: 18px;
+            }
+
+            .inventory-card {
+                padding: 14px;
+            }
+
+            .inventory-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .inventory-actions > div,
+            .inventory-actions button,
+            .inventory-actions a {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="inventory-page">
+
+    <div class="inventory-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+                <h2>
+                    <i class="bi bi-clipboard2-check me-2"></i>
+                    Comptage physique
+                </h2>
+                <p>
+                    Saisissez les quantités réellement présentes dans le magasin.
+                </p>
+            </div>
+
+            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                <i class="bi bi-hourglass-split me-1"></i>
+                Inventaire en cours
+            </span>
+        </div>
+
+        <div class="inventory-meta">
+            <div class="inventory-meta-item">
+                <i class="bi bi-shop"></i>
+                <strong>Magasin :</strong>
+                {{ inventaire.magasin.nom }}
+            </div>
+
+            <div class="inventory-meta-item">
+                <i class="bi bi-calendar3"></i>
+                <strong>Date :</strong>
+                {{ inventaire.dateInventaire|date('d/m/Y H:i') }}
+            </div>
+
+            <div class="inventory-meta-item">
+                <i class="bi bi-person"></i>
+                <strong>Responsable :</strong>
+                {% if inventaire.utilisateur %}
+                    {{ inventaire.utilisateur.prenom }} {{ inventaire.utilisateur.nom }}
+                {% else %}
+                    Non renseigné
+                {% endif %}
+            </div>
+
+            <div class="inventory-meta-item">
+                <i class="bi bi-box-seam"></i>
+                <strong>Produits :</strong>
+                {{ lignes|length }}
+            </div>
+        </div>
+    </div>
+
+    <div class="inventory-notice">
+        <i class="bi bi-info-circle-fill"></i>
+        <div>
+            <strong>À savoir :</strong>
+            les quantités saisies ici sont uniquement enregistrées dans l'inventaire.
+            Elles ne modifient pas le stock du magasin tant que l'inventaire n'est pas validé.
+            Vous pouvez enregistrer le comptage progressivement.
+        </div>
+    </div>
+
+    <div class="inventory-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+            <div>
+                <div class="inventory-card-title">Liste des produits à compter</div>
+                <div class="inventory-muted">
+                    Comparez le stock théorique avec la quantité physique constatée.
+                </div>
+            </div>
+
+            <input
+                type="search"
+                id="inventorySearch"
+                class="form-control inventory-search"
+                placeholder="Rechercher un produit..."
+                autocomplete="off"
+            >
+        </div>
+
+        {% if lignes is not empty %}
+            <form
+                method="post"
+                action="{{ path('admin_inventaire_comptage', {id: inventaire.id}) }}"
+                id="inventoryCountForm"
+            >
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('inventaire_comptage_' ~ inventaire.id) }}"
+                >
+
+                <div class="inventory-table-wrapper">
+                    <table class="inventory-table" id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 28%">Produit</th>
+                                <th>Unité</th>
+                                <th>Stock théorique</th>
+                                <th>Quantité physique</th>
+                                <th>Écart provisoire</th>
+                                <th>Observation</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for ligne in lignes %}
+                                <tr class="inventory-row">
+                                    <td>
+                                        <div class="product-name">
+                                            {{ ligne.produit.nom }}
+                                        </div>
+                                        <div class="product-reference">
+                                            Réf. : {{ ligne.produit.reference }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {{ ligne.produit.unite }}
+                                    </td>
+
+                                    <td>
+                                        <span class="theoretical-value">
+                                            {{ ligne.stockTheorique }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <input
+                                            type="number"
+                                            class="form-control physical-input physical-quantity"
+                                            name="quantites[{{ ligne.id }}]"
+                                            min="0"
+                                            step="1"
+                                            value="{{ ligne.quantitePhysique is not null ? ligne.quantitePhysique : '' }}"
+                                            placeholder="Quantité"
+                                            aria-label="Quantité physique pour {{ ligne.produit.nom }}"
+                                        >
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="delta-preview"
+                                            data-theoretical="{{ ligne.stockTheorique }}"
+                                        >
+                                            {% if ligne.ecart is not null %}
+                                                {% if ligne.ecart > 0 %}+{% endif %}{{ ligne.ecart }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <input
+                                            type="text"
+                                            class="form-control observation-input"
+                                            name="observations[{{ ligne.id }}]"
+                                            value="{{ ligne.observation|default('') }}"
+                                            maxlength="1000"
+                                            placeholder="Observation..."
+                                            aria-label="Observation pour {{ ligne.produit.nom }}"
+                                        >
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inventory-actions">
+                    <div class="inventory-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Les champs non renseignés resteront à compter.
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <a
+                            href="{{ path('admin_inventaire_show', {id: inventaire.id}) }}"
+                            class="btn btn-inventory-secondary"
+                        >
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Retour aux détails
+                        </a>
+
+                        <button type="submit" class="btn btn-inventory-primary">
+                            <i class="bi bi-save me-1"></i>
+                            Enregistrer le comptage
+                        </button>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <div class="inventory-empty">
+                <i class="bi bi-inbox"></i>
+                Aucun produit à compter dans cet inventaire.
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Calcul visuel de l'écart provisoire
+            document.querySelectorAll('.physical-quantity').forEach(function (input) {
+                input.addEventListener('input', function () {
+                    const row = input.closest('tr');
+                    const delta = row.querySelector('.delta-preview');
+                    const theoretical = Number(delta.dataset.theoretical);
+
+                    if (input.value.trim() === '') {
+                        delta.textContent = '—';
+                        delta.classList.remove('delta-positive', 'delta-negative');
+                        return;
+                    }
+
+                    const physical = Number(input.value);
+                    const difference = physical - theoretical;
+
+                    delta.textContent = difference > 0 ? '+' + difference : difference;
+                    delta.classList.remove('delta-positive', 'delta-negative');
+
+                    if (difference > 0) {
+                        delta.classList.add('delta-positive');
+                    } else if (difference < 0) {
+                        delta.classList.add('delta-negative');
+                    }
+                });
+            });
+
+            // Recherche dans la liste des produits
+            const searchInput = document.getElementById('inventorySearch');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const search = this.value.toLowerCase().trim();
+
+                    document.querySelectorAll('.inventory-row').forEach(function (row) {
+                        row.style.display = row.textContent.toLowerCase().includes(search)
+                            ? ''
+                            : 'none';
+                    });
+                });
+            }
+        });
+    </script>
+{% endblock %}

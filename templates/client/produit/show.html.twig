@@ -289,7 +289,55 @@
 .product-reference strong {
     color: #5c667a;
 }
+/* Code-barres EAN-13 */
 
+.product-barcode-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 18px;
+    padding: 14px 16px;
+    border: 1px solid var(--jumbo-border);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.product-barcode-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--jumbo-navy);
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.product-barcode-title i {
+    color: var(--jumbo-red);
+    font-size: 15px;
+}
+
+.product-barcode-image {
+    display: block;
+    width: 230px;
+    max-width: 100%;
+    height: 75px;
+    object-fit: contain;
+    object-position: left center;
+}
+
+.product-barcode-number {
+    color: var(--jumbo-navy);
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.product-barcode-note {
+    color: var(--jumbo-muted);
+    font-size: 9px;
+}
 .product-price-block {
     display: flex;
     align-items: baseline;
@@ -743,6 +791,31 @@
                     Référence produit :
                     <strong>{{ produit.reference|default('Non renseignée') }}</strong>
                 </div>
+                {# Code-barres EAN-13 #}
+{% if produit.codeBarres %}
+    <div class="product-barcode-section">
+
+        <div class="product-barcode-title">
+            <i class="bi bi-upc-scan"></i>
+            Code-barres EAN-13
+        </div>
+
+        <img
+            src="{{ path('app_client_produit_barcode', {id: produit.id}) }}"
+            alt="Code-barres EAN-13 {{ produit.codeBarres }}"
+            class="product-barcode-image"
+        >
+
+        <div class="product-barcode-number">
+            {{ produit.codeBarres }}
+        </div>
+
+        <div class="product-barcode-note">
+            Identifiant unique du produit
+        </div>
+
+    </div>
+{% endif %}
 
                 <div class="product-price-block">
                     <span class="product-detail-price">

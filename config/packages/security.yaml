@@ -56,7 +56,13 @@ security:
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
 
-               # Espace administrateur
+        # Localisation publique des magasins Jumbo Score
+        - { path: ^/magasins, roles: PUBLIC_ACCESS }
+
+        # Accès au code-barres pour les utilisateurs connectés
+        - { path: ^/produits/\d+/code-barres$, roles: ROLE_USER }
+
+        # Espace administrateur
         - { path: ^/admin, roles: ROLE_ADMIN }
 
         # Gestion des produits réservée à l'administrateur

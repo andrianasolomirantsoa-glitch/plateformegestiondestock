@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\SortieStock;
 use App\Entity\User;
 use App\Repository\ClientRepository;
+use App\Repository\MagasinRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\SortieStockRepository;
+use App\Repository\StockMagasinRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,18 +37,12 @@ class SortieStockController extends AbstractController
             ['dateSortie' => 'DESC']
         );
 
-        /*
-         * Recherche côté PHP pour rester simple,
-         * comme pour le module Entrées.
-         */
         if ($recherche !== '') {
-
             $rechercheMin = mb_strtolower($recherche);
 
             $sorties = array_filter(
                 $sorties,
                 function (SortieStock $sortie) use ($rechercheMin): bool {
-
                     $produitNom = $sortie->getProduit()?->getNom() ?? '';
                     $produitReference = $sortie->getProduit()?->getReference() ?? '';
                     $referenceDocument = $sortie->getReferenceDocument() ?? '';
@@ -72,15 +68,11 @@ class SortieStockController extends AbstractController
             );
         }
 
-        /*
-         * Statistiques
-         */
         $nombreSorties = count($sorties);
         $quantiteTotale = 0;
         $valeurTotale = 0.0;
 
         foreach ($sorties as $sortie) {
-
             $quantite = $sortie->getQuantite();
 
             $quantiteTotale += $quantite;
@@ -110,32 +102,38 @@ class SortieStockController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         ProduitRepository $produitRepository,
-        ClientRepository $clientRepository
+        ClientRepository $clientRepository,
+        MagasinRepository $magasinRepository,
+        StockMagasinRepository $stockMagasinRepository
     ): Response {
-
         $sortie = new SortieStock();
 
-        /*
-         * Produits actifs uniquement
-         */
+        // Produits actifs uniquement
         $produits = $produitRepository->findBy(
             ['actif' => true],
             ['nom' => 'ASC']
         );
 
-        /*
-         * Clients actifs uniquement
-         */
+        // Clients actifs uniquement
         $clients = $clientRepository->findBy(
             ['actif' => true],
             ['nom' => 'ASC']
         );
 
+        // Magasins actifs uniquement
+        $magasins = $magasinRepository->findBy(
+            ['actif' => true],
+            ['nom' => 'ASC']
+        );
+
+        // Préparation des stocks existants pour le formulaire Twig
+        $stocksParProduitMagasin = $this->construireCarteDesStocks(
+            $stockMagasinRepository
+        );
+
         if ($request->isMethod('POST')) {
 
-            /*
-             * CSRF
-             */
+            // CSRF
             if (!$this->isCsrfTokenValid(
                 'creer_sortie_stock',
                 $request->request->get('_token')
@@ -145,15 +143,11 @@ class SortieStockController extends AbstractController
                 );
             }
 
-            /*
-             * Produit
-             */
+            // Produit
             $produitId = (int) $request->request->get('produit');
-
             $produit = $produitRepository->find($produitId);
 
             if ($produit === null || !$produit->isActif()) {
-
                 $this->addFlash(
                     'error',
                     'Le produit sélectionné est invalide ou inactif.'
@@ -162,14 +156,23 @@ class SortieStockController extends AbstractController
                 return $this->redirectToRoute('app_sortie_stock_new');
             }
 
+            // Magasin
+            $magasinId = (int) $request->request->get('magasin');
+            $magasin = $magasinRepository->find($magasinId);
 
-            /*
-             * Quantité
-             */
+            if ($magasin === null || !$magasin->isActif()) {
+                $this->addFlash(
+                    'error',
+                    'Le magasin sélectionné est invalide ou inactif.'
+                );
+
+                return $this->redirectToRoute('app_sortie_stock_new');
+            }
+
+            // Quantité
             $quantite = (int) $request->request->get('quantite', 0);
 
             if ($quantite <= 0) {
-
                 $this->addFlash(
                     'error',
                     'La quantité doit être supérieure à zéro.'
@@ -178,18 +181,31 @@ class SortieStockController extends AbstractController
                 return $this->redirectToRoute('app_sortie_stock_new');
             }
 
+            // Recherche du stock du produit dans le magasin choisi
+            $stockMagasin = $stockMagasinRepository
+                ->findOneByProduitEtMagasin($produit, $magasin);
 
-            /*
-             * Vérification du stock
-             */
-            $stockActuel = $produit->getQuantiteStock();
-
-            if ($quantite > $stockActuel) {
-
+            if ($stockMagasin === null) {
                 $this->addFlash(
                     'error',
                     sprintf(
-                        'Stock insuffisant. Stock disponible : %d pièce(s).',
+                        'Aucun stock enregistré pour le produit "%s" dans le magasin "%s".',
+                        $produit->getNom(),
+                        $magasin->getNom()
+                    )
+                );
+
+                return $this->redirectToRoute('app_sortie_stock_new');
+            }
+
+            $stockActuel = $stockMagasin->getQuantite();
+
+            if ($quantite > $stockActuel) {
+                $this->addFlash(
+                    'error',
+                    sprintf(
+                        'Stock insuffisant dans %s. Stock disponible : %d pièce(s).',
+                        $magasin->getNom(),
                         $stockActuel
                     )
                 );
@@ -197,10 +213,7 @@ class SortieStockController extends AbstractController
                 return $this->redirectToRoute('app_sortie_stock_new');
             }
 
-
-            /*
-             * Prix unitaire
-             */
+            // Prix unitaire
             $prixUnitaire = trim(
                 (string) $request->request->get('prixUnitaire', '0')
             );
@@ -210,7 +223,6 @@ class SortieStockController extends AbstractController
             }
 
             if (!is_numeric($prixUnitaire) || (float) $prixUnitaire < 0) {
-
                 $this->addFlash(
                     'error',
                     'Le prix unitaire doit être un nombre positif ou nul.'
@@ -219,10 +231,7 @@ class SortieStockController extends AbstractController
                 return $this->redirectToRoute('app_sortie_stock_new');
             }
 
-
-            /*
-             * Client facultatif
-             */
+            // Client facultatif
             $client = null;
 
             $clientId = trim(
@@ -230,11 +239,9 @@ class SortieStockController extends AbstractController
             );
 
             if ($clientId !== '') {
-
                 $client = $clientRepository->find((int) $clientId);
 
                 if ($client === null || !$client->isActif()) {
-
                     $this->addFlash(
                         'error',
                         'Le client sélectionné est invalide ou inactif.'
@@ -244,10 +251,7 @@ class SortieStockController extends AbstractController
                 }
             }
 
-
-            /*
-             * Date
-             */
+            // Date
             $dateSortie = new \DateTimeImmutable();
 
             $dateInput = trim(
@@ -255,14 +259,12 @@ class SortieStockController extends AbstractController
             );
 
             if ($dateInput !== '') {
-
                 $date = \DateTimeImmutable::createFromFormat(
                     'Y-m-d\TH:i',
                     $dateInput
                 );
 
                 if ($date === false) {
-
                     $this->addFlash(
                         'error',
                         'La date de sortie est invalide.'
@@ -274,52 +276,35 @@ class SortieStockController extends AbstractController
                 $dateSortie = $date;
             }
 
-
-            /*
-             * Référence document
-             */
+            // Référence document
             $referenceDocument = trim(
-                (string) $request->request->get(
-                    'referenceDocument',
-                    ''
-                )
+                (string) $request->request->get('referenceDocument', '')
             );
 
             if ($referenceDocument === '') {
                 $referenceDocument = null;
             }
 
-
-            /*
-             * Commentaire
-             */
+            // Commentaire
             $commentaire = trim(
-                (string) $request->request->get(
-                    'commentaire',
-                    ''
-                )
+                (string) $request->request->get('commentaire', '')
             );
 
             if ($commentaire === '') {
                 $commentaire = null;
             }
 
-
-            /*
-             * Utilisateur connecté
-             */
+            // Utilisateur connecté
             $user = $this->getUser();
 
             if (!$user instanceof User) {
                 throw $this->createAccessDeniedException();
             }
 
-
-            /*
-             * Création de la sortie
-             */
+            // Création de la sortie
             $sortie
                 ->setProduit($produit)
+                ->setMagasin($magasin)
                 ->setClient($client)
                 ->setUtilisateur($user)
                 ->setQuantite($quantite)
@@ -328,33 +313,38 @@ class SortieStockController extends AbstractController
                 ->setReferenceDocument($referenceDocument)
                 ->setCommentaire($commentaire);
 
+            // Transaction : sortie et diminution du stock ensemble
+            $connection = $entityManager->getConnection();
 
-            /*
-             * Mise à jour du stock
-             */
-            $produit->setQuantiteStock(
-                $stockActuel - $quantite
-            );
+            $connection->beginTransaction();
 
+            try {
+                $stockMagasin->setQuantite(
+                    $stockActuel - $quantite
+                );
 
-            $entityManager->persist($sortie);
-            $entityManager->flush();
+                $entityManager->persist($sortie);
+                $entityManager->flush();
 
+                $connection->commit();
+            } catch (\Throwable $exception) {
+                $connection->rollBack();
+
+                throw $exception;
+            }
 
             $this->addFlash(
                 'success',
                 sprintf(
-                    'Sortie de %d pièce(s) enregistrée. Nouveau stock : %d pièce(s).',
+                    'Sortie de %d pièce(s) enregistrée pour %s. Nouveau stock : %d pièce(s).',
                     $quantite,
-                    $produit->getQuantiteStock()
+                    $magasin->getNom(),
+                    $stockMagasin->getQuantite()
                 )
             );
 
-            return $this->redirectToRoute(
-                'app_sortie_stock_index'
-            );
+            return $this->redirectToRoute('app_sortie_stock_index');
         }
-
 
         return $this->render(
             'admin/sortie_stock/new.html.twig',
@@ -362,6 +352,8 @@ class SortieStockController extends AbstractController
                 'sortie' => $sortie,
                 'produits' => $produits,
                 'clients' => $clients,
+                'magasins' => $magasins,
+                'stocksParProduitMagasin' => $stocksParProduitMagasin,
             ]
         );
     }
@@ -382,37 +374,47 @@ class SortieStockController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         ProduitRepository $produitRepository,
-        ClientRepository $clientRepository
+        ClientRepository $clientRepository,
+        MagasinRepository $magasinRepository,
+        StockMagasinRepository $stockMagasinRepository
     ): Response {
-
         $ancienneQuantite = $sortie->getQuantite();
         $ancienProduit = $sortie->getProduit();
+        $ancienMagasin = $sortie->getMagasin();
 
-        /*
-         * Produits actifs + ancien produit
-         *
-         * Cela permet de modifier une sortie même si
-         * l'ancien produit est devenu inactif.
-         */
+        // Tous les produits pour conserver l'ancien choix
         $produits = $produitRepository->findBy(
             [],
             ['nom' => 'ASC']
         );
 
-        /*
-         * Clients actifs + ancien client
-         */
+        // Tous les clients pour conserver l'ancien choix
         $clients = $clientRepository->findBy(
             [],
             ['nom' => 'ASC']
         );
 
+        // Magasins actifs
+        $magasins = $magasinRepository->findBy(
+            ['actif' => true],
+            ['nom' => 'ASC']
+        );
+
+        // Ajouter l'ancien magasin même s'il est devenu inactif
+        if (
+            $ancienMagasin !== null &&
+            !in_array($ancienMagasin, $magasins, true)
+        ) {
+            $magasins[] = $ancienMagasin;
+        }
+
+        $stocksParProduitMagasin = $this->construireCarteDesStocks(
+            $stockMagasinRepository
+        );
 
         if ($request->isMethod('POST')) {
 
-            /*
-             * CSRF
-             */
+            // CSRF
             if (!$this->isCsrfTokenValid(
                 'modifier_sortie_stock_' . $sortie->getId(),
                 $request->request->get('_token')
@@ -422,22 +424,17 @@ class SortieStockController extends AbstractController
                 );
             }
 
-
-            /*
-             * Nouveau produit
-             */
-            $nouveauProduitId =
-                (int) $request->request->get('produit');
-
-            $nouveauProduit =
-                $produitRepository->find($nouveauProduitId);
-
+            // Nouveau produit
+            $nouveauProduitId = (int) $request->request->get('produit');
+            $nouveauProduit = $produitRepository->find($nouveauProduitId);
 
             if (
                 $nouveauProduit === null ||
-                !$nouveauProduit->isActif()
+                (
+                    !$nouveauProduit->isActif() &&
+                    $nouveauProduit->getId() !== $ancienProduit?->getId()
+                )
             ) {
-
                 $this->addFlash(
                     'error',
                     'Le produit sélectionné est invalide ou inactif.'
@@ -449,19 +446,35 @@ class SortieStockController extends AbstractController
                 );
             }
 
+            // Nouveau magasin
+            $nouveauMagasinId = (int) $request->request->get('magasin');
+            $nouveauMagasin = $magasinRepository->find($nouveauMagasinId);
 
-            /*
-             * Nouvelle quantité
-             */
-            $nouvelleQuantite =
-                (int) $request->request->get(
-                    'quantite',
-                    0
+            if (
+                $nouveauMagasin === null ||
+                (
+                    !$nouveauMagasin->isActif() &&
+                    $nouveauMagasin->getId() !== $ancienMagasin?->getId()
+                )
+            ) {
+                $this->addFlash(
+                    'error',
+                    'Le magasin sélectionné est invalide ou inactif.'
                 );
 
+                return $this->redirectToRoute(
+                    'app_sortie_stock_edit',
+                    ['id' => $sortie->getId()]
+                );
+            }
+
+            // Nouvelle quantité
+            $nouvelleQuantite = (int) $request->request->get(
+                'quantite',
+                0
+            );
 
             if ($nouvelleQuantite <= 0) {
-
                 $this->addFlash(
                     'error',
                     'La quantité doit être supérieure à zéro.'
@@ -473,114 +486,9 @@ class SortieStockController extends AbstractController
                 );
             }
 
-
-            /*
-             * =====================================================
-             * MÊME PRODUIT
-             * =====================================================
-             *
-             * Stock actuel contient déjà l'ancienne sortie.
-             *
-             * Nouveau stock :
-             *
-             * stock actuel
-             * + ancienne quantité
-             * - nouvelle quantité
-             */
-            if ($nouveauProduit->getId() === $ancienProduit->getId()) {
-
-                $stockActuel =
-                    $nouveauProduit->getQuantiteStock();
-
-                $nouveauStock =
-                    $stockActuel
-                    + $ancienneQuantite
-                    - $nouvelleQuantite;
-
-
-                if ($nouveauStock < 0) {
-
-                    $this->addFlash(
-                        'error',
-                        sprintf(
-                            'Stock insuffisant. Stock disponible pour cette modification : %d pièce(s).',
-                            $stockActuel + $ancienneQuantite
-                        )
-                    );
-
-                    return $this->redirectToRoute(
-                        'app_sortie_stock_edit',
-                        ['id' => $sortie->getId()]
-                    );
-                }
-
-
-                $nouveauProduit->setQuantiteStock(
-                    $nouveauStock
-                );
-
-            }
-
-
-            /*
-             * =====================================================
-             * CHANGEMENT DE PRODUIT
-             * =====================================================
-             *
-             * 1. On rend l'ancienne quantité à l'ancien produit.
-             * 2. On vérifie le stock du nouveau produit.
-             * 3. On retire la nouvelle quantité du nouveau produit.
-             */
-            else {
-
-                $stockNouveauProduit =
-                    $nouveauProduit->getQuantiteStock();
-
-
-                if ($nouvelleQuantite > $stockNouveauProduit) {
-
-                    $this->addFlash(
-                        'error',
-                        sprintf(
-                            'Stock insuffisant pour le nouveau produit. Stock disponible : %d pièce(s).',
-                            $stockNouveauProduit
-                        )
-                    );
-
-                    return $this->redirectToRoute(
-                        'app_sortie_stock_edit',
-                        ['id' => $sortie->getId()]
-                    );
-                }
-
-
-                /*
-                 * Restaurer l'ancien stock
-                 */
-                $ancienProduit->setQuantiteStock(
-                    $ancienProduit->getQuantiteStock()
-                    + $ancienneQuantite
-                );
-
-
-                /*
-                 * Retirer la nouvelle quantité
-                 */
-                $nouveauProduit->setQuantiteStock(
-                    $stockNouveauProduit
-                    - $nouvelleQuantite
-                );
-            }
-
-
-            /*
-             * Prix unitaire
-             */
+            // Prix unitaire
             $prixUnitaire = trim(
-                (string) $request->request->get(
-                    'prixUnitaire',
-                    '0'
-                )
+                (string) $request->request->get('prixUnitaire', '0')
             );
 
             if ($prixUnitaire === '') {
@@ -588,7 +496,6 @@ class SortieStockController extends AbstractController
             }
 
             if (!is_numeric($prixUnitaire) || (float) $prixUnitaire < 0) {
-
                 $this->addFlash(
                     'error',
                     'Le prix unitaire doit être un nombre positif ou nul.'
@@ -600,31 +507,17 @@ class SortieStockController extends AbstractController
                 );
             }
 
-
-            /*
-             * Client
-             */
+            // Client facultatif
             $client = null;
 
             $clientId = trim(
-                (string) $request->request->get(
-                    'client',
-                    ''
-                )
+                (string) $request->request->get('client', '')
             );
 
             if ($clientId !== '') {
+                $client = $clientRepository->find((int) $clientId);
 
-                $client =
-                    $clientRepository->find(
-                        (int) $clientId
-                    );
-
-                if (
-                    $client === null ||
-                    !$client->isActif()
-                ) {
-
+                if ($client === null || !$client->isActif()) {
                     $this->addFlash(
                         'error',
                         'Le client sélectionné est invalide ou inactif.'
@@ -637,29 +530,20 @@ class SortieStockController extends AbstractController
                 }
             }
 
-
-            /*
-             * Date
-             */
-            $dateSortie =
-                $sortie->getDateSortie();
+            // Date
+            $dateSortie = $sortie->getDateSortie();
 
             $dateInput = trim(
-                (string) $request->request->get(
-                    'dateSortie',
-                    ''
-                )
+                (string) $request->request->get('dateSortie', '')
             );
 
             if ($dateInput !== '') {
-
                 $date = \DateTimeImmutable::createFromFormat(
                     'Y-m-d\TH:i',
                     $dateInput
                 );
 
                 if ($date === false) {
-
                     $this->addFlash(
                         'error',
                         'La date de sortie est invalide.'
@@ -674,65 +558,175 @@ class SortieStockController extends AbstractController
                 $dateSortie = $date;
             }
 
-
-            /*
-             * Référence document
-             */
-            $referenceDocument =
-                trim(
-                    (string) $request->request->get(
-                        'referenceDocument',
-                        ''
-                    )
-                );
+            // Référence document
+            $referenceDocument = trim(
+                (string) $request->request->get('referenceDocument', '')
+            );
 
             if ($referenceDocument === '') {
                 $referenceDocument = null;
             }
 
-
-            /*
-             * Commentaire
-             */
-            $commentaire =
-                trim(
-                    (string) $request->request->get(
-                        'commentaire',
-                        ''
-                    )
-                );
+            // Commentaire
+            $commentaire = trim(
+                (string) $request->request->get('commentaire', '')
+            );
 
             if ($commentaire === '') {
                 $commentaire = null;
             }
 
+            // Vérifier l'ancien couple produit-magasin
+            if ($ancienProduit === null || $ancienMagasin === null) {
+                throw new \LogicException(
+                    'Cette sortie ne possède pas de produit ou de magasin associé.'
+                );
+            }
 
-            /*
-             * Mise à jour de l'entité
-             */
-            $sortie
-                ->setProduit($nouveauProduit)
-                ->setClient($client)
-                ->setQuantite($nouvelleQuantite)
-                ->setPrixUnitaire((string) $prixUnitaire)
-                ->setDateSortie($dateSortie)
-                ->setReferenceDocument($referenceDocument)
-                ->setCommentaire($commentaire);
+            $ancienStock = $stockMagasinRepository
+                ->findOneByProduitEtMagasin(
+                    $ancienProduit,
+                    $ancienMagasin
+                );
 
+            if ($ancienStock === null) {
+                $this->addFlash(
+                    'error',
+                    'Impossible de modifier cette sortie : le stock d’origine est introuvable.'
+                );
 
-            $entityManager->flush();
+                return $this->redirectToRoute(
+                    'app_sortie_stock_edit',
+                    ['id' => $sortie->getId()]
+                );
+            }
 
+            // Rechercher le stock du nouveau couple
+            $nouveauStock = $stockMagasinRepository
+                ->findOneByProduitEtMagasin(
+                    $nouveauProduit,
+                    $nouveauMagasin
+                );
+
+            if ($nouveauStock === null) {
+                $this->addFlash(
+                    'error',
+                    sprintf(
+                        'Aucun stock enregistré pour "%s" dans le magasin "%s".',
+                        $nouveauProduit->getNom(),
+                        $nouveauMagasin->getNom()
+                    )
+                );
+
+                return $this->redirectToRoute(
+                    'app_sortie_stock_edit',
+                    ['id' => $sortie->getId()]
+                );
+            }
+
+            // Déterminer si le couple produit-magasin est identique
+            $memeCouple =
+                $ancienProduit->getId() === $nouveauProduit->getId()
+                && $ancienMagasin->getId() === $nouveauMagasin->getId();
+
+            if ($memeCouple) {
+                // On restitue virtuellement l'ancienne quantité
+                $stockDisponible = $ancienStock->getQuantite()
+                    + $ancienneQuantite;
+
+                if ($nouvelleQuantite > $stockDisponible) {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            'Stock insuffisant. Quantité disponible pour cette modification : %d pièce(s).',
+                            $stockDisponible
+                        )
+                    );
+
+                    return $this->redirectToRoute(
+                        'app_sortie_stock_edit',
+                        ['id' => $sortie->getId()]
+                    );
+                }
+            } else {
+                // Pour un changement de couple, le nouveau stock
+                // doit couvrir entièrement la nouvelle sortie.
+                if ($nouvelleQuantite > $nouveauStock->getQuantite()) {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            'Stock insuffisant dans %s. Stock disponible : %d pièce(s).',
+                            $nouveauMagasin->getNom(),
+                            $nouveauStock->getQuantite()
+                        )
+                    );
+
+                    return $this->redirectToRoute(
+                        'app_sortie_stock_edit',
+                        ['id' => $sortie->getId()]
+                    );
+                }
+            }
+
+            // Mise à jour atomique des stocks et de la sortie
+            $connection = $entityManager->getConnection();
+
+            $connection->beginTransaction();
+
+            try {
+                if ($memeCouple) {
+                    // Même produit et même magasin :
+                    // stock + ancienne sortie - nouvelle sortie
+                    $ancienStock->setQuantite(
+                        $ancienStock->getQuantite()
+                        + $ancienneQuantite
+                        - $nouvelleQuantite
+                    );
+                } else {
+                    // Restituer l'ancienne sortie à son magasin
+                    $ancienStock->setQuantite(
+                        $ancienStock->getQuantite()
+                        + $ancienneQuantite
+                    );
+
+                    // Déduire la nouvelle quantité du nouveau magasin
+                    $nouveauStock->setQuantite(
+                        $nouveauStock->getQuantite()
+                        - $nouvelleQuantite
+                    );
+                }
+
+                // Mise à jour de la sortie
+                $sortie
+                    ->setProduit($nouveauProduit)
+                    ->setMagasin($nouveauMagasin)
+                    ->setClient($client)
+                    ->setQuantite($nouvelleQuantite)
+                    ->setPrixUnitaire((string) $prixUnitaire)
+                    ->setDateSortie($dateSortie)
+                    ->setReferenceDocument($referenceDocument)
+                    ->setCommentaire($commentaire);
+
+                $entityManager->flush();
+
+                $connection->commit();
+            } catch (\Throwable $exception) {
+                $connection->rollBack();
+
+                throw $exception;
+            }
 
             $this->addFlash(
                 'success',
-                'La sortie de stock a été modifiée avec succès.'
+                sprintf(
+                    'Sortie modifiée avec succès. Stock restant dans %s : %d pièce(s).',
+                    $nouveauMagasin->getNom(),
+                    $nouveauStock->getQuantite()
+                )
             );
 
-            return $this->redirectToRoute(
-                'app_sortie_stock_index'
-            );
+            return $this->redirectToRoute('app_sortie_stock_index');
         }
-
 
         return $this->render(
             'admin/sortie_stock/edit.html.twig',
@@ -740,8 +734,45 @@ class SortieStockController extends AbstractController
                 'sortie' => $sortie,
                 'produits' => $produits,
                 'clients' => $clients,
+                'magasins' => $magasins,
+                'stocksParProduitMagasin' => $stocksParProduitMagasin,
             ]
         );
     }
-}
 
+
+    /*
+     * =========================================================
+     * CARTE DES STOCKS POUR LES FORMULAIRES
+     * =========================================================
+     *
+     * Format :
+     * [
+     *     "24-5" => 24,
+     *     "25-5" => 72,
+     *     "24-8" => 10
+     * ]
+     *
+     * Seuls les couples réellement enregistrés sont présents.
+     */
+    private function construireCarteDesStocks(
+        StockMagasinRepository $stockMagasinRepository
+    ): array {
+        $carte = [];
+
+        foreach ($stockMagasinRepository->findAll() as $stock) {
+            $produitId = $stock->getProduit()?->getId();
+            $magasinId = $stock->getMagasin()?->getId();
+
+            if ($produitId === null || $magasinId === null) {
+                continue;
+            }
+
+            $cle = $produitId . '-' . $magasinId;
+
+            $carte[$cle] = $stock->getQuantite();
+        }
+
+        return $carte;
+    }
+}

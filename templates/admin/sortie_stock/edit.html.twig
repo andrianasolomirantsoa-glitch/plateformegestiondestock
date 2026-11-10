@@ -130,78 +130,61 @@
                         }) }}"
                     >
 
+<div class="form-section">
+    <div class="section-title">
+        <i class="bi bi-shop"></i> Magasin
+    </div>
 
+    <label for="magasin" class="form-label">
+        Magasin <span class="required">*</span>
+    </label>
+
+    <select id="magasin" name="magasin" class="form-select custom-select" required>
+        <option value="">-- Sélectionner un magasin --</option>
+
+        {% for magasin in magasins %}
+            <option
+                value="{{ magasin.id }}"
+                {% if sortie.magasin and sortie.magasin.id == magasin.id %}selected{% endif %}
+            >
+                {{ magasin.nom }} — {{ magasin.ville }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <div class="field-help">
+        Sélectionnez le magasin dans lequel cette sortie de stock est effectuée.
+    </div>
+</div>
                         {# =================================================
                            PRODUIT
-                           ================================================= #}
+                           ================================================= #} 
                         <div class="form-section">
+    <div class="section-title">
+        <i class="bi bi-box-seam"></i> Produit
+    </div>
 
-                            <div class="section-title">
+    <label for="produit" class="form-label">
+        Produit <span class="required">*</span>
+    </label>
 
-                                <i class="bi bi-box-seam"></i>
+    <select id="produit" name="produit" class="form-select custom-select" required>
+        <option value="">-- Sélectionner un produit --</option>
 
-                                Produit
+        {% for produit in produits %}
+            <option
+                value="{{ produit.id }}"
+                {% if sortie.produit and sortie.produit.id == produit.id %}selected{% endif %}
+            >
+                {{ produit.reference }} — {{ produit.nom }}
+            </option>
+        {% endfor %}
+    </select>
 
-                            </div>
-
-
-                            <label
-                                for="produit"
-                                class="form-label"
-                            >
-
-                                Produit
-                                <span class="required">*</span>
-
-                            </label>
-
-
-                            <select
-                                id="produit"
-                                name="produit"
-                                class="form-select custom-select"
-                                required
-                            >
-
-                                <option value="">
-                                    -- Sélectionner un produit --
-                                </option>
-
-
-                                {% for produit in produits %}
-
-                                    <option
-                                        value="{{ produit.id }}"
-                                        data-stock="{{ produit.quantiteStock }}"
-                                        {% if sortie.produit and sortie.produit.id == produit.id %}
-                                            selected
-                                        {% endif %}
-                                    >
-
-                                        {{ produit.reference }}
-                                        —
-                                        {{ produit.nom }}
-
-                                        — Stock :
-                                        {{ produit.quantiteStock }}
-
-                                    </option>
-
-                                {% endfor %}
-
-                            </select>
-
-
-                            <div class="field-help">
-
-                                <i class="bi bi-info-circle me-1"></i>
-
-                                Le stock actuel est celui enregistré en base.
-                                L'ancienne sortie est déjà comprise dans ce stock.
-
-                            </div>
-
-                        </div>
+    <div class="field-help">
+        Sélectionnez le produit concerné par cette sortie.
+    </div>
+</div>
 
 
                         {# =================================================
@@ -1417,605 +1400,244 @@
 {# =============================================================
    JAVASCRIPT
    ============================================================= #}
+
 <script>
-
 document.addEventListener('DOMContentLoaded', function () {
+    const produitSelect = document.getElementById('produit');
+    const magasinSelect = document.getElementById('magasin');
+    const quantiteInput = document.getElementById('quantite');
 
-    const produitSelect =
-        document.getElementById('produit');
+    const stockActuelElement = document.getElementById('stockActuel');
+    const ancienneQuantiteElement = document.getElementById('ancienneQuantite');
+    const stockAvantSortieElement = document.getElementById('stockAvantSortie');
+    const nouvelleQuantiteElement = document.getElementById('nouvelleQuantite');
+    const nouveauStockElement = document.getElementById('nouveauStock');
 
-    const quantiteInput =
-        document.getElementById('quantite');
+    const formulaStock = document.getElementById('formulaStock');
+    const formulaResult = document.getElementById('formulaResult');
+    const exampleText = document.getElementById('exampleText');
 
-    const stockActuelElement =
-        document.getElementById('stockActuel');
+    const stockInfoMessage = document.getElementById('stockInfoMessage');
+    const stockAlert = document.getElementById('stockAlert');
+    const stockAlertText = document.getElementById('stockAlertText');
+    const stockResultText = document.getElementById('stockResultText');
+    const quantityHelp = document.getElementById('quantiteHelp');
 
-    const ancienneQuantiteElement =
-        document.getElementById('ancienneQuantite');
+    const submitButton = document.getElementById('submitButton');
+    const form = document.querySelector('form');
 
-    const stockAvantSortieElement =
-        document.getElementById('stockAvantSortie');
+    // Stocks réels enregistrés par produit et par magasin.
+    const stocksParProduitMagasin = {{ stocksParProduitMagasin|json_encode|raw }};
 
-    const nouvelleQuantiteElement =
-        document.getElementById('nouvelleQuantite');
+    // Informations de la sortie actuellement modifiée.
+    const ancienneQuantite = {{ sortie.quantite }};
+    const ancienProduitId = {{ sortie.produit ? sortie.produit.id : 0 }};
+    const ancienMagasinId = {{ sortie.magasin ? sortie.magasin.id : 0 }};
 
-    const nouveauStockElement =
-        document.getElementById('nouveauStock');
-
-    const formulaStock =
-        document.getElementById('formulaStock');
-
-    const formulaResult =
-        document.getElementById('formulaResult');
-
-    const exampleText =
-        document.getElementById('exampleText');
-
-    const stockInfoMessage =
-        document.getElementById('stockInfoMessage');
-
-    const stockAlert =
-        document.getElementById('stockAlert');
-
-    const stockAlertText =
-        document.getElementById('stockAlertText');
-
-    const quantityHelp =
-        document.getElementById('quantiteHelp');
-
-    const submitButton =
-        document.getElementById('submitButton');
-
-
-    /*
-     * Anciennes informations
-     */
-    const ancienneQuantite =
-        {{ sortie.quantite }};
-
-    const ancienProduitId =
-        {{ sortie.produit ? sortie.produit.id : 0 }};
-
-
-    /*
-     * Stock du produit sélectionné
-     */
-    function getStockProduit() {
-
-        if (
-            !produitSelect ||
-            !produitSelect.value
-        ) {
-            return 0;
+    function obtenirStock(produitId, magasinId) {
+        if (!produitId || !magasinId) {
+            return null;
         }
 
-        const option =
-            produitSelect.options[
-                produitSelect.selectedIndex
-            ];
+        const cle = `${produitId}-${magasinId}`;
 
-        if (!option) {
-            return 0;
+        if (!Object.prototype.hasOwnProperty.call(stocksParProduitMagasin, cle)) {
+            return null;
         }
 
-        return parseInt(
-            option.dataset.stock || '0',
-            10
-        );
+        return Number(stocksParProduitMagasin[cle]);
     }
 
+    function afficherMessage(type, message) {
+        let icon = 'bi-info-circle-fill';
 
-    /*
-     * Mise à jour de l'aperçu
-     */
+        if (type === 'warning') {
+            icon = 'bi-exclamation-triangle-fill';
+        } else if (type === 'good') {
+            icon = 'bi-check-circle-fill';
+        }
+
+        stockInfoMessage.className = `stock-message ${type}`;
+        stockInfoMessage.innerHTML =
+            `<i class="bi ${icon}"></i><span>${message}</span>`;
+    }
+
+    function bloquerModification(message) {
+        stockActuelElement.textContent = '—';
+        stockAvantSortieElement.textContent = '—';
+        nouveauStockElement.textContent = '—';
+        formulaStock.textContent = '—';
+        formulaResult.textContent = '—';
+
+        quantityHelp.textContent = message;
+        quantityHelp.className = 'quantity-help danger';
+
+        afficherMessage('warning', message);
+
+        stockAlert.style.display = 'flex';
+        stockAlertText.textContent = message;
+
+        if (stockResultText) {
+            stockResultText.textContent = message;
+        }
+
+        exampleText.innerHTML =
+            `<i class="bi bi-exclamation-circle me-1"></i>${message}`;
+
+        submitButton.disabled = true;
+    }
+
     function mettreAJourStock() {
+        const produitId = Number(produitSelect.value || 0);
+        const magasinId = Number(magasinSelect.value || 0);
 
-        const produitId =
-            parseInt(
-                produitSelect.value || '0',
-                10
-            );
+        let nouvelleQuantite = parseInt(quantiteInput.value || '0', 10);
 
-
-        let nouvelleQuantite =
-            parseInt(
-                quantiteInput.value || '0',
-                10
-            );
-
-
-        if (
-            isNaN(nouvelleQuantite) ||
-            nouvelleQuantite < 0
-        ) {
+        if (isNaN(nouvelleQuantite) || nouvelleQuantite < 0) {
             nouvelleQuantite = 0;
         }
 
+        ancienneQuantiteElement.textContent = ancienneQuantite;
+        nouvelleQuantiteElement.textContent = nouvelleQuantite;
 
-        const stockActuel =
-            getStockProduit();
-
-
-        /*
-         * Affichage général
-         */
-        stockActuelElement.textContent =
-            stockActuel;
-
-        ancienneQuantiteElement.textContent =
-            ancienneQuantite;
-
-        nouvelleQuantiteElement.textContent =
-            nouvelleQuantite;
-
-        formulaStock.textContent =
-            stockActuel;
-
-
-        /*
-         * Aucun produit
-         */
-        if (produitId === 0) {
-
-            stockAvantSortieElement.textContent =
-                0;
-
-            nouveauStockElement.textContent =
-                0;
-
-            formulaResult.textContent =
-                0;
-
-            quantityHelp.textContent =
-                'Sélectionnez un produit.';
-
-            quantityHelp.className =
-                'quantity-help';
-
-            stockInfoMessage.className =
-                'stock-message';
-
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-info-circle-fill"></i>
-                <span>
-                    Sélectionnez un produit pour afficher
-                    le calcul du stock.
-                </span>
-            `;
-
-            stockAlert.style.display =
-                'none';
-
-            submitButton.disabled =
-                false;
-
+        if (!produitId || !magasinId) {
+            bloquerModification(
+                'Sélectionnez un magasin et un produit pour consulter le stock.'
+            );
             return;
         }
 
+        const stockActuel = obtenirStock(produitId, magasinId);
 
-        /*
-         * =====================================================
-         * MÊME PRODUIT
-         * =====================================================
-         *
-         * Le stock actuel contient déjà l'ancienne sortie.
-         *
-         * Exemple :
-         *
-         * Stock actuel = 10
-         * Ancienne sortie = 4
-         * Nouvelle sortie = 5
-         *
-         * Stock avant sortie = 10 + 4 = 14
-         *
-         * Nouveau stock = 14 - 5 = 9
-         */
-        if (produitId === ancienProduitId) {
+        if (stockActuel === null) {
+            stockActuelElement.textContent = '—';
 
-            const stockAvantSortie =
-                stockActuel + ancienneQuantite;
-
-
-            const nouveauStock =
-                stockAvantSortie - nouvelleQuantite;
-
-
-            stockAvantSortieElement.textContent =
-                stockAvantSortie;
-
-            nouveauStockElement.textContent =
-                nouveauStock;
-
-            formulaResult.textContent =
-                nouveauStock;
-
-
-            if (nouvelleQuantite === 0) {
-
-                quantityHelp.textContent =
-                    'Saisissez une quantité supérieure à zéro.';
-
-                quantityHelp.className =
-                    'quantity-help';
-
-                stockInfoMessage.className =
-                    'stock-message';
-
-                stockInfoMessage.innerHTML = `
-                    <i class="bi bi-info-circle-fill"></i>
-                    <span>
-                        L'ancienne sortie de
-                        <strong>${ancienneQuantite} pièce(s)</strong>
-                        est déjà incluse dans le stock actuel.
-                    </span>
-                `;
-
-                stockAlert.style.display =
-                    'none';
-
-                submitButton.disabled =
-                    true;
-
-            }
-
-            else {
-
-                quantityHelp.textContent =
-                    `Stock disponible pour cette modification : ${stockAvantSortie} pièce(s).`;
-
-                if (nouvelleQuantite > stockAvantSortie) {
-
-                    quantityHelp.textContent =
-                        `Stock insuffisant : ${stockAvantSortie} pièce(s) disponibles.`;
-
-                    quantityHelp.className =
-                        'quantity-help danger';
-
-
-                    stockInfoMessage.className =
-                        'stock-message warning';
-
-                    stockInfoMessage.innerHTML = `
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                        <span>
-                            La nouvelle sortie de
-                            <strong>${nouvelleQuantite} pièce(s)</strong>
-                            dépasse le stock disponible de
-                            <strong>${stockAvantSortie} pièce(s)</strong>.
-                        </span>
-                    `;
-
-
-                    stockAlert.style.display =
-                        'flex';
-
-                    stockAlertText.textContent =
-                        `Nouvelle sortie : ${nouvelleQuantite} pièce(s). Stock disponible : ${stockAvantSortie} pièce(s).`;
-
-
-                    submitButton.disabled =
-                        true;
-
-                }
-
-                else {
-
-                    quantityHelp.className =
-                        'quantity-help success';
-
-
-                    stockInfoMessage.className =
-                        'stock-message good';
-
-                    stockInfoMessage.innerHTML = `
-                        <i class="bi bi-check-circle-fill"></i>
-                        <span>
-                            Calcul :
-                            <strong>
-                                ${stockActuel}
-                                + ${ancienneQuantite}
-                                − ${nouvelleQuantite}
-                                = ${nouveauStock} pièce(s)
-                            </strong>
-                            <br>
-                            La modification est possible.
-                        </span>
-                    `;
-
-
-                    stockAlert.style.display =
-                        'none';
-
-                    submitButton.disabled =
-                        false;
-
-                }
-
-            }
-
-
-            exampleText.innerHTML = `
-                <i class="bi bi-check-circle me-1"></i>
-                ${stockActuel}
-                + ${ancienneQuantite}
-                − ${nouvelleQuantite}
-                = ${nouveauStock} pièce(s)
-            `;
-
+            bloquerModification(
+                'Aucun stock enregistré pour ce produit dans le magasin sélectionné. La modification est impossible.'
+            );
+            return;
         }
 
+        // Vérifier si on conserve exactement le même produit et le même magasin.
+        const memeCouple =
+            produitId === ancienProduitId &&
+            magasinId === ancienMagasinId;
 
-        /*
-         * =====================================================
-         * CHANGEMENT DE PRODUIT
-         * =====================================================
-         */
-        else {
+        // Si le couple est identique, on réintègre l'ancienne sortie
+        // uniquement pour calculer la quantité disponible.
+        const stockDisponible = memeCouple
+            ? stockActuel + ancienneQuantite
+            : stockActuel;
 
-            /*
-             * Pour le nouveau produit,
-             * son stock actuel n'inclut pas l'ancienne sortie.
-             */
-            const stockAvantSortie =
-                stockActuel;
+        const nouveauStock = stockDisponible - nouvelleQuantite;
 
+        stockActuelElement.textContent = stockActuel;
+        stockAvantSortieElement.textContent = stockDisponible;
+        nouveauStockElement.textContent = nouveauStock;
+        formulaStock.textContent = stockDisponible;
+        formulaResult.textContent = nouveauStock;
 
-            const nouveauStock =
-                stockActuel - nouvelleQuantite;
+        if (nouvelleQuantite <= 0) {
+            quantityHelp.textContent =
+                `Saisissez une quantité positive. Stock disponible : ${stockDisponible} pièce(s).`;
 
+            quantityHelp.className = 'quantity-help';
 
-            stockAvantSortieElement.textContent =
-                stockAvantSortie;
+            afficherMessage(
+                '',
+                `Stock disponible pour cette modification : ${stockDisponible} pièce(s).`
+            );
 
-            nouveauStockElement.textContent =
-                nouveauStock;
+            stockAlert.style.display = 'none';
+            submitButton.disabled = true;
 
-            formulaResult.textContent =
-                nouveauStock;
+        } else if (nouvelleQuantite > stockDisponible) {
+            quantityHelp.textContent =
+                `Stock insuffisant : seulement ${stockDisponible} pièce(s) disponibles.`;
 
+            quantityHelp.className = 'quantity-help danger';
 
-            if (nouvelleQuantite === 0) {
+            afficherMessage(
+                'warning',
+                `Quantité demandée : ${nouvelleQuantite}. Stock disponible : ${stockDisponible}.`
+            );
 
-                quantityHelp.textContent =
-                    'Saisissez une quantité supérieure à zéro.';
+            stockAlert.style.display = 'flex';
 
-                quantityHelp.className =
-                    'quantity-help';
+            stockAlertText.textContent =
+                `Vous demandez ${nouvelleQuantite} pièce(s), mais seulement ${stockDisponible} sont disponibles.`;
 
-                stockInfoMessage.className =
-                    'stock-message';
-
-                stockInfoMessage.innerHTML = `
-                    <i class="bi bi-arrow-left-right"></i>
-                    <span>
-                        Le produit a été changé.
-                        L'ancienne sortie de
-                        <strong>${ancienneQuantite} pièce(s)</strong>
-                        sera rendue à l'ancien produit.
-                    </span>
-                `;
-
-                stockAlert.style.display =
-                    'none';
-
-                submitButton.disabled =
-                    true;
-
+            if (stockResultText) {
+                stockResultText.textContent =
+                    'Stock insuffisant pour cette modification.';
             }
 
-            else if (
-                nouvelleQuantite > stockActuel
-            ) {
+            submitButton.disabled = true;
 
-                quantityHelp.textContent =
-                    `Stock insuffisant : ${stockActuel} pièce(s) disponibles.`;
+        } else {
+            quantityHelp.textContent =
+                `Stock disponible : ${stockDisponible} pièce(s).`;
 
-                quantityHelp.className =
-                    'quantity-help danger';
+            quantityHelp.className = 'quantity-help success';
 
+            afficherMessage(
+                'good',
+                `Calcul : ${stockDisponible} − ${nouvelleQuantite} = ${nouveauStock} pièce(s).`
+            );
 
-                stockInfoMessage.className =
-                    'stock-message warning';
+            stockAlert.style.display = 'none';
+            submitButton.disabled = false;
 
-                stockInfoMessage.innerHTML = `
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    <span>
-                        Le nouveau produit possède seulement
-                        <strong>${stockActuel} pièce(s)</strong>.
-                        La nouvelle sortie demande
-                        <strong>${nouvelleQuantite} pièce(s)</strong>.
-                    </span>
-                `;
-
-
-                stockAlert.style.display =
-                    'flex';
-
-                stockAlertText.textContent =
-                    `Stock du nouveau produit : ${stockActuel} pièce(s). Quantité demandée : ${nouvelleQuantite} pièce(s).`;
-
-
-                submitButton.disabled =
-                    true;
-
+            if (stockResultText) {
+                stockResultText.textContent =
+                    `Le nouveau stock sera de ${nouveauStock} pièce(s).`;
             }
-
-            else {
-
-                quantityHelp.textContent =
-                    `Stock disponible du nouveau produit : ${stockActuel} pièce(s).`;
-
-                quantityHelp.className =
-                    'quantity-help success';
-
-
-                stockInfoMessage.className =
-                    'stock-message good';
-
-                stockInfoMessage.innerHTML = `
-                    <i class="bi bi-arrow-left-right"></i>
-                    <span>
-                        L'ancienne sortie de
-                        <strong>${ancienneQuantite} pièce(s)</strong>
-                        sera rendue à l'ancien produit.
-                        <br>
-                        Nouveau produit :
-                        <strong>
-                            ${stockActuel}
-                            − ${nouvelleQuantite}
-                            = ${nouveauStock} pièce(s)
-                        </strong>
-                    </span>
-                `;
-
-
-                stockAlert.style.display =
-                    'none';
-
-                submitButton.disabled =
-                    false;
-
-            }
-
-
-            exampleText.innerHTML = `
-                <i class="bi bi-check-circle me-1"></i>
-                Nouveau produit :
-                ${stockActuel}
-                − ${nouvelleQuantite}
-                = ${nouveauStock} pièce(s)
-            `;
-
         }
 
+        exampleText.innerHTML =
+            `<i class="bi bi-check-circle me-1"></i>${stockDisponible} − ${nouvelleQuantite} = ${nouveauStock} pièce(s)`;
     }
 
+    magasinSelect.addEventListener('change', mettreAJourStock);
+    produitSelect.addEventListener('change', mettreAJourStock);
+    quantiteInput.addEventListener('input', mettreAJourStock);
+    quantiteInput.addEventListener('change', mettreAJourStock);
 
-    /*
-     * Changement produit
-     */
-    if (produitSelect) {
+    form.addEventListener('submit', function (event) {
+        const produitId = Number(produitSelect.value || 0);
+        const magasinId = Number(magasinSelect.value || 0);
+        const stockActuel = obtenirStock(produitId, magasinId);
+        const nouvelleQuantite = parseInt(quantiteInput.value || '0', 10);
 
-        produitSelect.addEventListener(
-            'change',
-            mettreAJourStock
-        );
+        const memeCouple =
+            produitId === ancienProduitId &&
+            magasinId === ancienMagasinId;
 
-    }
+        const stockDisponible =
+            stockActuel === null
+                ? null
+                : (memeCouple
+                    ? stockActuel + ancienneQuantite
+                    : stockActuel);
 
+        if (
+            !produitId ||
+            !magasinId ||
+            stockDisponible === null ||
+            isNaN(nouvelleQuantite) ||
+            nouvelleQuantite <= 0 ||
+            nouvelleQuantite > stockDisponible
+        ) {
+            event.preventDefault();
+            mettreAJourStock();
+        }
+    });
 
-    /*
-     * Changement quantité
-     */
-    if (quantiteInput) {
-
-        quantiteInput.addEventListener(
-            'input',
-            mettreAJourStock
-        );
-
-        quantiteInput.addEventListener(
-            'change',
-            mettreAJourStock
-        );
-
-    }
-
-
-    /*
-     * Sécurité avant envoi
-     */
-    const form =
-        document.querySelector('form');
-
-    if (form) {
-
-        form.addEventListener(
-            'submit',
-            function (event) {
-
-                const produitId =
-                    parseInt(
-                        produitSelect.value || '0',
-                        10
-                    );
-
-                const quantite =
-                    parseInt(
-                        quantiteInput.value || '0',
-                        10
-                    );
-
-                if (
-                    produitId === 0 ||
-                    isNaN(quantite) ||
-                    quantite <= 0
-                ) {
-
-                    event.preventDefault();
-
-                    mettreAJourStock();
-
-                    return;
-                }
-
-
-                /*
-                 * Même produit :
-                 * stock disponible = stock actuel + ancienne sortie
-                 */
-                if (produitId === ancienProduitId) {
-
-                    const stockDisponible =
-                        getStockProduit()
-                        + ancienneQuantite;
-
-
-                    if (quantite > stockDisponible) {
-
-                        event.preventDefault();
-
-                        mettreAJourStock();
-
-                    }
-
-                }
-
-
-                /*
-                 * Produit changé :
-                 * stock disponible = stock actuel du nouveau produit
-                 */
-                else {
-
-                    const stockDisponible =
-                        getStockProduit();
-
-
-                    if (quantite > stockDisponible) {
-
-                        event.preventDefault();
-
-                        mettreAJourStock();
-
-                    }
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /*
-     * Calcul initial
-     */
     mettreAJourStock();
-
 });
-
 </script>
+
+
 
 {% endblock %}
 

@@ -1,0 +1,1168 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Localiser les magasins Jumbo Score{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="">
+
+    <style>
+        .store-locator {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px 30px;
+            color: #18234a;
+        }
+
+        .locator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .locator-header h1 {
+            margin: 0 0 7px;
+            font-size: 27px;
+            font-weight: 800;
+            color: #18234a;
+        }
+
+        .locator-header p {
+            margin: 0;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .locator-badge {
+            background: #eaf8f0;
+            color: #16834e;
+            padding: 9px 15px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .locator-layout {
+            display: grid;
+            grid-template-columns: 390px minmax(0, 1fr);
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .store-panel,
+        .map-panel {
+            background: #fff;
+            border: 1px solid #e7eaf0;
+            border-radius: 16px;
+            box-shadow: 0 5px 22px rgba(24, 35, 74, .06);
+            overflow: hidden;
+        }
+
+        .store-panel {
+            display: flex;
+            flex-direction: column;
+            min-height: 650px;
+        }
+
+        .store-panel-header {
+            padding: 20px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .store-panel-header h2 {
+            margin: 0 0 6px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #18234a;
+        }
+
+        .store-count {
+            color: #7b8496;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .store-filters {
+            display: grid;
+            gap: 10px;
+        }
+
+        .store-search,
+        .city-filter {
+            width: 100%;
+            height: 43px;
+            border: 1px solid #dfe4ed;
+            border-radius: 9px;
+            padding: 0 12px;
+            background: #fff;
+            color: #18234a;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .store-search:focus,
+        .city-filter:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+        }
+
+        .locator-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .locator-btn {
+            border: none;
+            border-radius: 9px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .locator-btn:hover {
+            transform: translateY(-1px);
+            opacity: .92;
+        }
+
+        .btn-location {
+            background: #18234a;
+            color: white;
+            flex: 1;
+        }
+        .calculate-route {
+    background: #fff4e5;
+    color: #c47a16;
+}
+
+        .calculate-route:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+        .btn-all {
+            background: #eaf8f0;
+            color: #16834e;
+            flex: 1;
+        }
+
+        .location-status {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #718096;
+            line-height: 1.5;
+        }
+
+        .store-list {
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 560px;
+            flex: 1;
+        }
+
+        .store-item {
+            padding: 15px;
+            border: 1px solid #edf0f5;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: .2s;
+            background: #fff;
+        }
+
+        .store-item:hover {
+            border-color: #c8d6f5;
+            box-shadow: 0 4px 12px rgba(24, 35, 74, .06);
+        }
+
+        .store-item h3 {
+            font-size: 14px;
+            font-weight: 800;
+            margin: 0 0 7px;
+            color: #18234a;
+        }
+.closest-badge {
+    display: inline-block;
+    margin-left: 7px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background: #eaf8f0;
+    color: #16834e;
+    font-size: 10px;
+    font-weight: 800;
+    vertical-align: middle;
+}
+
+.store-item.is-closest {
+    border: 2px solid #16a36a;
+    background: #f7fdf9;
+}
+        .store-city {
+            color: #16834e;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .store-address {
+            color: #7b8496;
+            font-size: 12px;
+            line-height: 1.5;
+            margin: 0 0 9px;
+        }
+
+        .store-distance {
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .store-card-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .store-action {
+            display: inline-block;
+            text-decoration: none;
+            border: none;
+            border-radius: 7px;
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .show-on-map {
+            background: #edf3ff;
+            color: #2563eb;
+        }
+
+        .directions-link {
+            background: #eaf8f0;
+            color: #16834e;
+        }
+
+        .no-stores {
+            padding: 30px 15px;
+            text-align: center;
+            color: #8a93a3;
+            font-size: 13px;
+        }
+
+        .map-panel {
+            position: relative;
+            min-height: 650px;
+        }
+
+        #storeMap {
+            width: 100%;
+            height: 100%;
+            min-height: 650px;
+            z-index: 1;
+        }
+
+        .map-legend {
+            position: absolute;
+            z-index: 500;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 9px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, .12);
+            font-size: 12px;
+            color: #18234a;
+        }
+
+        .map-legend span {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #16a36a;
+            margin-right: 6px;
+        }
+
+        /* Marqueur personnalisé */
+        .jumbo-marker-wrapper {
+            background: transparent;
+            border: none;
+        }
+
+        .jumbo-map-pin {
+            width: 34px;
+            height: 34px;
+            background: #18234a;
+            border: 3px solid white;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 3px 9px rgba(0, 0, 0, .3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .jumbo-marker-letter {
+            color: white;
+            font-size: 15px;
+            font-weight: 900;
+            transform: rotate(45deg);
+        }
+
+        .visitor-marker {
+            background: #2563eb;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 19px;
+            height: 19px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+
+        .popup-store-name {
+            font-weight: 800;
+            color: #18234a;
+            margin-bottom: 5px;
+        }
+
+        .popup-store-city {
+            font-size: 12px;
+            color: #16834e;
+            margin-bottom: 5px;
+        }
+
+        .popup-store-address {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .popup-directions {
+            display: inline-block;
+            background: #18234a;
+            color: white !important;
+            padding: 7px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1000px) {
+            .locator-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .store-panel {
+                min-height: auto;
+            }
+
+            .store-list {
+                max-height: 420px;
+            }
+
+            .map-panel,
+            #storeMap {
+                min-height: 500px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .store-locator {
+                padding: 0 10px 20px;
+                margin-top: 20px;
+            }
+
+            .locator-header h1 {
+                font-size: 22px;
+            }
+
+            .map-panel,
+            #storeMap {
+                min-height: 400px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="store-locator">
+
+    <div class="locator-header">
+        <div>
+            <h1>Nos magasins Jumbo Score</h1>
+            <p>Retrouvez les magasins et localisez celui qui se trouve près de vous.</p>
+        </div>
+
+        <div class="locator-badge">
+            <i class="fas fa-map-marked-alt"></i>
+            Madagascar
+        </div>
+    </div>
+
+    <div class="locator-layout">
+
+        <section class="store-panel">
+            <div class="store-panel-header">
+
+                <h2>
+                    <i class="fas fa-store"></i>
+                    Magasins disponibles
+                </h2>
+
+                <div class="store-count" id="storeCount">
+                    {{ magasins|length }} magasin(s) enregistré(s)
+                </div>
+
+                <div class="store-filters">
+
+                    <input
+                        type="search"
+                        id="storeSearch"
+                        class="store-search"
+                        placeholder="Rechercher un magasin, une ville..."
+                        autocomplete="off"
+                    >
+
+                    <select id="cityFilter" class="city-filter">
+                        <option value="">Toutes les villes</option>
+                    </select>
+
+                </div>
+
+                <div class="locator-actions">
+                    <button type="button" id="locateMe" class="locator-btn btn-location">
+                        <i class="fas fa-location-arrow"></i>
+                        Me localiser
+                    </button>
+
+                    <button type="button" id="showAllStores" class="locator-btn btn-all">
+                        <i class="fas fa-globe"></i>
+                        Tout afficher
+                    </button>
+                </div>
+
+                <div id="locationStatus" class="location-status">
+                    Active la géolocalisation pour connaître la distance entre toi et les magasins.
+                </div>
+
+            </div>
+
+            <div class="store-list" id="storeList">
+
+                {% for magasin in magasins %}
+                    <article
+                        class="store-item"
+                        data-id="{{ magasin.id }}"
+                        data-name="{{ magasin.nom|e('html_attr') }}"
+                        data-city="{{ magasin.ville|e('html_attr') }}"
+                        data-address="{{ magasin.adresse|default('')|e('html_attr') }}"
+                        data-lat="{{ magasin.latitude }}"
+                        data-lng="{{ magasin.longitude }}"
+                    >
+
+                        <h3>{{ magasin.nom }}</h3>
+
+                        <div class="store-city">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ magasin.ville }}
+                        </div>
+
+                        {% if magasin.adresse %}
+                            <p class="store-address">
+                                {{ magasin.adresse }}
+                            </p>
+                        {% endif %}
+
+                        <p class="store-distance" hidden></p>
+
+                        <div class="store-card-actions">
+    <button type="button" class="store-action show-on-map">
+        <i class="fas fa-map"></i>
+        Voir sur la carte
+    </button>
+
+    <button type="button" class="store-action calculate-route">
+        <i class="fas fa-route"></i>
+        Calculer le trajet
+    </button>
+
+                            <a
+                                class="store-action directions-link"
+                                href="https://www.google.com/maps/dir/?api=1&destination={{ magasin.latitude }},{{ magasin.longitude }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <i class="fas fa-route"></i>
+                                Itinéraire
+                            </a>
+                        </div>
+
+                    </article>
+                {% else %}
+                    <div class="no-stores">
+                        Aucun magasin n'est enregistré pour le moment.
+                    </div>
+                {% endfor %}
+
+                <div class="no-stores" id="noSearchResults" hidden>
+                    Aucun magasin ne correspond à votre recherche.
+                </div>
+
+            </div>
+        </section>
+
+        <section class="map-panel">
+            <div id="storeMap"></div>
+
+            <div class="map-legend">
+                <span></span>
+                Magasin Jumbo Score
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const map = L.map('storeMap', {
+                scrollWheelZoom: true
+            }).setView([-18.7669, 46.8691], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            const storeCards = Array.from(
+                document.querySelectorAll('.store-item[data-id]')
+            );
+
+            const searchInput = document.getElementById('storeSearch');
+            const cityFilter = document.getElementById('cityFilter');
+            const storeCount = document.getElementById('storeCount');
+            const noResults = document.getElementById('noSearchResults');
+            const locationStatus = document.getElementById('locationStatus');
+
+            const markers = new Map();
+            let visitorMarker = null;
+            let userPosition = null;
+            let currentRoute = null;
+            let currentRouteInfo = null;
+
+            const markerIcon = L.divIcon({
+                className: 'jumbo-marker-wrapper',
+                html: '<div class="jumbo-map-pin"><span class="jumbo-marker-letter">J</span></div>',
+                iconSize: [34, 34],
+                iconAnchor: [17, 34],
+                popupAnchor: [0, -34]
+            });
+
+            const visitorIcon = L.divIcon({
+                className: '',
+                html: '<div class="visitor-marker"></div>',
+                iconSize: [19, 19],
+                iconAnchor: [9, 9]
+            });
+
+            function validCoordinates(lat, lng) {
+                return Number.isFinite(lat)
+                    && Number.isFinite(lng)
+                    && lat >= -26
+                    && lat <= -11
+                    && lng >= 43
+                    && lng <= 51;
+            }
+
+            function createPopup(card) {
+                const content = document.createElement('div');
+
+                const name = document.createElement('div');
+                name.className = 'popup-store-name';
+                name.textContent = card.dataset.name;
+
+                const city = document.createElement('div');
+                city.className = 'popup-store-city';
+                city.textContent = card.dataset.city;
+
+                content.appendChild(name);
+                content.appendChild(city);
+
+                if (card.dataset.address) {
+                    const address = document.createElement('div');
+                    address.className = 'popup-store-address';
+                    address.textContent = card.dataset.address;
+                    content.appendChild(address);
+                }
+
+                const link = document.createElement('a');
+                link.className = 'popup-directions';
+                link.textContent = 'Obtenir un itinéraire';
+                link.href = 'https://www.google.com/maps/dir/?api=1&destination='
+                    + encodeURIComponent(card.dataset.lat + ',' + card.dataset.lng);
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+
+                content.appendChild(link);
+
+                return content;
+            }
+
+            // Création des marqueurs et des options de villes.
+            const cities = new Set();
+            const bounds = [];
+
+            storeCards.forEach(function (card) {
+
+                const lat = Number(card.dataset.lat);
+                const lng = Number(card.dataset.lng);
+
+                cities.add(card.dataset.city);
+
+                if (!validCoordinates(lat, lng)) {
+                    return;
+                }
+
+                const marker = L.marker([lat, lng], {
+                    icon: markerIcon
+                });
+
+                marker.bindPopup(createPopup(card));
+
+                markers.set(card.dataset.id, marker);
+                bounds.push([lat, lng]);
+            });
+
+            Array.from(cities)
+                .sort((a, b) => a.localeCompare(b, 'fr'))
+                .forEach(function (city) {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    cityFilter.appendChild(option);
+                });
+
+            // Calcul de distance entre deux positions.
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const earthRadius = 6371;
+                const toRadians = value => value * Math.PI / 180;
+
+                const dLat = toRadians(lat2 - lat1);
+                const dLon = toRadians(lon2 - lon1);
+
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRadians(lat1)) *
+                    Math.cos(toRadians(lat2)) *
+                    Math.sin(dLon / 2) *
+                    Math.sin(dLon / 2);
+
+                return earthRadius * 2 * Math.atan2(
+                    Math.sqrt(a),
+                    Math.sqrt(1 - a)
+                );
+            }
+            // Calculer les distances routières vers tous les magasins en une seule requête.
+async function calculateAllRoadDistances() {
+
+    if (!userPosition) {
+        return;
+    }
+
+    locationStatus.textContent =
+        'Calcul des distances routières vers les magasins...';
+
+    const validStores = storeCards.filter(function (card) {
+        return validCoordinates(
+            Number(card.dataset.lat),
+            Number(card.dataset.lng)
+        );
+    });
+
+    if (validStores.length === 0) {
+        locationStatus.textContent =
+            'Aucun magasin ne possède de coordonnées GPS valides.';
+        return;
+    }
+
+    try {
+
+        // OSRM attend les coordonnées sous la forme longitude,latitude.
+        const coordinates = [
+            userPosition.lng + ',' + userPosition.lat
+        ];
+
+        validStores.forEach(function (card) {
+            coordinates.push(
+                card.dataset.lng + ',' + card.dataset.lat
+            );
+        });
+
+        const destinations = validStores.map(function (card, index) {
+            return index + 1;
+        });
+
+        const url =
+            'https://router.project-osrm.org/table/v1/driving/' +
+            coordinates.join(';') +
+            '?sources=0&destinations=' +
+            destinations.join(';') +
+            '&annotations=distance,duration';
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('Erreur de communication avec OSRM.');
+        }
+
+        const data = await response.json();
+
+        if (
+            data.code !== 'Ok' ||
+            !data.distances ||
+            !data.durations
+        ) {
+            throw new Error('Les distances routières sont indisponibles.');
+        }
+
+        validStores.forEach(function (card, index) {
+
+            const distance = data.distances[0][index];
+            const duration = data.durations[0][index];
+
+            if (distance === null || duration === null) {
+                card.dataset.roadDistance = '';
+                card.dataset.roadDuration = '';
+                return;
+            }
+
+            const distanceKm = distance / 1000;
+            const durationMinutes = Math.round(duration / 60);
+
+            card.dataset.roadDistance = distanceKm;
+            card.dataset.roadDuration = durationMinutes;
+
+            const distanceElement =
+                card.querySelector('.store-distance');
+
+            distanceElement.textContent =
+                distanceKm.toFixed(1) + ' km par la route · ' +
+                durationMinutes + ' min environ en voiture';
+
+            distanceElement.hidden = false;
+        });
+
+        // Trier les magasins du plus proche au plus éloigné.
+        storeCards.sort(function (a, b) {
+
+            const distanceA = Number(a.dataset.roadDistance);
+            const distanceB = Number(b.dataset.roadDistance);
+
+            const validA = a.dataset.roadDistance !== '';
+            const validB = b.dataset.roadDistance !== '';
+
+            if (!validA && !validB) return 0;
+            if (!validA) return 1;
+            if (!validB) return -1;
+
+            return distanceA - distanceB;
+        });
+
+        const list = document.getElementById('storeList');
+        const noResults = document.getElementById('noSearchResults');
+
+        storeCards.forEach(function (card) {
+            list.insertBefore(card, noResults);
+        });
+
+        // Supprimer les anciennes mises en évidence.
+        storeCards.forEach(function (card) {
+            card.classList.remove('is-closest');
+
+            const oldBadge = card.querySelector('.closest-badge');
+
+            if (oldBadge) {
+                oldBadge.remove();
+            }
+        });
+
+        // Mettre en évidence le magasin le plus proche.
+        const closestStore = storeCards.find(function (card) {
+            return card.dataset.roadDistance !== '';
+        });
+
+        if (closestStore) {
+
+            closestStore.classList.add('is-closest');
+
+            const badge = document.createElement('span');
+            badge.className = 'closest-badge';
+            badge.textContent = 'Le plus proche';
+
+            closestStore.querySelector('h3').appendChild(badge);
+
+            locationStatus.textContent =
+                'Magasin le plus proche : ' +
+                closestStore.dataset.name + ' (' +
+                Number(closestStore.dataset.roadDistance).toFixed(1) +
+                ' km par la route).';
+        }
+
+        applyFilters();
+
+    } catch (error) {
+
+        console.error(error);
+
+        locationStatus.textContent =
+            'Impossible de calculer toutes les distances routières. ' +
+            'Tu peux toujours calculer un trajet individuellement.';
+    }
+}
+            // Calculer et afficher un véritable itinéraire routier avec OSRM.
+async function calculateRoadRoute(card, button) {
+
+    if (!userPosition) {
+        locationStatus.textContent =
+            'Veuillez d’abord cliquer sur « Me localiser ».';
+        return;
+    }
+
+    const storeLat = Number(card.dataset.lat);
+    const storeLng = Number(card.dataset.lng);
+
+    if (!validCoordinates(storeLat, storeLng)) {
+        locationStatus.textContent =
+            'Les coordonnées de ce magasin ne sont pas disponibles.';
+        return;
+    }
+
+    const originalText = button.innerHTML;
+
+    button.disabled = true;
+    button.textContent = 'Calcul en cours...';
+
+    try {
+
+        const url =
+            'https://router.project-osrm.org/route/v1/driving/' +
+            userPosition.lng + ',' + userPosition.lat + ';' +
+            storeLng + ',' + storeLat +
+            '?overview=full&geometries=geojson';
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('Erreur lors de la communication avec OSRM.');
+        }
+
+        const data = await response.json();
+
+        if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
+            throw new Error('Aucun itinéraire routier disponible.');
+        }
+
+        const route = data.routes[0];
+
+        // Supprimer l'ancien itinéraire.
+        if (currentRoute) {
+            map.removeLayer(currentRoute);
+        }
+
+        // Tracer le nouvel itinéraire.
+        currentRoute = L.geoJSON(route.geometry, {
+            style: {
+                color: '#2563eb',
+                weight: 6,
+                opacity: 0.85
+            }
+        }).addTo(map);
+
+        const distanceKm = route.distance / 1000;
+        const durationMinutes = Math.round(route.duration / 60);
+
+        currentRouteInfo = {
+            distance: distanceKm,
+            duration: durationMinutes,
+            store: card.dataset.name
+        };
+
+        // Encadrer le trajet dans la carte.
+        map.fitBounds(currentRoute.getBounds(), {
+            padding: [40, 40]
+        });
+
+        // Afficher les informations du trajet.
+        locationStatus.textContent =
+            'Trajet vers ' + card.dataset.name +
+            ' : ' + distanceKm.toFixed(1) + ' km environ, ' +
+            durationMinutes + ' min environ en voiture.';
+
+        // Mettre à jour la distance dans la fiche du magasin.
+        const distanceElement = card.querySelector('.store-distance');
+
+        distanceElement.textContent =
+            distanceKm.toFixed(1) + ' km par la route · ' +
+            durationMinutes + ' min environ en voiture';
+
+        distanceElement.hidden = false;
+
+    } catch (error) {
+
+        console.error(error);
+
+        locationStatus.textContent =
+            'Impossible de calculer le trajet. Réessayez ou utilisez Google Maps.';
+
+    } finally {
+
+        button.disabled = false;
+        button.innerHTML = originalText;
+    }
+}
+
+            // Recherche et filtre par ville appliqués à la liste ET à la carte.
+            function applyFilters() {
+
+                const search = searchInput.value.trim().toLocaleLowerCase('fr');
+                const selectedCity = cityFilter.value;
+
+                let visibleCount = 0;
+                const visibleMarkers = [];
+
+                storeCards.forEach(function (card) {
+
+                    const name = card.dataset.name.toLocaleLowerCase('fr');
+                    const city = card.dataset.city.toLocaleLowerCase('fr');
+                    const address = card.dataset.address.toLocaleLowerCase('fr');
+
+                    const matchesSearch =
+                        name.includes(search) ||
+                        city.includes(search) ||
+                        address.includes(search);
+
+                    const matchesCity =
+                        selectedCity === '' ||
+                        card.dataset.city === selectedCity;
+
+                    const visible = matchesSearch && matchesCity;
+
+                    card.hidden = !visible;
+
+                    const marker = markers.get(card.dataset.id);
+
+                    if (marker) {
+                        if (visible) {
+                            if (!map.hasLayer(marker)) {
+                                marker.addTo(map);
+                            }
+                            visibleMarkers.push(marker);
+                        } else if (map.hasLayer(marker)) {
+                            map.removeLayer(marker);
+                        }
+                    }
+
+                    if (visible) {
+                        visibleCount++;
+                    }
+                });
+
+                storeCount.textContent =
+                    visibleCount + ' magasin(s) affiché(s) sur ' +
+                    storeCards.length;
+
+                noResults.hidden = visibleCount !== 0;
+            }
+
+            searchInput.addEventListener('input', applyFilters);
+            cityFilter.addEventListener('change', applyFilters);
+
+            // Afficher un magasin sur la carte.
+            document.querySelectorAll('.show-on-map').forEach(function (button) {
+
+                button.addEventListener('click', function () {
+
+                    const card = button.closest('.store-item');
+                    const marker = markers.get(card.dataset.id);
+
+                    if (!marker) {
+                        locationStatus.textContent =
+                            'Les coordonnées de ce magasin ne sont pas disponibles.';
+                        return;
+                    }
+
+                    map.setView(marker.getLatLng(), 15);
+                    marker.openPopup();
+                });
+            });
+            // Calculer le trajet routier vers un magasin.
+document.querySelectorAll('.calculate-route').forEach(function (button) {
+
+    button.addEventListener('click', function () {
+
+        const card = button.closest('.store-item');
+
+        calculateRoadRoute(card, button);
+    });
+});
+
+            // Géolocalisation de l'utilisateur.
+            document.getElementById('locateMe').addEventListener('click', function () {
+
+                if (!navigator.geolocation) {
+                    locationStatus.textContent =
+                        'La géolocalisation n’est pas prise en charge par ce navigateur.';
+                    return;
+                }
+
+                locationStatus.textContent =
+                    'Recherche de votre position en cours...';
+
+                navigator.geolocation.getCurrentPosition(
+
+                    function (position) {
+
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        userPosition = { lat, lng };
+
+                        if (visitorMarker) {
+                            map.removeLayer(visitorMarker);
+                        }
+
+                        visitorMarker = L.marker([lat, lng], {
+                            icon: visitorIcon
+                        }).addTo(map);
+
+                        visitorMarker.bindPopup('Votre position').openPopup();
+
+                        map.setView([lat, lng], 12);
+
+                        storeCards.forEach(function (card) {
+
+                            const storeLat = Number(card.dataset.lat);
+                            const storeLng = Number(card.dataset.lng);
+                            const distanceElement =
+                                card.querySelector('.store-distance');
+
+                            if (!validCoordinates(storeLat, storeLng)) {
+                                distanceElement.hidden = true;
+                                return;
+                            }
+
+                            const distance = calculateDistance(
+                                lat, lng, storeLat, storeLng
+                            );
+
+                            distanceElement.textContent =
+                                'À environ ' + distance.toFixed(2) + ' km de vous';
+
+                            distanceElement.hidden = false;
+
+                            card.dataset.distance = distance;
+                        });
+
+                        // Calculer les distances réelles par la route.
+                        calculateAllRoadDistances();
+
+                        locationStatus.textContent =
+                            'Votre position a été détectée. Les distances sont calculées à vol d’oiseau.';
+                    },
+
+                    function (error) {
+
+                        const messages = {
+                            1: 'Vous avez refusé l’accès à votre position.',
+                            2: 'Votre position est momentanément indisponible.',
+                            3: 'La demande de localisation a expiré.'
+                        };
+
+                        locationStatus.textContent =
+                            messages[error.code] ||
+                            'Impossible de déterminer votre position.';
+                    },
+
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 60000
+                    }
+                );
+            });
+
+            // Réafficher tous les magasins correspondant aux filtres.
+            document.getElementById('showAllStores').addEventListener('click', function () {
+
+                applyFilters();
+
+                const visibleMarkers = [];
+
+                storeCards.forEach(function (card) {
+                    const marker = markers.get(card.dataset.id);
+
+                    if (marker && !card.hidden) {
+                        visibleMarkers.push(marker);
+                    }
+                });
+
+                const points = visibleMarkers.map(marker => marker.getLatLng());
+
+                if (visitorMarker) {
+                    points.push(visitorMarker.getLatLng());
+                }
+
+                if (points.length > 0) {
+                    const group = L.featureGroup(
+                        points.map(point => L.marker(point))
+                    );
+
+                    map.fitBounds(group.getBounds().pad(0.15), {
+                        maxZoom: 12
+                    });
+                } else {
+                    locationStatus.textContent =
+                        'Aucun magasin géolocalisé ne correspond aux filtres.';
+                }
+            });
+
+            // Affichage initial de tous les magasins.
+            applyFilters();
+
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [30, 30] });
+            }
+
+            setTimeout(function () {
+                map.invalidateSize();
+            }, 200);
+
+            window.addEventListener('resize', function () {
+                map.invalidateSize();
+            });
+
+        });
+    </script>
+{% endblock %}

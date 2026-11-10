@@ -17,6 +17,9 @@ class SortieStock
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'produit_id', nullable: false)]
     private ?Produit $produit = null;
+    #[ORM\ManyToOne(targetEntity: Magasin::class)]
+#[ORM\JoinColumn(name: 'magasin_id', nullable: false, onDelete: 'RESTRICT')]
+private ?Magasin $magasin = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'client_id', nullable: true)]
@@ -146,5 +149,16 @@ class SortieStock
 
         return $this;
     }
+    public function getMagasin(): ?Magasin
+{
+    return $this->magasin;
+}
+
+public function setMagasin(?Magasin $magasin): static
+{
+    $this->magasin = $magasin;
+
+    return $this;
+}
 }
 

@@ -5,19 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Jumbo Score Madagascar | Accueil</title>
-    <meta name="description" content="Découvrez le catalogue Jumbo Score Madagascar et consultez les produits disponibles.">
+    <meta name="description" content="Découvrez Jumbo Score Madagascar, consultez notre catalogue et localisez nos magasins.">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <style>
         :root {
-            --jumbo-red: #e31e24;
-            --jumbo-red-dark: #b8171c;
-            --jumbo-yellow: #ffcf00;
-            --jumbo-navy: #17213e;
-            --jumbo-gray: #f5f6f8;
+            --jumbo-primary: #173b70;
+            --jumbo-primary-dark: #10294f;
+            --jumbo-blue: #2864a5;
+            --jumbo-yellow: #ffc928;
+            --jumbo-yellow-light: #fff5d6;
+            --jumbo-gray: #f4f7fb;
             --jumbo-white: #ffffff;
+            --jumbo-text: #18263b;
+            --jumbo-muted: #68778d;
+            --jumbo-border: #e6ebf2;
+            --jumbo-green: #16834a;
         }
 
         * {
@@ -32,7 +37,7 @@
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            color: var(--jumbo-navy);
+            color: var(--jumbo-text);
             background: var(--jumbo-white);
         }
 
@@ -40,9 +45,10 @@
             text-decoration: none;
         }
 
-        /* Barre d'information */
+        /* BARRE D'INFORMATION */
+
         .top-bar {
-            background: var(--jumbo-navy);
+            background: var(--jumbo-primary-dark);
             color: white;
             padding: 9px 0;
             font-size: 13px;
@@ -52,23 +58,25 @@
             color: var(--jumbo-yellow);
         }
 
-        /* Navigation */
+        /* NAVIGATION */
+
         .main-navbar {
             background: white;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 3px 18px rgba(23, 33, 62, 0.09);
+            box-shadow: 0 4px 20px rgba(16, 41, 79, .09);
+            border-bottom: 3px solid var(--jumbo-yellow);
         }
 
         .navbar-brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--jumbo-red);
+            color: var(--jumbo-primary);
             font-weight: 900;
-            font-size: 25px;
-            letter-spacing: -1px;
+            font-size: 23px;
+            letter-spacing: -.7px;
         }
 
         .navbar-brand img {
@@ -81,34 +89,37 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: var(--jumbo-red);
+            color: var(--jumbo-primary);
             font-weight: 900;
-            font-size: 24px;
-            letter-spacing: -1px;
+            font-size: 22px;
         }
 
         .brand-mark {
+            width: 42px;
+            height: 42px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 42px;
-            height: 42px;
-            background: var(--jumbo-red);
+            background: var(--jumbo-primary);
             color: white;
             border-bottom: 5px solid var(--jumbo-yellow);
             border-radius: 8px;
-            font-size: 23px;
+            font-size: 22px;
         }
 
         .navbar-nav .nav-link {
-            color: var(--jumbo-navy);
+            color: var(--jumbo-text);
             font-weight: 700;
-            padding: 12px 14px !important;
-            transition: color 0.2s;
+            padding: 12px 11px !important;
+            transition: color .2s;
         }
 
         .navbar-nav .nav-link:hover {
-            color: var(--jumbo-red);
+            color: var(--jumbo-blue);
+        }
+
+        .navbar-toggler {
+            border-color: var(--jumbo-border);
         }
 
         .btn-jumbo {
@@ -116,18 +127,37 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            border: none;
+            border: 0;
             border-radius: 8px;
-            background: var(--jumbo-red);
+            background: var(--jumbo-primary);
             color: white;
             padding: 12px 20px;
             font-weight: 800;
-            transition: background 0.2s, transform 0.2s;
+            transition: all .2s;
         }
 
         .btn-jumbo:hover {
-            background: var(--jumbo-red-dark);
+            background: var(--jumbo-blue);
             color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-jumbo-yellow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--jumbo-yellow);
+            color: var(--jumbo-primary-dark);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 900;
+            transition: all .2s;
+        }
+
+        .btn-jumbo-yellow:hover {
+            background: #f0b800;
+            color: var(--jumbo-primary-dark);
             transform: translateY(-2px);
         }
 
@@ -141,22 +171,23 @@
             padding: 11px 20px;
             color: white;
             font-weight: 800;
-            transition: all 0.2s;
+            transition: all .2s;
         }
 
         .btn-jumbo-outline:hover {
             background: white;
-            color: var(--jumbo-red);
+            color: var(--jumbo-primary);
         }
 
-        /* Grande bannière */
+        /* HERO */
+
         .hero {
             position: relative;
-            min-height: 500px;
+            min-height: 520px;
             display: flex;
             align-items: center;
             overflow: hidden;
-            background: var(--jumbo-navy);
+            background: var(--jumbo-primary-dark);
             color: white;
         }
 
@@ -166,7 +197,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            animation: heroAppear 0.8s ease-out;
+            animation: heroAppear .8s ease-out;
         }
 
         .hero::after {
@@ -175,23 +206,23 @@
             inset: 0;
             background: linear-gradient(
                 90deg,
-                rgba(17, 25, 48, 0.94) 0%,
-                rgba(17, 25, 48, 0.75) 48%,
-                rgba(17, 25, 48, 0.18) 100%
+                rgba(10, 27, 54, .96) 0%,
+                rgba(16, 41, 79, .82) 48%,
+                rgba(16, 41, 79, .25) 100%
             );
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            padding-top: 70px;
-            padding-bottom: 70px;
+            padding-top: 75px;
+            padding-bottom: 75px;
         }
 
         .hero-label {
             display: inline-block;
             background: var(--jumbo-yellow);
-            color: var(--jumbo-navy);
+            color: var(--jumbo-primary-dark);
             border-radius: 5px;
             padding: 8px 13px;
             margin-bottom: 22px;
@@ -202,10 +233,10 @@
         }
 
         .hero h1 {
-            max-width: 700px;
-            font-size: clamp(35px, 5vw, 60px);
+            max-width: 720px;
+            font-size: clamp(35px, 5vw, 61px);
             font-weight: 900;
-            line-height: 1.08;
+            line-height: 1.1;
             margin-bottom: 20px;
         }
 
@@ -214,8 +245,8 @@
         }
 
         .hero p {
-            max-width: 570px;
-            color: rgba(255, 255, 255, 0.9);
+            max-width: 590px;
+            color: rgba(255,255,255,.9);
             font-size: 17px;
             line-height: 1.8;
             margin-bottom: 28px;
@@ -232,23 +263,27 @@
             z-index: 2;
             right: 5%;
             bottom: 25px;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255,255,255,.85);
             font-size: 12px;
             letter-spacing: 1px;
         }
 
         @keyframes heroAppear {
-            from { opacity: 0.55; transform: scale(1.03); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: .55;
+                transform: scale(1.03);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        /* Avantages */
+        /* AVANTAGES */
+
         .benefits {
-            position: relative;
-            z-index: 3;
-            margin-top: -1px;
             background: white;
-            border-bottom: 1px solid #eceef2;
+            border-bottom: 1px solid var(--jumbo-border);
         }
 
         .benefit-item {
@@ -264,10 +299,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 48px;
-            height: 48px;
-            background: #fff0f0;
-            color: var(--jumbo-red);
+            width: 50px;
+            height: 50px;
+            background: var(--jumbo-yellow-light);
+            color: var(--jumbo-primary);
             border-radius: 12px;
             font-size: 23px;
         }
@@ -280,13 +315,14 @@
 
         .benefit-item p {
             font-size: 12px;
-            color: #697184;
+            color: var(--jumbo-muted);
             margin: 0;
         }
 
-        /* Titres de sections */
+        /* SECTIONS */
+
         .section {
-            padding: 75px 0;
+            padding: 78px 0;
         }
 
         .section-soft {
@@ -295,7 +331,7 @@
 
         .section-eyebrow {
             display: inline-block;
-            color: var(--jumbo-red);
+            color: var(--jumbo-blue);
             font-size: 12px;
             font-weight: 900;
             letter-spacing: 1.8px;
@@ -304,19 +340,20 @@
         }
 
         .section-title {
-            color: var(--jumbo-navy);
+            color: var(--jumbo-primary-dark);
             font-size: clamp(28px, 3vw, 39px);
             font-weight: 900;
             margin-bottom: 12px;
         }
 
         .section-description {
-            color: #6b7280;
+            color: var(--jumbo-muted);
             line-height: 1.8;
             max-width: 650px;
         }
 
-        /* Catalogue */
+        /* CATALOGUE */
+
         .catalogue-heading {
             display: flex;
             justify-content: space-between;
@@ -329,20 +366,20 @@
         .product-card {
             height: 100%;
             background: white;
-            border: 1px solid #eaecf0;
+            border: 1px solid var(--jumbo-border);
             border-radius: 14px;
             overflow: hidden;
-            transition: transform 0.25s, box-shadow 0.25s;
+            transition: transform .25s, box-shadow .25s;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(23, 33, 62, 0.1);
+            box-shadow: 0 15px 35px rgba(16, 41, 79, .12);
         }
 
         .product-image-wrap {
             height: 215px;
-            background: #f5f6f8;
+            background: #f5f7fa;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -354,7 +391,7 @@
             height: 100%;
             object-fit: contain;
             padding: 15px;
-            transition: transform 0.3s;
+            transition: transform .3s;
         }
 
         .product-card:hover .product-image {
@@ -380,8 +417,8 @@
 
         .product-category {
             display: inline-block;
-            background: #fff0f0;
-            color: var(--jumbo-red);
+            background: var(--jumbo-yellow-light);
+            color: var(--jumbo-primary);
             border-radius: 4px;
             padding: 5px 8px;
             margin-bottom: 10px;
@@ -394,11 +431,11 @@
             font-size: 17px;
             font-weight: 900;
             margin-bottom: 8px;
-            color: var(--jumbo-navy);
+            color: var(--jumbo-primary-dark);
         }
 
         .product-description {
-            color: #747b8a;
+            color: var(--jumbo-muted);
             font-size: 13px;
             line-height: 1.7;
             min-height: 44px;
@@ -410,44 +447,36 @@
             justify-content: space-between;
             align-items: center;
             gap: 8px;
-            border-top: 1px solid #eceef2;
+            border-top: 1px solid var(--jumbo-border);
             padding-top: 15px;
         }
 
         .product-price {
-            color: var(--jumbo-red);
+            color: var(--jumbo-primary);
             font-size: 18px;
             font-weight: 900;
-        }
-
-        .stock-label {
-            font-size: 11px;
-            color: #667085;
-            text-align: right;
-        }
-
-        .stock-label i {
-            color: #16834a;
         }
 
         .empty-catalogue {
             text-align: center;
             padding: 55px 20px;
             background: white;
-            border: 1px dashed #d4d8e0;
+            border: 1px dashed #cbd5e1;
             border-radius: 14px;
         }
 
         .empty-catalogue i {
             font-size: 50px;
-            color: #a4aab6;
+            color: #9aa8ba;
         }
 
-        /* Bandeau promotionnel */
+        /* BANDEAU */
+
         .promo-section {
             padding: 65px 0;
-            background: var(--jumbo-red);
+            background: linear-gradient(120deg, var(--jumbo-primary-dark), var(--jumbo-blue));
             color: white;
+            border-top: 5px solid var(--jumbo-yellow);
         }
 
         .promo-section h2 {
@@ -457,7 +486,7 @@
         }
 
         .promo-section p {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255,255,255,.9);
             line-height: 1.8;
             margin-bottom: 0;
         }
@@ -468,13 +497,14 @@
             text-align: center;
         }
 
-        /* À propos */
+        /* A PROPOS */
+
         .about-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 300px;
-            background: linear-gradient(135deg, var(--jumbo-navy), #293b68);
+            min-height: 310px;
+            background: linear-gradient(135deg, var(--jumbo-primary-dark), var(--jumbo-blue));
             border-radius: 18px;
             color: var(--jumbo-yellow);
             font-size: 115px;
@@ -488,7 +518,7 @@
             position: absolute;
             width: 180px;
             height: 180px;
-            border: 25px solid rgba(255, 255, 255, 0.07);
+            border: 25px solid rgba(255,255,255,.07);
             border-radius: 50%;
         }
 
@@ -514,7 +544,7 @@
         }
 
         .about-point i {
-            color: var(--jumbo-red);
+            color: var(--jumbo-blue);
             font-size: 21px;
         }
 
@@ -525,16 +555,172 @@
 
         .about-point p {
             margin: 0;
-            color: #697184;
+            color: var(--jumbo-muted);
             font-size: 14px;
             line-height: 1.7;
         }
 
-        /* Pied de page */
+        /* LOCALISATION */
+
+        .location-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            border-top: 5px solid var(--jumbo-yellow);
+            box-shadow: 0 8px 28px rgba(16, 41, 79, .07);
+        }
+
+        .location-icon {
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--jumbo-yellow-light);
+            color: var(--jumbo-primary);
+            border-radius: 14px;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .location-badge {
+            display: inline-block;
+            background: var(--jumbo-yellow);
+            color: var(--jumbo-primary-dark);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            padding: 7px 11px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .location-card h3 {
+            font-size: 23px;
+            font-weight: 900;
+            color: var(--jumbo-primary-dark);
+            margin-bottom: 18px;
+        }
+
+        .location-address {
+            color: var(--jumbo-primary);
+            font-weight: 800;
+            line-height: 1.7;
+        }
+
+        .location-address i {
+            color: var(--jumbo-blue);
+            margin-right: 7px;
+        }
+
+        .location-description {
+            color: var(--jumbo-muted);
+            font-size: 14px;
+            line-height: 1.8;
+            margin: 20px 0 25px;
+        }
+
+        .btn-location-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 2px solid var(--jumbo-primary);
+            border-radius: 8px;
+            color: var(--jumbo-primary);
+            padding: 12px 16px;
+            font-weight: 800;
+            transition: all .2s;
+        }
+
+        .btn-location-outline:hover {
+            background: var(--jumbo-primary);
+            color: white;
+        }
+
+        .location-map-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 28px rgba(16, 41, 79, .07);
+            border: 1px solid var(--jumbo-border);
+        }
+
+        .location-map-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 25px;
+            border-bottom: 1px solid var(--jumbo-border);
+        }
+
+        .location-map-heading h3 {
+            font-size: 17px;
+            font-weight: 900;
+            margin: 0 0 5px;
+            color: var(--jumbo-primary-dark);
+        }
+
+        .location-map-heading h3 i {
+            color: var(--jumbo-blue);
+            margin-right: 5px;
+        }
+
+        .location-map-heading p {
+            color: var(--jumbo-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .map-status {
+            background: var(--jumbo-yellow-light);
+            color: var(--jumbo-primary-dark);
+            border-radius: 20px;
+            padding: 7px 11px;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .map-status i {
+            color: var(--jumbo-green);
+            font-size: 8px;
+            margin-right: 4px;
+        }
+
+        .location-map {
+            height: 390px;
+            width: 100%;
+            background: #eeeeee;
+        }
+
+        .location-map iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .location-map-footer {
+            padding: 15px 20px;
+            color: var(--jumbo-muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .location-map-footer i {
+            color: var(--jumbo-blue);
+            margin-right: 5px;
+        }
+
+        /* FOOTER */
+
         .footer {
             padding-top: 55px;
-            background: var(--jumbo-navy);
+            background: var(--jumbo-primary-dark);
             color: white;
+            border-top: 5px solid var(--jumbo-yellow);
         }
 
         .footer-brand {
@@ -545,7 +731,7 @@
 
         .footer-description {
             max-width: 370px;
-            color: #c4cad7;
+            color: #c4cfdf;
             line-height: 1.8;
             font-size: 14px;
         }
@@ -554,6 +740,7 @@
             font-size: 15px;
             font-weight: 900;
             margin-bottom: 18px;
+            color: var(--jumbo-yellow);
         }
 
         .footer-links {
@@ -563,9 +750,9 @@
         }
 
         .footer-links a {
-            color: #c4cad7;
+            color: #c4cfdf;
             font-size: 14px;
-            transition: color 0.2s;
+            transition: color .2s;
         }
 
         .footer-links a:hover {
@@ -575,10 +762,12 @@
         .footer-bottom {
             margin-top: 45px;
             padding: 20px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.13);
-            color: #c4cad7;
+            border-top: 1px solid rgba(255,255,255,.13);
+            color: #c4cfdf;
             font-size: 12px;
         }
+
+        /* RESPONSIVE */
 
         @media (max-width: 767px) {
             .top-bar {
@@ -595,7 +784,7 @@
             }
 
             .hero::after {
-                background: rgba(17, 25, 48, 0.78);
+                background: rgba(10, 27, 54, .82);
             }
 
             .hero-decoration {
@@ -618,13 +807,26 @@
             .benefit-item {
                 padding: 15px 5px;
             }
+
+            .location-card {
+                padding: 22px;
+            }
+
+            .location-map {
+                height: 300px;
+            }
+
+            .location-map-heading {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 
 <body>
 
-{# Images locales : une image différente peut apparaître à chaque actualisation #}
+{# Images locales de la bannière #}
 {% set imagesJumbo = [
     'images/jumbo/jumbo-1.jpg',
     'images/jumbo/jumbo-2.jpg',
@@ -634,13 +836,14 @@
 
 {% set imageJumbo = random(imagesJumbo) %}
 
-<!-- Barre d'information -->
+<!-- BARRE D'INFORMATION -->
 <div class="top-bar">
     <div class="container d-flex justify-content-between align-items-center gap-2">
         <span>
             <i class="bi bi-geo-alt-fill me-1"></i>
             Jumbo Score Madagascar
         </span>
+
         <span>
             <i class="bi bi-bag-check-fill me-1"></i>
             Découvrez notre catalogue de produits
@@ -648,20 +851,25 @@
     </div>
 </div>
 
-<!-- Navigation -->
+<!-- NAVIGATION -->
 <nav class="navbar navbar-expand-lg main-navbar">
     <div class="container">
 
         <a class="navbar-brand" href="{{ path('app_home') }}" aria-label="Accueil Jumbo Score">
+
             <img
                 src="{{ asset('images/jumbo-score-logo.png') }}"
                 alt="Jumbo Score"
                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
             >
+
             <span class="brand-fallback" style="display:none;">
-                <span class="brand-mark"><i class="bi bi-shop"></i></span>
+                <span class="brand-mark">
+                    <i class="bi bi-shop"></i>
+                </span>
                 JUMBO SCORE
             </span>
+
         </a>
 
         <button
@@ -677,41 +885,56 @@
         </button>
 
         <div class="collapse navbar-collapse" id="mainNavigation">
+
             <ul class="navbar-nav ms-auto align-items-lg-center">
+
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#catalogue">Catalogue</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#avantages">Nos avantages</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#apropos">À propos</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#localisation">
+                        <i class="bi bi-geo-alt-fill me-1"></i>
+                        Localisation
+                    </a>
+                </li>
+
                 <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
                     <a class="btn-jumbo" href="{{ path('app_login') }}">
                         <i class="bi bi-person-circle"></i>
                         Connexion
                     </a>
                 </li>
+
             </ul>
         </div>
-
     </div>
 </nav>
 
-<!-- Grande bannière Jumbo Score -->
+<!-- HERO -->
 <header class="hero">
+
     <img
         class="hero-image"
         src="{{ asset(imageJumbo) }}"
-        alt="Découverte du supermarché Jumbo Score Madagascar"
+        alt="Supermarché Jumbo Score Madagascar"
         fetchpriority="high"
     >
 
     <div class="container hero-content">
+
         <span class="hero-label">
             <i class="bi bi-star-fill me-1"></i>
             Bienvenue chez Jumbo Score
@@ -729,23 +952,27 @@
         </p>
 
         <div class="hero-buttons">
-            <a href="#catalogue" class="btn-jumbo">
+
+            <a href="#catalogue" class="btn-jumbo-yellow">
                 Découvrir le catalogue
                 <i class="bi bi-arrow-right"></i>
             </a>
 
-            <a href="#apropos" class="btn-jumbo-outline">
-                En savoir plus
+            <a href="#localisation" class="btn-jumbo-outline">
+                <i class="bi bi-geo-alt"></i>
+                Nous trouver
             </a>
+
         </div>
     </div>
 
     <div class="hero-decoration">
         JUMBO SCORE · MADAGASCAR
     </div>
+
 </header>
 
-<!-- Avantages -->
+<!-- AVANTAGES -->
 <section class="benefits" id="avantages">
     <div class="container">
         <div class="row">
@@ -802,7 +1029,7 @@
     </div>
 </section>
 
-<!-- Catalogue -->
+<!-- CATALOGUE -->
 <section class="section section-soft" id="catalogue">
     <div class="container">
 
@@ -817,34 +1044,44 @@
 
             <a href="{{ path('app_login') }}" class="btn-jumbo">
                 <i class="bi bi-person-lock"></i>
-                Accès à l'espace de gestion
+                Espace de gestion
             </a>
         </div>
 
         {% if produits is defined and produits|length > 0 %}
 
             <div class="row g-4">
+
                 {% for produit in produits %}
+
                     <div class="col-6 col-md-4 col-xl-3">
+
                         <article class="product-card">
 
                             <div class="product-image-wrap">
+
                                 {% if produit.image is defined and produit.image %}
+
                                     <img
                                         class="product-image"
                                         src="{{ asset('images/produits/' ~ produit.image) }}"
                                         alt="{{ produit.nom }}"
                                         loading="lazy"
                                     >
+
                                 {% else %}
+
                                     <div class="product-placeholder">
                                         <i class="bi bi-box-seam"></i>
                                         <span>Image non disponible</span>
                                     </div>
+
                                 {% endif %}
+
                             </div>
 
                             <div class="product-body">
+
                                 <span class="product-category">
                                     <i class="bi bi-bag me-1"></i>
                                     Produit
@@ -855,44 +1092,68 @@
                                 </h3>
 
                                 <p class="product-description">
+
                                     {% if produit.description is defined and produit.description %}
+
                                         {{ produit.description|length > 95
                                             ? produit.description|slice(0, 95) ~ '…'
                                             : produit.description }}
+
                                     {% else %}
+
                                         Découvrez ce produit dans notre catalogue.
+
                                     {% endif %}
+
                                 </p>
 
                                 <div class="product-bottom">
+
                                     <div class="product-price">
+
                                         {% if produit.prixVente is defined and produit.prixVente is not null %}
+
                                             {{ produit.prixVente|number_format(0, ',', ' ') }} Ar
+
                                         {% else %}
+
                                             Prix non renseigné
+
                                         {% endif %}
+
                                     </div>
 
                                 </div>
+
                             </div>
 
                         </article>
+
                     </div>
+
                 {% endfor %}
+
             </div>
 
         {% else %}
 
             <div class="empty-catalogue">
+
                 <i class="bi bi-inboxes"></i>
-                <h3 class="mt-3 fw-bold">Le catalogue est en préparation</h3>
+
+                <h3 class="mt-3 fw-bold">
+                    Le catalogue est en préparation
+                </h3>
+
                 <p class="text-secondary mb-4">
                     Aucun produit n'est disponible à l'affichage pour le moment.
                 </p>
+
                 <a href="{{ path('app_login') }}" class="btn-jumbo">
                     <i class="bi bi-person-circle"></i>
                     Se connecter
                 </a>
+
             </div>
 
         {% endif %}
@@ -900,41 +1161,60 @@
     </div>
 </section>
 
-<!-- Bandeau rouge -->
+<!-- BANDEAU PROMOTIONNEL -->
 <section class="promo-section">
+
     <div class="container">
+
         <div class="row align-items-center g-4">
+
             <div class="col-lg-8">
-                <h2>Découvrez notre catalogue en quelques clics.</h2>
+
+                <h2>
+                    Découvrez notre catalogue en quelques clics.
+                </h2>
+
                 <p>
                     Consultez les produits présentés sur notre site et accédez
                     à l'espace de gestion si vous disposez d'un compte autorisé.
                 </p>
+
             </div>
 
             <div class="col-lg-4 text-lg-end">
-                <a href="{{ path('app_login') }}" class="btn btn-light fw-bold px-4 py-3">
+
+                <a href="{{ path('app_login') }}" class="btn-jumbo-yellow">
                     Accéder à mon compte
-                    <i class="bi bi-arrow-right ms-2"></i>
+                    <i class="bi bi-arrow-right"></i>
                 </a>
+
             </div>
+
         </div>
+
     </div>
+
 </section>
 
-<!-- À propos -->
+<!-- À PROPOS -->
 <section class="section" id="apropos">
+
     <div class="container">
+
         <div class="row align-items-center g-5">
 
             <div class="col-lg-5">
+
                 <div class="about-icon">
                     <i class="bi bi-shop-window"></i>
                 </div>
+
             </div>
 
             <div class="col-lg-7">
+
                 <span class="section-eyebrow">À propos</span>
+
                 <h2 class="section-title">
                     Bienvenue dans l'univers Jumbo Score
                 </h2>
@@ -949,7 +1229,10 @@
                     <i class="bi bi-check-circle-fill"></i>
                     <div>
                         <strong>Un catalogue facile à parcourir</strong>
-                        <p>Les produits sont présentés avec leur nom, leur description et leur prix lorsqu'ils sont renseignés.</p>
+                        <p>
+                            Les produits sont présentés avec leur nom,
+                            leur description et leur prix lorsqu'ils sont renseignés.
+                        </p>
                     </div>
                 </div>
 
@@ -957,7 +1240,10 @@
                     <i class="bi bi-check-circle-fill"></i>
                     <div>
                         <strong>Une consultation pratique</strong>
-                        <p>Une interface adaptée aux écrans d'ordinateur, de tablette et de téléphone.</p>
+                        <p>
+                            Une interface adaptée aux écrans d'ordinateur,
+                            de tablette et de téléphone.
+                        </p>
                     </div>
                 </div>
 
@@ -965,7 +1251,10 @@
                     <i class="bi bi-check-circle-fill"></i>
                     <div>
                         <strong>Un espace de gestion protégé</strong>
-                        <p>Les utilisateurs autorisés peuvent accéder à leur espace via la page de connexion.</p>
+                        <p>
+                            Les utilisateurs autorisés peuvent accéder
+                            à leur espace via la page de connexion.
+                        </p>
                     </div>
                 </div>
 
@@ -973,66 +1262,268 @@
                     Accéder à l'espace de gestion
                     <i class="bi bi-arrow-right"></i>
                 </a>
+
             </div>
 
         </div>
+
     </div>
+
 </section>
 
-<!-- Pied de page -->
-<footer class="footer">
+<!-- LOCALISATION -->
+<section class="section section-soft" id="localisation">
+
     <div class="container">
+
+        <div class="text-center mb-5">
+
+            <span class="section-eyebrow">Nous trouver</span>
+
+            <h2 class="section-title">
+                Où nous trouver ?
+            </h2>
+
+            <p class="section-description mx-auto">
+                Retrouvez le siège central de Jumbo Score Madagascar
+                et découvrez les différents emplacements de nos magasins.
+            </p>
+
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+
+            <!-- INFORMATIONS DU SIÈGE -->
+            <div class="col-lg-4">
+
+                <div class="location-card h-100">
+
+                    <div class="location-icon">
+                        <i class="bi bi-building-fill"></i>
+                    </div>
+
+                    <span class="location-badge">
+                        SIÈGE CENTRAL
+                    </span>
+
+                    <h3>Jumbo Score Madagascar</h3>
+
+                    <p class="location-address">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        4F5V+63P, Andohitapenaka,
+                        Antananarivo, Madagascar
+                    </p>
+
+                    <p class="location-description">
+                        Retrouvez notre siège central à Andohitapenaka.
+                        Cette adresse correspond au site de la société
+                        pour laquelle cette plateforme a été développée.
+                    </p>
+
+                    <a
+                        href="https://www.google.com/maps/search/?api=1&query=4F5V%2B63P%20Andohitapenaka%2C%20Antananarivo%2C%20Madagascar"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn-jumbo w-100 mb-3"
+                    >
+                        <i class="bi bi-sign-turn-right-fill"></i>
+                        Obtenir un itinéraire
+                    </a>
+
+                    <a
+                        href="{{ path('app_home') == '/' ? '/magasins' : '/magasins' }}"
+                        class="btn-location-outline w-100"
+                    >
+                        <i class="bi bi-shop"></i>
+                        Découvrir les autres magasins
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- CARTE DU SIÈGE -->
+            <div class="col-lg-8">
+
+                <div class="location-map-card h-100">
+
+                    <div class="location-map-heading">
+
+                        <div>
+                            <h3>
+                                <i class="bi bi-geo-alt-fill"></i>
+                                Notre siège central
+                            </h3>
+
+                            <p>
+                                Andohitapenaka, Antananarivo
+                            </p>
+                        </div>
+
+                        <span class="map-status">
+                            <i class="bi bi-circle-fill"></i>
+                            Localisation
+                        </span>
+
+                    </div>
+
+                    <div class="location-map">
+
+                        <iframe
+                            title="Localisation du siège central Jumbo Score à Andohitapenaka"
+                            src="https://www.google.com/maps?q=4F5V%2B63P%20Andohitapenaka%2C%20Antananarivo%2C%20Madagascar&output=embed"
+                            loading="lazy"
+                            allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+
+                    </div>
+
+                    <div class="location-map-footer">
+
+                        <i class="bi bi-info-circle-fill"></i>
+
+                        La carte indique l'emplacement du siège central.
+                        Les autres magasins sont consultables sur notre page
+                        de localisation.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ACCÈS AUX AUTRES MAGASINS -->
+        <div class="text-center mt-5">
+
+            <h3 class="fw-bold mb-2" style="color: var(--jumbo-primary-dark);">
+                Vous recherchez un autre magasin ?
+            </h3>
+
+            <p class="section-description mx-auto mb-4">
+                Consultez notre carte interactive pour découvrir les autres
+                emplacements Jumbo Score et préparer votre itinéraire.
+            </p>
+
+            <a
+                href="{{ path('app_magasins') }}"
+                class="btn-jumbo-yellow"
+            >
+                <i class="bi bi-map-fill"></i>
+                Voir tous nos magasins
+                <i class="bi bi-arrow-right"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+
+    <div class="container">
+
         <div class="row g-4">
 
             <div class="col-lg-5">
+
                 <div class="footer-brand mb-3">
                     <i class="bi bi-shop me-2" style="color: var(--jumbo-yellow);"></i>
                     JUMBO SCORE
                 </div>
 
                 <p class="footer-description">
-                    Bienvenue sur notre page d'accueil. Découvrez les produits
-                    disponibles dans le catalogue et consultez les informations
-                    présentées sur notre site.
+                    Bienvenue sur notre page d'accueil.
+                    Découvrez les produits disponibles dans le catalogue
+                    et consultez les informations présentées sur notre site.
                 </p>
+
             </div>
 
             <div class="col-6 col-lg-3">
+
                 <h4>Navigation</h4>
+
                 <div class="footer-links">
+
                     <a href="{{ path('app_home') }}">Accueil</a>
+
                     <a href="#catalogue">Catalogue</a>
+
                     <a href="#avantages">Nos avantages</a>
+
                     <a href="#apropos">À propos</a>
+
+                    <a href="#localisation">Localisation</a>
+
                 </div>
+
             </div>
 
             <div class="col-6 col-lg-4">
-                <h4>Espace utilisateur</h4>
+
+                <h4>Nos emplacements</h4>
+
                 <div class="footer-links">
+
+                    <a href="#localisation">
+                        <i class="bi bi-building me-2"></i>
+                        Siège central
+                    </a>
+
+                    <a href="{{ path('app_magasins') }}">
+                        <i class="bi bi-shop me-2"></i>
+                        Tous nos magasins
+                    </a>
+
+                    <a
+                        href="https://www.google.com/maps/search/?api=1&query=4F5V%2B63P%20Andohitapenaka%2C%20Antananarivo"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <i class="bi bi-geo-alt me-2"></i>
+                        Itinéraire vers le siège
+                    </a>
+
                     <a href="{{ path('app_login') }}">
                         <i class="bi bi-box-arrow-in-right me-2"></i>
                         Connexion
                     </a>
+
                     <a href="{{ path('app_register') }}">
                         <i class="bi bi-person-plus me-2"></i>
                         Inscription
                     </a>
+
                 </div>
+
             </div>
 
         </div>
 
         <div class="footer-bottom">
+
             <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+
                 <span>
                     &copy; {{ "now"|date("Y") }} Jumbo Score Madagascar.
                     Tous droits réservés.
                 </span>
-                <span>Site développé avec Symfony</span>
+
+                <span>
+                    Site développé avec Symfony
+                </span>
+
             </div>
+
         </div>
+
     </div>
+
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

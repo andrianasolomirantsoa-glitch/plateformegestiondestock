@@ -64,34 +64,41 @@
     color: var(--jumbo-yellow);
 }
 
-/* ================= HERO ================= */
+/* ================= HERO AVEC IMAGE ================= */
 
 .catalog-hero {
     position: relative;
-    overflow: hidden;
     isolation: isolate;
-    padding: 35px 35px;
+    overflow: hidden;
+    min-height: 330px;
+    display: flex;
+    align-items: center;
+    padding: 42px 40px;
     margin-bottom: 25px;
-    border-radius: 17px;
+    border-radius: 18px;
     color: white;
+
     background:
-        radial-gradient(
-            circle at 90% 10%,
-            rgba(237,28,36,.28),
-            transparent 30%
+        linear-gradient(
+            90deg,
+            rgba(16, 39, 75, 0.96) 0%,
+            rgba(21, 59, 112, 0.86) 48%,
+            rgba(21, 59, 112, 0.28) 100%
         ),
-        linear-gradient(115deg, #17213e 0%, #222f50 70%, #17213e 100%);
-    box-shadow: 0 8px 25px rgba(23,33,62,.12);
+        url('/images/products/product-hero.jpg')
+        center 50% / cover no-repeat;
+
+    box-shadow: 0 10px 28px rgba(23, 33, 62, .15);
 }
 
 .catalog-hero::after {
     content: "";
     position: absolute;
-    width: 280px;
-    height: 280px;
-    right: -65px;
-    bottom: -180px;
-    border: 45px solid rgba(255,201,0,.10);
+    width: 300px;
+    height: 300px;
+    right: -90px;
+    bottom: -200px;
+    border: 45px solid rgba(255, 201, 0, .16);
     border-radius: 50%;
     z-index: -1;
 }
@@ -99,7 +106,7 @@
 .catalog-hero-content {
     position: relative;
     z-index: 1;
-    max-width: 800px;
+    max-width: 650px;
 }
 
 .catalog-eyebrow {
@@ -133,7 +140,7 @@
 .catalog-hero p {
     max-width: 610px;
     margin: 14px 0 22px;
-    color: #e0e5ef;
+    color: #f0f3f9;
     font-size: 13px;
     line-height: 1.8;
 }
@@ -153,22 +160,22 @@
     min-height: 43px;
     padding: 0 18px;
     border-radius: 8px;
-    background: var(--jumbo-red);
-    color: white;
+    background: var(--jumbo-yellow);
+    color: var(--jumbo-navy);
     text-decoration: none;
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 900;
     transition: .2s;
 }
 
 .catalog-hero-button:hover {
-    background: #cb1119;
-    color: white;
+    background: #ffe16b;
+    color: var(--jumbo-navy);
     transform: translateY(-2px);
 }
 
 .catalog-hero-note {
-    color: #e0e5ef;
+    color: #f0f3f9;
     font-size: 11px;
 }
 
@@ -697,6 +704,12 @@
         align-items: flex-start;
         flex-direction: column;
     }
+    .catalog-hero {
+    min-height: 300px;
+    padding: 24px 17px;
+
+    background-position: 58% center;
+}
 
     .catalog-section-heading {
         align-items: flex-start;
@@ -918,6 +931,19 @@
                     </option>
                 {% endfor %}
             </select>
+            <select
+    id="familyFilter"
+    class="products-select"
+    aria-label="Filtrer par famille"
+>
+    <option value="">Toutes les familles</option>
+
+    {% for famille in familles %}
+    <option value="{{ famille.nom|lower }}">
+        {{ famille.nom }}
+    </option>
+{% endfor %}
+</select>
 
             <select
                 id="sortProducts"
@@ -960,6 +986,17 @@
                     {{ category }}
                 </button>
             {% endfor %}
+            {% set familles = [] %}
+
+{% for produit in produits %}
+    {% if produit.famille and produit.famille.actif %}
+        {% set familleName = produit.famille.nom %}
+
+        {% if familleName not in familles %}
+            {% set familles = familles|merge([familleName]) %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
 
         </div>
 
@@ -968,10 +1005,15 @@
 
             {% for produit in produits %}
 
-                {% set categoryName = produit.categorie
-                    ? produit.categorie.nom
-                    : 'Sans catégorie'
-                %}
+                {% set categoryName = produit.famille
+    ? produit.famille.categorie.nom
+    : (produit.categorie ? produit.categorie.nom : 'Sans catégorie')
+%}
+
+{% set familyName = produit.famille
+    ? produit.famille.nom
+    : 'Sans famille'
+%}
 
                 <article
                     class="product-card"
@@ -979,6 +1021,7 @@
                     data-reference="{{ produit.reference|default('')|lower }}"
                     data-category="{{ categoryName|lower }}"
                     data-price="{{ produit.prixVente }}"
+                    data-family="{{ familyName|lower }}"
                 >
 
                     <div class="product-visual">
@@ -1045,6 +1088,12 @@
                         <div class="product-reference">
                             Réf. {{ produit.reference }}
                         </div>
+                        <div class="product-reference">
+    Réf. {{ produit.reference }}
+    {% if produit.famille %}
+        · {{ produit.famille.nom }}
+    {% endif %}
+</div>
 
                         <h3 class="product-name">
                             {{ produit.nom }}
@@ -1183,6 +1232,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const searchInput = document.getElementById('productSearch');
+    const familyFilter = document.getElementById('familyFilter');
     const categoryFilter = document.getElementById('categoryFilter');
     const sortSelect = document.getElementById('sortProducts');
     const productsGrid = document.getElementById('productsGrid');
@@ -1227,6 +1277,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function applyFilters() {
         const search = normalize(searchInput.value);
         const selectedCategory = normalize(categoryFilter.value);
+        const selectedFamily = normalize(familyFilter?.value);
 
         let visibleCount = 0;
 
@@ -1234,6 +1285,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const name = normalize(product.dataset.name);
             const reference = normalize(product.dataset.reference);
             const category = normalize(product.dataset.category);
+            const family = normalize(product.dataset.family);
 
             const matchesSearch =
                 !search ||
@@ -1245,13 +1297,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 !selectedCategory ||
                 category === selectedCategory;
 
-            const visible = matchesSearch && matchesCategory;
+            const matchesFamily =
+    !selectedFamily || family === selectedFamily;
 
-            product.hidden = !visible;
-
-            if (visible) {
-                visibleCount++;
-            }
+const visible =
+    matchesSearch &&
+    matchesCategory &&
+    matchesFamily;
+    familyFilter?.addEventListener('change', applyFilters);
+    if (familyFilter) {
+    familyFilter.value = '';
+}
         });
 
         productCount.textContent = visibleCount;

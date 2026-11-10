@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Categorie;
+use App\Entity\Famille;
 use App\Entity\Produit;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -17,6 +17,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Image;
 use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Service\Ean13Generator;
+
 
 class ProduitType extends AbstractType
 {
@@ -29,6 +32,33 @@ class ProduitType extends AbstractType
                 'label' => 'Référence',
                 'attr' => [
                     'placeholder' => 'Ex : PRD-001',
+                ],
+            ])
+            ->add('codeBarres', TextType::class, [
+                'label' => 'Code-barres EAN-13',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Exemple : 2012345678901',
+                    'maxlength' => 13,
+                    'inputmode' => 'numeric',
+                    'class' => 'form-control',
+                ],
+                'constraints' => [
+                    new Assert\Regex([
+                        'pattern' => '/^\d{13}$/',
+                        'message' => 'Le code-barres doit contenir exactement 13 chiffres.',
+                    ]),
+                    new Assert\Callback(function ($value, $context) {
+                        if ($value === null || $value === '') {
+                            return;
+                        }
+            
+                        if (!\App\Service\Ean13Generator::isValid($value)) {
+                            $context->buildViolation(
+                                'La clé de contrôle de ce code EAN-13 est incorrecte.'
+                            )->addViolation();
+                        }
+                    }),
                 ],
             ])
 
@@ -49,19 +79,34 @@ class ProduitType extends AbstractType
             ])
 
             
-->add('categorie', EntityType::class, [
-    'class' => Categorie::class,
-    'choice_label' => 'nom',
-    'label' => 'Catégorie',
-    'placeholder' => 'Sélectionner une catégorie',
-
-    'query_builder' => function (EntityRepository $er) {
-        return $er->createQueryBuilder('c')
-            ->andWhere('c.actif = :actif')
-            ->setParameter('actif', true)
-            ->orderBy('c.nom', 'ASC');
-    },
-])
+            ->add('famille', EntityType::class, [
+                'class' => Famille::class,
+                'choice_label' => function (Famille $famille) {
+                    return $famille->getNom()
+                        . ' — '
+                        . $famille->getCategorie()->getNom();
+                },
+                'label' => 'Famille du produit',
+                'placeholder' => 'Sélectionner une famille',
+                'required' => false,
+            
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('f')
+                        ->join('f.categorie', 'c')
+                        ->andWhere('f.actif = :actif')
+                        ->andWhere('c.actif = :categorieActif')
+                        ->setParameter('actif', true)
+                        ->setParameter('categorieActif', true)
+                        ->orderBy('c.nom', 'ASC')
+                        ->addOrderBy('f.nom', 'ASC');
+                },
+            
+                'attr' => [
+                    'class' => 'form-select',
+                ],
+            
+                'help' => 'La catégorie sera automatiquement associée selon la famille choisie.',
+            ])
 
             ->add('prixAchat', MoneyType::class, [
                 'label' => 'Prix d’achat',

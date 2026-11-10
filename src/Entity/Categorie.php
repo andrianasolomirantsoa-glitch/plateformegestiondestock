@@ -19,6 +19,12 @@ class Categorie
     #[ORM\Column(length: 100, unique: true)]
     private ?string $nom = null;
 
+    /**
+ * @var Collection<int, Famille>
+ */
+#[ORM\OneToMany(mappedBy: 'categorie', targetEntity: Famille::class)]
+private Collection $familles;
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
@@ -44,6 +50,7 @@ class Categorie
     {
         $this->produits = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->familles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,4 +146,32 @@ class Categorie
 
         return $this;
     }
+    /**
+ * @return Collection<int, Famille>
+ */
+public function getFamilles(): Collection
+{
+    return $this->familles;
+}
+
+public function addFamille(Famille $famille): static
+{
+    if (!$this->familles->contains($famille)) {
+        $this->familles->add($famille);
+        $famille->setCategorie($this);
+    }
+
+    return $this;
+}
+
+public function removeFamille(Famille $famille): static
+{
+    if ($this->familles->removeElement($famille)) {
+        if ($famille->getCategorie() === $this) {
+            $famille->setCategorie(null);
+        }
+    }
+
+    return $this;
+}
 }

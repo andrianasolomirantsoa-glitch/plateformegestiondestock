@@ -103,54 +103,104 @@
 
                     <form method="post"
                           action="{{ path('app_entree_stock_edit', {'id': entree.id}) }}">
+{# =================================================
+   MAGASIN
+   ================================================= #}
 
+<div class="form-section">
+
+    <div class="section-title">
+        <i class="bi bi-shop"></i>
+        Magasin de destination
+    </div>
+
+    <label for="magasin_id" class="form-label">
+        Magasin <span class="required">*</span>
+    </label>
+
+    <select
+        id="magasin_id"
+        name="magasin_id"
+        class="form-select custom-select"
+        required
+    >
+
+        <option value="">
+            -- Sélectionner un magasin --
+        </option>
+
+        {% for magasin in magasins %}
+
+            <option
+                value="{{ magasin.id }}"
+                {% if entree.magasin and entree.magasin.id == magasin.id %}
+                    selected
+                {% endif %}
+            >
+                {{ magasin.nom }} — {{ magasin.ville }}
+            </option>
+
+        {% endfor %}
+
+    </select>
+
+    <div class="field-help">
+        <i class="bi bi-info-circle me-1"></i>
+        Le stock sera mis à jour uniquement dans ce magasin.
+    </div>
+
+</div>
                         {# =================================================
                            PRODUIT
                            ================================================= #}
-                        <div class="form-section">
+                        {# =================================================
+   PRODUIT
+   ================================================= #}
 
-                            <div class="section-title">
-                                <i class="bi bi-box-seam"></i>
-                                Produit
-                            </div>
+<div class="form-section">
 
-                            <label for="produit" class="form-label">
-                                Produit <span class="required">*</span>
-                            </label>
+    <div class="section-title">
+        <i class="bi bi-box-seam"></i>
+        Produit
+    </div>
 
-                            <select
-                                id="produit"
-                                name="produit"
-                                class="form-select custom-select"
-                                required
-                            >
+    <label for="produit_id" class="form-label">
+        Produit <span class="required">*</span>
+    </label>
 
-                                <option value="">
-                                    -- Sélectionner un produit --
-                                </option>
+    <select
+        id="produit_id"
+        name="produit_id"
+        class="form-select custom-select"
+        required
+    >
 
-                                {% for produit in produits %}
+        <option value="">
+            -- Sélectionner un produit --
+        </option>
 
-                                    <option
-                                        value="{{ produit.id }}"
-                                        data-stock="{{ produit.quantiteStock }}"
-                                        {% if entree.produit and entree.produit.id == produit.id %}
-                                            selected
-                                        {% endif %}
-                                    >
-                                        {{ produit.reference }} — {{ produit.nom }}
-                                    </option>
+        {% for produit in produits %}
 
-                                {% endfor %}
+            <option
+                value="{{ produit.id }}"
+                data-unite="{{ produit.unite }}"
+                {% if entree.produit and entree.produit.id == produit.id %}
+                    selected
+                {% endif %}
+            >
+                {{ produit.reference }} — {{ produit.nom }}
+            </option>
 
-                            </select>
+        {% endfor %}
 
-                            <div class="field-help">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Le stock actuel du produit est pris en compte automatiquement.
-                            </div>
+    </select>
 
-                        </div>
+    <div class="field-help">
+        <i class="bi bi-info-circle me-1"></i>
+        Le stock affiché dépend du produit et du magasin sélectionnés.
+    </div>
+
+</div>
 
 
                         {# =================================================
@@ -303,14 +353,14 @@
                                     </label>
 
                                     <input
-                                        type="text"
-                                        id="referenceDocument"
-                                        name="referenceDocument"
-                                        class="form-control custom-input"
-                                        maxlength="100"
-                                        value="{{ entree.referenceDocument ?? '' }}"
-                                        placeholder="Ex : BL-2026-001"
-                                    >
+    type="text"
+    id="reference_document"
+    name="reference_document"
+    class="form-control custom-input"
+    maxlength="100"
+    value="{{ entree.referenceDocument ?? '' }}"
+    placeholder="Ex : BL-2026-001"
+>
 
                                 </div>
 
@@ -1048,263 +1098,191 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    const produitSelect = document.getElementById('produit');
+    const magasinSelect = document.getElementById('magasin_id');
+    const produitSelect = document.getElementById('produit_id');
     const quantiteInput = document.getElementById('quantite');
 
-    const stockActuelElement =
-        document.getElementById('stockActuel');
+    const stockActuelElement = document.getElementById('stockActuel');
+    const ancienneQuantiteElement = document.getElementById('ancienneQuantite');
+    const stockAvantEntreeElement = document.getElementById('stockAvantEntree');
+    const nouvelleQuantiteElement = document.getElementById('nouvelleQuantite');
+    const nouveauStockElement = document.getElementById('nouveauStock');
+    const stockInfoMessage = document.getElementById('stockInfoMessage');
 
-    const ancienneQuantiteElement =
-        document.getElementById('ancienneQuantite');
+    // Stocks réels par couple produit-magasin
+    const stocksParProduitMagasin = {{ stocksParProduitMagasin|json_encode|raw }};
 
-    const stockAvantEntreeElement =
-        document.getElementById('stockAvantEntree');
-
-    const nouvelleQuantiteElement =
-        document.getElementById('nouvelleQuantite');
-
-    const nouveauStockElement =
-        document.getElementById('nouveauStock');
-
-    const stockInfoMessage =
-        document.getElementById('stockInfoMessage');
-
-
-    /*
-     * Anciennes informations de cette entrée
-     */
+    // Informations de l'entrée originale
     const ancienneQuantite = {{ entree.quantite }};
     const ancienProduitId = {{ entree.produit ? entree.produit.id : 0 }};
+    const ancienMagasinId = {{ entree.magasin ? entree.magasin.id : 0 }};
 
+    function obtenirStock(produitId, magasinId) {
 
-    /*
-     * Récupérer le stock du produit sélectionné
-     */
-    function getStockProduit() {
+        const cle = produitId + '-' + magasinId;
 
-        if (!produitSelect || !produitSelect.value) {
-            return 0;
+        if (
+            Object.prototype.hasOwnProperty.call(
+                stocksParProduitMagasin,
+                cle
+            )
+        ) {
+            return stocksParProduitMagasin[cle];
         }
 
-        const option =
-            produitSelect.options[produitSelect.selectedIndex];
-
-        if (!option) {
-            return 0;
-        }
-
-        return parseInt(
-            option.dataset.stock || '0',
-            10
-        );
+        // Le couple n'existe pas encore : stock initial 0
+        return 0;
     }
 
+    function afficherMessage(message, warning = false) {
 
-    /*
-     * Calcul et affichage
-     */
+        stockInfoMessage.className = warning
+            ? 'stock-message warning'
+            : 'stock-message';
+
+        stockInfoMessage.replaceChildren();
+
+        const icon = document.createElement('i');
+        icon.className = warning
+            ? 'bi bi-exclamation-triangle-fill'
+            : 'bi bi-info-circle-fill';
+
+        const span = document.createElement('span');
+        span.textContent = message;
+
+        stockInfoMessage.append(icon, span);
+    }
+
     function mettreAJourStock() {
 
-        if (!produitSelect || !quantiteInput) {
-            return;
-        }
+        const produitId = parseInt(produitSelect.value || '0', 10);
+        const magasinId = parseInt(magasinSelect.value || '0', 10);
 
+        let nouvelleQuantite = parseInt(
+            quantiteInput.value || '0',
+            10
+        );
 
-        const produitId =
-            parseInt(produitSelect.value || '0', 10);
-
-
-        let nouvelleQuantite =
-            parseInt(quantiteInput.value || '0', 10);
-
-
-        if (isNaN(nouvelleQuantite) || nouvelleQuantite < 0) {
+        if (!Number.isFinite(nouvelleQuantite) || nouvelleQuantite < 0) {
             nouvelleQuantite = 0;
         }
 
+        ancienneQuantiteElement.textContent = ancienneQuantite;
+        nouvelleQuantiteElement.textContent = nouvelleQuantite;
 
-        const stockActuel =
-            getStockProduit();
+        if (produitId === 0 || magasinId === 0) {
 
-
-        stockActuelElement.textContent =
-            stockActuel;
-
-        ancienneQuantiteElement.textContent =
-            ancienneQuantite;
-
-        nouvelleQuantiteElement.textContent =
-            nouvelleQuantite;
-
-
-        /*
-         * Aucun produit
-         */
-        if (produitId === 0) {
-
+            stockActuelElement.textContent = '0';
             stockAvantEntreeElement.textContent = '0';
             nouveauStockElement.textContent = '0';
 
-            stockInfoMessage.className =
-                'stock-message';
-
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-info-circle-fill"></i>
-                <span>
-                    Sélectionnez un produit pour afficher
-                    le calcul du stock.
-                </span>
-            `;
+            afficherMessage(
+                'Sélectionnez un produit et un magasin pour afficher le calcul.'
+            );
 
             return;
         }
 
+        // Stock du produit dans le magasin sélectionné
+        const stockActuel = obtenirStock(produitId, magasinId);
 
-        /*
-         * =========================================================
-         * MÊME PRODUIT
-         * =========================================================
-         *
-         * Le stock actuel contient déjà l'ancienne quantité.
-         *
-         * Exemple :
-         *
-         * 10 stock actuel
-         * - 4 ancienne quantité
-         * + 5 nouvelle quantité
-         * = 11 nouveau stock
-         */
-        if (produitId === ancienProduitId) {
+        stockActuelElement.textContent = stockActuel;
 
-            let stockAvantEntree =
-                stockActuel - ancienneQuantite;
+        const memeProduit = produitId === ancienProduitId;
+        const memeMagasin = magasinId === ancienMagasinId;
+        const memeCouple = memeProduit && memeMagasin;
 
+        let stockAvantEntree;
+        let nouveauStock;
+
+        if (memeCouple) {
+
+            /*
+             * Même produit et même magasin.
+             *
+             * Le stock actuel contient déjà l'ancienne entrée.
+             *
+             * Nouveau stock =
+             * stock actuel - ancienne quantité + nouvelle quantité
+             */
+
+            stockAvantEntree = stockActuel - ancienneQuantite;
+
+            nouveauStock = stockAvantEntree + nouvelleQuantite;
+
+            stockAvantEntreeElement.textContent = stockAvantEntree;
+            nouveauStockElement.textContent = nouveauStock;
 
             if (stockAvantEntree < 0) {
-                stockAvantEntree = 0;
+
+                afficherMessage(
+                    'Attention : le stock actuel est inférieur à l’ancienne quantité. Vérifiez les mouvements de stock.',
+                    true
+                );
+
+                return;
             }
 
+            afficherMessage(
+                'Même produit et même magasin : ' +
+                stockActuel + ' - ' +
+                ancienneQuantite + ' + ' +
+                nouvelleQuantite + ' = ' +
+                nouveauStock + ' unités.'
+            );
 
-            const nouveauStock =
-                stockAvantEntree + nouvelleQuantite;
+        } else {
 
+            /*
+             * Produit ou magasin différent.
+             *
+             * L'ancienne entrée sera retirée de son ancien couple.
+             * La nouvelle quantité sera ajoutée au couple cible.
+             */
 
-            stockAvantEntreeElement.textContent =
-                stockAvantEntree;
+            stockAvantEntree = stockActuel;
+            nouveauStock = stockActuel + nouvelleQuantite;
 
-            nouveauStockElement.textContent =
-                nouveauStock;
+            stockAvantEntreeElement.textContent = stockAvantEntree;
+            nouveauStockElement.textContent = nouveauStock;
 
+            const ancienStock = obtenirStock(
+                ancienProduitId,
+                ancienMagasinId
+            );
 
-            stockInfoMessage.className =
-                'stock-message';
+            if (ancienStock < ancienneQuantite) {
 
+                afficherMessage(
+                    'Attention : le stock de l’ancien produit dans son ancien magasin est insuffisant pour retirer cette entrée.',
+                    true
+                );
 
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-info-circle-fill"></i>
-                <span>
-                    Le stock actuel de
-                    <strong>${stockActuel} pièce(s)</strong>
-                    contient déjà l'ancienne quantité
-                    de <strong>${ancienneQuantite} pièce(s)</strong>.
-                    <br>
-                    Calcul :
-                    <strong>
-                        ${stockActuel}
-                        − ${ancienneQuantite}
-                        + ${nouvelleQuantite}
-                        = ${nouveauStock} pièce(s)
-                    </strong>
-                </span>
-            `;
+                return;
+            }
 
-        }
-
-
-        /*
-         * =========================================================
-         * CHANGEMENT DE PRODUIT
-         * =========================================================
-         */
-        else {
-
-            const nouveauStock =
-                stockActuel + nouvelleQuantite;
-
-
-            stockAvantEntreeElement.textContent =
-                stockActuel;
-
-            nouveauStockElement.textContent =
-                nouveauStock;
-
-
-            stockInfoMessage.className =
-                'stock-message';
-
-
-            stockInfoMessage.innerHTML = `
-                <i class="bi bi-arrow-left-right"></i>
-                <span>
-                    Le produit a été changé.
-                    <br>
-                    L'ancienne quantité de
-                    <strong>${ancienneQuantite} pièce(s)</strong>
-                    sera retirée de l'ancien produit.
-                    <br>
-                    Nouveau produit :
-                    <strong>
-                        ${stockActuel}
-                        + ${nouvelleQuantite}
-                        = ${nouveauStock} pièce(s)
-                    </strong>
-                </span>
-            `;
+            afficherMessage(
+                'Le produit ou le magasin a changé. ' +
+                'L’ancienne entrée de ' + ancienneQuantite +
+                ' unités sera retirée de son ancien stock. ' +
+                'Le nouveau stock du magasin sélectionné sera de ' +
+                nouveauStock + ' unités.'
+            );
 
         }
 
     }
 
+    magasinSelect.addEventListener('change', mettreAJourStock);
+    produitSelect.addEventListener('change', mettreAJourStock);
 
-    /*
-     * Changement de produit
-     */
-    if (produitSelect) {
+    quantiteInput.addEventListener('input', mettreAJourStock);
+    quantiteInput.addEventListener('change', mettreAJourStock);
 
-        produitSelect.addEventListener(
-            'change',
-            mettreAJourStock
-        );
-
-    }
-
-
-    /*
-     * Modification quantité
-     */
-    if (quantiteInput) {
-
-        quantiteInput.addEventListener(
-            'input',
-            mettreAJourStock
-        );
-
-        quantiteInput.addEventListener(
-            'change',
-            mettreAJourStock
-        );
-
-    }
-
-
-    /*
-     * Calcul initial
-     */
     mettreAJourStock();
 
 });
 
 </script>
-
 {% endblock %}
 
